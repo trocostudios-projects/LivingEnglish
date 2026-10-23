@@ -747,10 +747,14 @@ async function loadTeacherStudents() {
     showToast("Error al obtener la lista de alumnos", "error");
   } else {
     teacherStudentsList = (data || []).map(student => {
-      // Si profiles aún no tiene la columna en la BD, consultar respaldo de metadata / localStorage
+      // Sincronizar documento y caducidad con respaldo local si aplica
       const cachedExpiry = localStorage.getItem('le_student_expires_' + student.id);
       if (!student.expires_at && cachedExpiry) {
         student.expires_at = cachedExpiry;
+      }
+      const cachedDoc = localStorage.getItem('le_student_doc_' + student.id);
+      if (!student.document_id && cachedDoc) {
+        student.document_id = cachedDoc;
       }
       return student;
     });
@@ -790,11 +794,14 @@ function renderStudentList() {
 
   const progFilter = document.getElementById('filterProgramSelect')?.value || 'all';
   const expiryFilter = document.getElementById('filterExpirySelect')?.value || 'all';
-  const q = document.getElementById('searchStudent')?.value?.toLowerCase() || '';
+  const q = document.getElementById('searchStudent')?.value?.toLowerCase().trim() || '';
 
   const filtered = teacherStudentsList.filter(student => {
     const matchesProg = progFilter === 'all' || student.program === progFilter;
-    const matchesSearch = !q || (student.full_name && student.full_name.toLowerCase().includes(q)) || (student.email && student.email.toLowerCase().includes(q));
+    const matchesSearch = !q || 
+      (student.full_name && student.full_name.toLowerCase().includes(q)) || 
+      (student.email && student.email.toLowerCase().includes(q)) ||
+      (student.document_id && String(student.document_id).toLowerCase().includes(q));
 
     const expInfo = getExpirationInfo(student.expires_at);
     let matchesExpiry = true;
@@ -818,6 +825,7 @@ function renderStudentList() {
     const item = document.createElement('div');
     const isSelected = selectedStudent && selectedStudent.id === student.id;
     const expInfo = getExpirationInfo(student.expires_at);
+    const docDisplay = student.document_id ? `🪪 ${student.document_id}` : '🪪 Sin doc';
 
     item.className = `student-item ${isSelected ? 'active' : ''}`;
     item.onclick = (e) => {
@@ -833,7 +841,7 @@ function renderStudentList() {
           ✏️
         </button>
       </div>
-      <div class="student-level">📚 ${student.course_level} · ${student.email}</div>
+      <div class="student-level">${docDisplay} · 📚 ${student.course_level}</div>
       <div style="margin-top: 6px;">
         <span class="expiry-chip ${expInfo.chipClass}">${expInfo.label}</span>
       </div>
@@ -889,7 +897,8 @@ async function selectStudent(studentId) {
   const historyNotice = document.getElementById('teacherHistoryNotice');
 
   titleElem.innerText = selectedStudent.full_name;
-  subElem.innerText = `Matrícula: ${selectedStudent.course_level} (${selectedStudent.email})`;
+  const docText = selectedStudent.document_id ? `🪪 Doc: ${selectedStudent.document_id}` : '🪪 Sin documento registrado';
+  subElem.innerText = `${docText} · 📚 ${selectedStudent.course_level} · ✉️ ${selectedStudent.email}`;
 
   // Configuración del chip de caducidad en el encabezado
   if (expiryChip) {
@@ -1390,6 +1399,7 @@ function updateNewStudentLevelOptions() {
 async function handleCreateNewStudent(e) {
   e.preventDefault();
   const fullName = document.getElementById('newStudentFullName').value.trim();
+  const documentId = document.getElementById('newStudentDoc')?.value?.trim() || '';
   const email = document.getElementById('newStudentEmail').value.trim();
   const password = document.getElementById('newStudentPass').value;
   const program = document.getElementById('newStudentProgram').value;
@@ -1421,6 +1431,7 @@ async function handleCreateNewStudent(e) {
       options: {
         data: {
           full_name: fullName,
+          document_id: documentId,
           role: 'estudiante',
           program: program,
           course_level: courseLevel,
@@ -1437,11 +1448,15 @@ async function handleCreateNewStudent(e) {
       if (expiresAt) {
         localStorage.setItem('le_student_expires_' + studentId, expiresAt);
       }
+      if (documentId) {
+        localStorage.setItem('le_student_doc_' + studentId, documentId);
+      }
 
       const client = getClient();
       if (client) {
         try {
           await client.from('profiles').update({
+            document_id: documentId,
             expires_at: expiresAt,
             course_level: courseLevel,
             program: program
@@ -1456,6 +1471,8 @@ async function handleCreateNewStudent(e) {
 
     // Limpiar formulario y cerrar modal
     document.getElementById('newStudentFullName').value = '';
+    const docInput = document.getElementById('newStudentDoc');
+    if (docInput) docInput.value = '';
     document.getElementById('newStudentEmail').value = '';
     document.getElementById('newStudentPass').value = '';
     document.getElementById('newStudentExpiresAt').value = '';
@@ -1610,6 +1627,8 @@ function openEditStudentModal(studentId) {
 
   document.getElementById('editStudentId').value = student.id;
   document.getElementById('editStudentFullName').value = student.full_name || '';
+  const docInput = document.getElementById('editStudentDoc');
+  if (docInput) docInput.value = student.document_id || '';
   document.getElementById('editStudentEmail').value = student.email || '';
   document.getElementById('editStudentProgram').value = student.program || 'adultos';
 
@@ -1683,6 +1702,7 @@ async function handleSaveEditStudent(e) {
   e.preventDefault();
   const studentId = document.getElementById('editStudentId').value;
   const fullName = document.getElementById('editStudentFullName').value.trim();
+  const documentId = document.getElementById('editStudentDoc')?.value?.trim() || '';
   const program = document.getElementById('editStudentProgram').value;
   const courseLevel = document.getElementById('editStudentCourseLevel').value;
   const expiresAt = document.getElementById('editStudentExpiresAt').value || null;
@@ -1700,6 +1720,7 @@ async function handleSaveEditStudent(e) {
       .from('profiles')
       .update({
         full_name: fullName,
+        document_id: documentId,
         program: program,
         course_level: courseLevel,
         expires_at: expiresAt
@@ -1707,7 +1728,7 @@ async function handleSaveEditStudent(e) {
       .eq('id', studentId);
 
     if (profileErr) {
-      console.warn("Error al actualizar profiles directamente:", profileErr);
+      console.warn("Actualización complementaria de profiles:", profileErr);
     }
 
     // 2. Guardar en respaldo local
@@ -1716,11 +1737,17 @@ async function handleSaveEditStudent(e) {
     } else {
       localStorage.removeItem('le_student_expires_' + studentId);
     }
+    if (documentId) {
+      localStorage.setItem('le_student_doc_' + studentId, documentId);
+    } else {
+      localStorage.removeItem('le_student_doc_' + studentId);
+    }
 
     // 3. Actualizar memoria local de estudiantes
     const student = teacherStudentsList.find(s => s.id === studentId);
     if (student) {
       student.full_name = fullName;
+      student.document_id = documentId;
       student.program = program;
       student.course_level = courseLevel;
       student.expires_at = expiresAt;
@@ -1728,6 +1755,7 @@ async function handleSaveEditStudent(e) {
 
     if (selectedStudent && selectedStudent.id === studentId) {
       selectedStudent.full_name = fullName;
+      selectedStudent.document_id = documentId;
       selectedStudent.program = program;
       selectedStudent.course_level = courseLevel;
       selectedStudent.expires_at = expiresAt;

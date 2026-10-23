@@ -163,7 +163,7 @@
           <!-- LISTA DE ESTUDIANTES -->
           <div class="student-list">
             <div class="form-group" style="margin-bottom: 10px;">
-              <input type="text" id="searchStudent" class="form-control" placeholder="🔍 Buscar por nombre o correo..." onkeyup="filterStudents()">
+              <input type="text" id="searchStudent" class="form-control" placeholder="🔍 Buscar por nombre, doc o correo..." onkeyup="filterStudents()">
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
               <div>
@@ -259,19 +259,34 @@
       </div>
 
       <form onsubmit="handleCreateNewStudent(event)">
-        <!-- Fila 1: Nombre y Correo -->
+        <!-- Fila 1: Nombre y Documento de Identidad -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
           <div class="form-group" style="margin-bottom: 0;">
             <label for="newStudentFullName" style="font-size: 12px; margin-bottom: 3px;">Nombre Completo</label>
             <input type="text" id="newStudentFullName" class="form-control" placeholder="Ej. Carlos Mendoza" required style="padding: 8px 10px; font-size: 13px;">
           </div>
           <div class="form-group" style="margin-bottom: 0;">
-            <label for="newStudentEmail" style="font-size: 12px; margin-bottom: 3px;">Correo Electrónico</label>
-            <input type="email" id="newStudentEmail" class="form-control" placeholder="alumno@livingenglish.com" required style="padding: 8px 10px; font-size: 13px;">
+            <label for="newStudentDoc" style="font-size: 12px; margin-bottom: 3px;">🪪 No. Documento / Cédula</label>
+            <input type="text" id="newStudentDoc" class="form-control" placeholder="Ej. 1020304050" required style="padding: 8px 10px; font-size: 13px;">
           </div>
         </div>
 
-        <!-- Fila 2: Programa y Nivel -->
+        <!-- Fila 2: Correo y Clave Temporal -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="newStudentEmail" style="font-size: 12px; margin-bottom: 3px;">Correo Electrónico</label>
+            <input type="email" id="newStudentEmail" class="form-control" placeholder="alumno@livingenglish.com" required style="padding: 8px 10px; font-size: 13px;">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+              <label for="newStudentPass" style="font-size: 12px; margin-bottom: 0;">Clave Temporal</label>
+              <button type="button" onclick="generateNewStudentPassword()" class="btn-link-action" style="font-size: 11px;">🎲 Generar</button>
+            </div>
+            <input type="password" id="newStudentPass" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6" style="padding: 8px 10px; font-size: 13px;">
+          </div>
+        </div>
+
+        <!-- Fila 3: Programa y Nivel -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
           <div class="form-group" style="margin-bottom: 0;">
             <label for="newStudentProgram" style="font-size: 12px; margin-bottom: 3px;">Programa</label>
@@ -293,22 +308,12 @@
           </div>
         </div>
 
-        <!-- Fila 3: Contraseña Temporal y Fecha de Caducidad (1 Año oficial) -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
-          <div class="form-group" style="margin-bottom: 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-              <label for="newStudentPass" style="font-size: 12px; margin-bottom: 0;">Clave Temporal</label>
-              <button type="button" onclick="generateNewStudentPassword()" class="btn-link-action" style="font-size: 11px;">🎲 Generar</button>
-            </div>
-            <input type="password" id="newStudentPass" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6" style="padding: 8px 10px; font-size: 13px;">
-          </div>
-
-          <div class="form-group" style="margin-bottom: 0;">
-            <label for="newStudentExpiresAt" style="font-size: 12px; margin-bottom: 3px; color: #86efac; font-weight: 700;">
-              🗓️ Caducidad (1 Año de Matrícula)
-            </label>
-            <input type="date" id="newStudentExpiresAt" class="form-control" style="background: rgba(0,0,0,0.5); padding: 8px 10px; font-size: 13px;" required>
-          </div>
+        <!-- Fila 4: Fecha de Caducidad (1 Año oficial) -->
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label for="newStudentExpiresAt" style="font-size: 12px; margin-bottom: 3px; color: #86efac; font-weight: 700; display: block;">
+            🗓️ Caducidad de la Matrícula (1 Año Oficial de Acceso)
+          </label>
+          <input type="date" id="newStudentExpiresAt" class="form-control" style="background: rgba(0,0,0,0.5); padding: 8px 10px; font-size: 13px;" required>
         </div>
 
         <div style="font-size: 11px; color: var(--color-muted); margin-bottom: 14px; background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 6px;">
@@ -394,9 +399,15 @@
       <form onsubmit="handleSaveEditStudent(event)">
         <input type="hidden" id="editStudentId">
 
-        <div class="form-group">
-          <label for="editStudentFullName">Nombre Completo</label>
-          <input type="text" id="editStudentFullName" class="form-control" required>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="editStudentFullName" style="font-size: 12px; margin-bottom: 3px;">Nombre Completo</label>
+            <input type="text" id="editStudentFullName" class="form-control" required style="padding: 8px 10px; font-size: 13px;">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="editStudentDoc" style="font-size: 12px; margin-bottom: 3px;">🪪 No. Documento / Cédula</label>
+            <input type="text" id="editStudentDoc" class="form-control" placeholder="Ej. 1020304050" required style="padding: 8px 10px; font-size: 13px;">
+          </div>
         </div>
 
         <div class="form-group">
