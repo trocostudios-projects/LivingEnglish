@@ -264,8 +264,17 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 1. SDK de Supabase Local (sin depender de CDN ni problemas de conexión) -->
+  <script src="assets/js/supabase.js"></script>
+  <!-- Fallback a CDN si no existiera el archivo local -->
+  <script>
+    if (typeof window.supabase === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>');
+    }
+  </script>
+  <!-- 2. Cliente de Supabase -->
   <script src="assets/js/supabaseClient.js"></script>
+  <!-- 3. Lógica de la Plataforma -->
   <script src="assets/js/platform.js"></script>
 </body>
 </html>
