@@ -558,6 +558,19 @@
   color: #86efac;
 }
 
+.btn-sm-upgrade {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(96, 165, 250, 0.6);
+  color: #bfdbfe;
+  font-weight: 700;
+}
+
+.btn-sm-upgrade:hover {
+  background: rgba(59, 130, 246, 0.45);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
 .btn-sm-renew:hover {
   background: rgba(34, 197, 94, 0.35);
   border-color: #86efac;

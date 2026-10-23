@@ -86,8 +86,14 @@
             <h1 class="page-title" id="studentCourseTitle">Mi Guía de Estudio</h1>
             <p class="page-description" id="studentCourseSub">Control oficial de evaluaciones y progreso curricular.</p>
           </div>
-          <div style="background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); font-size: 14px;">
-            Curso actual: <strong id="studentCurrentLevelBadge" style="color: var(--color-primary-light);">Adultos 1</strong>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div id="studentLevelSelectorWrapper" class="hidden" style="background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); font-size: 13px; display: flex; align-items: center; gap: 6px;">
+              <label for="studentLevelSelect" style="color: var(--color-muted); font-size: 12px; margin: 0;">Nivel:</label>
+              <select id="studentLevelSelect" onchange="changeStudentViewLevel(this.value)" style="background: transparent; color: #ffffff; border: none; font-weight: 700; outline: none; cursor: pointer;"></select>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); font-size: 14px;">
+              Nivel actual: <strong id="studentCurrentLevelBadge" style="color: var(--color-primary-light);">Adultos 1</strong>
+            </div>
           </div>
         </div>
 
@@ -196,14 +202,27 @@
                   <span id="selectedStudentExpiryChip" class="hidden"></span>
                 </div>
                 <p id="selectedStudentSub" class="page-description" style="font-size: 13px; margin-bottom: 6px;">Haz clic en un alumno de la lista para gestionar sus calificaciones y matrícula.</p>
+
+                <!-- Selector de Nivel a Calificar / Consultar (Discriminación de Notas) -->
+                <div id="teacherLevelSelectorContainer" class="hidden" style="margin-top: 6px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span style="font-size: 12px; font-weight: 700; color: #93c5fd;">📖 Libro de Calificaciones:</span>
+                  <select id="teacherActiveLevelSelect" onchange="changeTeacherGradingLevel(this.value)" class="form-control" style="width: auto; padding: 4px 10px; font-size: 12px; background: rgba(0,0,0,0.6); color: #ffffff; border-color: rgba(255,255,255,0.3); height: auto; font-weight: 600; cursor: pointer;">
+                  </select>
+                  <span id="teacherHistoryNotice" class="hidden" style="font-size: 11px; background: rgba(245,158,11,0.2); color: #fde047; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(245,158,11,0.4); font-weight: 600;">
+                    Historial de Nivel Anterior
+                  </span>
+                </div>
                 
                 <!-- Acciones rápidas sobre el estudiante -->
                 <div id="studentActionsBar" class="hidden" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                  <button class="btn-sm-action btn-sm-upgrade" onclick="openRenewLevelModal()" title="Inscribir al estudiante para el siguiente año en el nivel siguiente con notas independientes">
+                    🎓 Renovar al Siguiente Nivel (+1 Año)
+                  </button>
                   <button class="btn-sm-action" onclick="openEditStudentModal()" title="Editar información del estudiante">
                     ✏️ Editar datos / Vigencia
                   </button>
                   <button class="btn-sm-action btn-sm-renew" onclick="quickRenewStudent(30)" title="Extender acceso por 30 días">
-                    ⚡ +30 días acceso
+                    ⚡ +30 días
                   </button>
                 </div>
               </div>
@@ -231,39 +250,32 @@
     </main>
   </div>
 
-  <!-- MODAL PARA QUE EL DOCENTE REGISTRE NUEVOS ESTUDIANTES -->
-  <div id="newStudentModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
-    <div class="auth-card" style="max-width: 520px; width: 100%; margin: 20px auto; background: #0e387a; border: 1px solid rgba(255,255,255,0.4);">
-      <h3 class="page-title" style="font-size: 22px; margin-bottom: 6px;">➕ Registrar Nuevo Estudiante</h3>
-      <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 20px;">
-        Crea la cuenta del alumno en Supabase para que pueda acceder a su plataforma.
-      </p>
+  <!-- MODAL PARA QUE EL DOCENTE REGISTRE NUEVOS ESTUDIANTES (COMPACTO) -->
+  <div id="newStudentModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
+    <div class="auth-card" style="max-width: 520px; width: 100%; margin: auto; background: #0e387a; border: 1px solid rgba(255,255,255,0.4); padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 class="page-title" style="font-size: 20px; margin: 0;">➕ Registrar Nuevo Estudiante</h3>
+        <button type="button" onclick="toggleNewStudentModal(false)" style="background: none; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
 
       <form onsubmit="handleCreateNewStudent(event)">
-        <div class="form-group">
-          <label for="newStudentFullName">Nombre Completo del Estudiante</label>
-          <input type="text" id="newStudentFullName" class="form-control" placeholder="Ej. Carlos Mendoza" required>
-        </div>
-
-        <div class="form-group">
-          <label for="newStudentEmail">Correo Electrónico</label>
-          <input type="email" id="newStudentEmail" class="form-control" placeholder="alumno@livingenglish.com" required>
-        </div>
-
-        <div class="form-group">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <label for="newStudentPass" style="margin-bottom: 0;">Contraseña Temporal</label>
-            <button type="button" onclick="generateNewStudentPassword()" class="btn-link-action" style="font-size: 11px;">
-              🎲 Generar clave segura
-            </button>
+        <!-- Fila 1: Nombre y Correo -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="newStudentFullName" style="font-size: 12px; margin-bottom: 3px;">Nombre Completo</label>
+            <input type="text" id="newStudentFullName" class="form-control" placeholder="Ej. Carlos Mendoza" required style="padding: 8px 10px; font-size: 13px;">
           </div>
-          <input type="password" id="newStudentPass" class="form-control" placeholder="Mínimo 6 caracteres (ej. Living2027*)" required minlength="6">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="newStudentEmail" style="font-size: 12px; margin-bottom: 3px;">Correo Electrónico</label>
+            <input type="email" id="newStudentEmail" class="form-control" placeholder="alumno@livingenglish.com" required style="padding: 8px 10px; font-size: 13px;">
+          </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-          <div class="form-group">
-            <label for="newStudentProgram">Programa</label>
-            <select id="newStudentProgram" class="form-control" onchange="updateNewStudentLevelOptions()" style="background: rgba(0,0,0,0.5);">
+        <!-- Fila 2: Programa y Nivel -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="newStudentProgram" style="font-size: 12px; margin-bottom: 3px;">Programa</label>
+            <select id="newStudentProgram" class="form-control" onchange="updateNewStudentLevelOptions()" style="background: rgba(0,0,0,0.5); padding: 8px 10px; font-size: 13px;">
               <option value="adultos">Adultos (17+)</option>
               <option value="teens">Teens (12-16)</option>
               <option value="junior">Junior (8-11)</option>
@@ -271,10 +283,9 @@
               <option value="nursery">Nursery</option>
             </select>
           </div>
-
-          <div class="form-group">
-            <label for="newStudentCourseLevel">Nivel Asignado</label>
-            <select id="newStudentCourseLevel" class="form-control" style="background: rgba(0,0,0,0.5);">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="newStudentCourseLevel" style="font-size: 12px; margin-bottom: 3px;">Nivel Inicial</label>
+            <select id="newStudentCourseLevel" class="form-control" style="background: rgba(0,0,0,0.5); padding: 8px 10px; font-size: 13px;">
               <option value="Adultos 1">Adultos 1 (Basic)</option>
               <option value="Adultos 2">Adultos 2</option>
               <option value="Adultos 3">Adultos 3</option>
@@ -282,26 +293,91 @@
           </div>
         </div>
 
-        <!-- FECHA DE CADUCIDAD / VENCIMIENTO DEL ALUMNO -->
-        <div class="form-group" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); padding: 12px; border-radius: var(--radius-md); margin-top: 4px;">
-          <label for="newStudentExpiresAt" style="display: flex; justify-content: space-between; align-items: center;">
-            <span>🗓️ Fecha de Caducidad de la Matrícula</span>
-            <span style="font-size: 11px; color: var(--color-muted); font-weight: normal;">(Acceso a la plataforma)</span>
-          </label>
-          <input type="date" id="newStudentExpiresAt" class="form-control" style="background: rgba(0,0,0,0.5); margin-bottom: 8px;">
-          
-          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(1)">+1 Mes</button>
-            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(3)">+3 Meses</button>
-            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(6)">+6 Meses</button>
-            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(12)">+1 Año</button>
-            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(0)">Sin caducidad</button>
+        <!-- Fila 3: Contraseña Temporal y Fecha de Caducidad (1 Año oficial) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+              <label for="newStudentPass" style="font-size: 12px; margin-bottom: 0;">Clave Temporal</label>
+              <button type="button" onclick="generateNewStudentPassword()" class="btn-link-action" style="font-size: 11px;">🎲 Generar</button>
+            </div>
+            <input type="password" id="newStudentPass" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6" style="padding: 8px 10px; font-size: 13px;">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="newStudentExpiresAt" style="font-size: 12px; margin-bottom: 3px; color: #86efac; font-weight: 700;">
+              🗓️ Caducidad (1 Año de Matrícula)
+            </label>
+            <input type="date" id="newStudentExpiresAt" class="form-control" style="background: rgba(0,0,0,0.5); padding: 8px 10px; font-size: 13px;" required>
           </div>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 16px;">
-          <button type="submit" id="btnSaveNewStudent" class="btn-primary" style="flex: 1; background: #22c55e; color: #0e387a;">Guardar y Crear Alumno</button>
-          <button type="button" class="btn-secondary" style="flex: 1;" onclick="toggleNewStudentModal(false)">Cancelar</button>
+        <div style="font-size: 11px; color: var(--color-muted); margin-bottom: 14px; background: rgba(0,0,0,0.2); padding: 6px 10px; border-radius: 6px;">
+          ✨ La vigencia se calcula automáticamente a <strong>1 año calendario</strong> desde el registro.
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" id="btnSaveNewStudent" class="btn-primary" style="flex: 1; padding: 10px; background: #22c55e; color: #0e387a; font-weight: 700; font-size: 14px;">Guardar Alumno</button>
+          <button type="button" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 14px;" onclick="toggleNewStudentModal(false)">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE RENOVACIÓN DE MATRÍCULA Y PROMOCIÓN AL SIGUIENTE NIVEL -->
+  <div id="renewLevelModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
+    <div class="auth-card" style="max-width: 500px; width: 100%; margin: auto; background: #0e387a; border: 2px solid #3b82f6; padding: 22px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 class="page-title" style="font-size: 20px; margin: 0;">🎓 Renovar al Siguiente Nivel (+1 Año)</h3>
+        <button type="button" onclick="toggleRenewLevelModal(false)" style="background: none; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <p style="font-size: 12px; color: var(--color-muted); margin-bottom: 14px; line-height: 1.4;">
+        Inscribe al alumno para su siguiente año lectivo. Las notas de su nivel anterior quedarán preservadas en su historial y se iniciará un nuevo libro de calificaciones independiente.
+      </p>
+
+      <form onsubmit="handleConfirmRenewLevel(event)">
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 12px;">
+          <div style="font-size: 14px; font-weight: 700; color: #ffffff;" id="renewStudentName">Estudiante</div>
+          <div style="font-size: 12px; color: var(--color-muted);" id="renewCurrentLevelText">Nivel previo: Adultos 1</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="renewNewProgram" style="font-size: 12px; margin-bottom: 3px;">Programa</label>
+            <select id="renewNewProgram" class="form-control" onchange="updateRenewLevelOptions()" style="background: rgba(0,0,0,0.5); padding: 8px 10px; font-size: 13px;">
+              <option value="adultos">Adultos</option>
+              <option value="teens">Teens</option>
+              <option value="junior">Junior</option>
+              <option value="kids">Kids</option>
+              <option value="nursery">Nursery</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="renewNewCourseLevel" style="font-size: 12px; margin-bottom: 3px;">Nuevo Nivel</label>
+            <select id="renewNewCourseLevel" class="form-control" style="background: rgba(0,0,0,0.5); font-weight: 700; color: #60a5fa; padding: 8px 10px; font-size: 13px;">
+              <!-- Opciones dinámicas -->
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.35); padding: 10px 12px; border-radius: var(--radius-md); margin-bottom: 14px;">
+          <label for="renewExpiresAt" style="color: #86efac; font-weight: 700; font-size: 12px; margin-bottom: 4px; display: block;">
+            🗓️ Nueva Fecha de Caducidad (+1 Año Renovado)
+          </label>
+          <input type="date" id="renewExpiresAt" class="form-control" style="background: rgba(0,0,0,0.5); padding: 8px 10px; font-size: 13px;" required>
+          <div style="font-size: 11px; color: #86efac; margin-top: 4px;">
+            ✨ Extiende el acceso a la plataforma por 365 días a partir de la fecha seleccionada.
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" id="btnConfirmRenew" class="btn-primary" style="flex: 1; padding: 10px; background: #22c55e; color: #0e387a; font-weight: 700; font-size: 14px;">
+            Confirmar Renovación
+          </button>
+          <button type="button" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 14px;" onclick="toggleRenewLevelModal(false)">
+            Cancelar
+          </button>
         </div>
       </form>
     </div>

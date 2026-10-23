@@ -530,20 +530,29 @@ async function logout() {
 }
 
 // ==============================================================================
-// 8. DASHBOARD DEL ESTUDIANTE
+// 8. DASHBOARD DEL ESTUDIANTE (CON DISCRIMINACIÓN POR NIVEL)
 // ==============================================================================
-function setupStudentView() {
-  const courseLevel = currentUserProfile.course_level || 'Adultos 1';
-  const config = getCourseConfig(courseLevel);
+let studentActiveViewingLevel = null;
+
+async function setupStudentView() {
+  const currentActualLevel = currentUserProfile.course_level || 'Adultos 1';
+  if (!studentActiveViewingLevel) {
+    studentActiveViewingLevel = currentActualLevel;
+  }
+
+  const config = getCourseConfig(studentActiveViewingLevel);
 
   document.getElementById('studentCourseTitle').innerText = config.title;
-  document.getElementById('studentCurrentLevelBadge').innerText = courseLevel;
+  document.getElementById('studentCurrentLevelBadge').innerText = currentActualLevel;
 
   const targetText = config.isKids
     ? 'Meta: Completar stickers y Show Day'
     : (config.isNursery ? 'Seguimiento de estimulación diaria' : `Meta para aprobar: ${config.passingScore} / ${config.maxPoints} pts`);
 
   document.getElementById('studentApprovalTarget').innerText = targetText;
+
+  // Cargar selector de niveles históricos del alumno si ha cursado más de un nivel
+  await populateStudentLevelSelector(currentActualLevel);
 
   // Mostrar aviso de caducidad / vigencia en el panel del alumno
   const expiryNotice = document.getElementById('studentExpiryNotice');
@@ -574,16 +583,65 @@ function setupStudentView() {
   }
 }
 
+async function populateStudentLevelSelector(currentLevel) {
+  const wrapper = document.getElementById('studentLevelSelectorWrapper');
+  const select = document.getElementById('studentLevelSelect');
+  if (!wrapper || !select) return;
+
+  const client = getClient();
+  let distinctLevels = [currentLevel];
+
+  if (client && currentUserProfile) {
+    try {
+      const { data } = await client
+        .from('student_grades')
+        .select('course_level')
+        .eq('student_id', currentUserProfile.id);
+
+      if (data && data.length > 0) {
+        const foundLevels = Array.from(new Set(data.map(d => d.course_level).filter(Boolean)));
+        foundLevels.forEach(lvl => {
+          if (!distinctLevels.includes(lvl)) distinctLevels.push(lvl);
+        });
+      }
+    } catch (e) {
+      console.warn("No se pudo listar historial de niveles:", e);
+    }
+  }
+
+  if (distinctLevels.length > 1) {
+    select.innerHTML = '';
+    distinctLevels.forEach(lvl => {
+      const opt = document.createElement('option');
+      opt.value = lvl;
+      opt.textContent = lvl === currentLevel ? `${lvl} (Actual)` : `${lvl} (Histórico)`;
+      opt.selected = lvl === studentActiveViewingLevel;
+      select.appendChild(opt);
+    });
+    wrapper.classList.remove('hidden');
+  } else {
+    wrapper.classList.add('hidden');
+  }
+}
+
+async function changeStudentViewLevel(newLevel) {
+  studentActiveViewingLevel = newLevel;
+  const config = getCourseConfig(studentActiveViewingLevel);
+  document.getElementById('studentCourseTitle').innerText = config.title;
+  await loadStudentGrades();
+}
+
 async function loadStudentGrades() {
   const client = getClient();
   studentGradesCache = {};
+  const levelToLoad = studentActiveViewingLevel || currentUserProfile?.course_level || 'Adultos 1';
 
   if (client && currentUserProfile) {
     const { data, error } = await client
       .from('student_grades')
       .select('item_number, points_awarded')
       .eq('student_id', currentUserProfile.id)
-      .eq('course_level', currentUserProfile.course_level);
+      .eq('course_level', levelToLoad);
 
     if (error) {
       console.error("Error al cargar notas:", error);
@@ -788,6 +846,30 @@ function filterStudents() {
   renderStudentList();
 }
 
+// ==============================================================================
+// 8.5. SECUENCIA CURRICULAR PARA PROMOCIÓN DE NIVELES
+// ==============================================================================
+function getNextCourseLevel(currentLevel) {
+  const nextLevelMap = {
+    'Adultos 1': 'Adultos 2',
+    'Adultos 2': 'Adultos 3',
+    'Adultos 3': 'Adultos 3',
+    'Teens 1': 'Teens 2',
+    'Teens 2': 'Teens 3',
+    'Teens 3': 'Teens 3',
+    'Junior 1': 'Junior 2',
+    'Junior 2': 'Junior 3',
+    'Junior 3': 'Junior 3',
+    'Kids 1': 'Kids 2',
+    'Kids 2': 'Kids 3',
+    'Kids 3': 'Junior 1',
+    'Nursery': 'Kids 1'
+  };
+  return nextLevelMap[currentLevel] || currentLevel;
+}
+
+let teacherActiveGradingLevel = null;
+
 async function selectStudent(studentId) {
   selectedStudent = teacherStudentsList.find(s => s.id === studentId);
   if (!selectedStudent) return;
@@ -802,9 +884,12 @@ async function selectStudent(studentId) {
   const pointsBadge = document.getElementById('teacherStudentTotalPoints');
   const statusChip = document.getElementById('teacherStudentStatusChip');
   const grid = document.getElementById('teacherUnitsGrid');
+  const levelSelectContainer = document.getElementById('teacherLevelSelectorContainer');
+  const levelSelect = document.getElementById('teacherActiveLevelSelect');
+  const historyNotice = document.getElementById('teacherHistoryNotice');
 
   titleElem.innerText = selectedStudent.full_name;
-  subElem.innerText = `Evaluaciones asignadas para ${selectedStudent.course_level} (${selectedStudent.email})`;
+  subElem.innerText = `Matrícula: ${selectedStudent.course_level} (${selectedStudent.email})`;
 
   // Configuración del chip de caducidad en el encabezado
   if (expiryChip) {
@@ -817,31 +902,100 @@ async function selectStudent(studentId) {
   if (actionsBar) actionsBar.classList.remove('hidden');
   if (gradeActionsArea) gradeActionsArea.classList.remove('hidden');
 
-  pointsBadge.innerText = 'Cargando puntaje...';
-  if (statusChip) statusChip.innerHTML = '';
+  // Por defecto calificar el nivel actual oficial del estudiante
+  teacherActiveGradingLevel = selectedStudent.course_level;
 
-  grid.innerHTML = '<div style="color: var(--color-muted); padding: 30px; text-align: center;">Cargando lista de evaluaciones...</div>';
+  // Consultar historial de niveles cursados por el alumno para discriminar sus notas
+  const client = getClient();
+  let distinctLevels = [selectedStudent.course_level];
+
+  if (client) {
+    try {
+      const { data: pastGrades } = await client
+        .from('student_grades')
+        .select('course_level')
+        .eq('student_id', selectedStudent.id);
+
+      if (pastGrades && pastGrades.length > 0) {
+        pastGrades.forEach(r => {
+          if (r.course_level && !distinctLevels.includes(r.course_level)) {
+            distinctLevels.push(r.course_level);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("No se pudo obtener lista de niveles cursados:", e);
+    }
+  }
+
+  // Poblar selector de libro de notas
+  if (levelSelect) {
+    levelSelect.innerHTML = '';
+    distinctLevels.forEach(lvl => {
+      const opt = document.createElement('option');
+      opt.value = lvl;
+      opt.textContent = lvl === selectedStudent.course_level ? `${lvl} (Nivel Actual)` : `${lvl} (Histórico)`;
+      opt.selected = lvl === teacherActiveGradingLevel;
+      levelSelect.appendChild(opt);
+    });
+  }
+
+  if (levelSelectContainer) levelSelectContainer.classList.remove('hidden');
+  if (historyNotice) historyNotice.classList.add('hidden');
+
+  // Cargar calificaciones correspondientes al nivel activo
+  await loadAndRenderTeacherGradesForActiveLevel();
+}
+
+async function changeTeacherGradingLevel(newLevel) {
+  if (!selectedStudent) return;
+  teacherActiveGradingLevel = newLevel;
+
+  const historyNotice = document.getElementById('teacherHistoryNotice');
+  if (historyNotice) {
+    if (newLevel !== selectedStudent.course_level) {
+      historyNotice.classList.remove('hidden');
+    } else {
+      historyNotice.classList.add('hidden');
+    }
+  }
+
+  await loadAndRenderTeacherGradesForActiveLevel();
+}
+
+async function loadAndRenderTeacherGradesForActiveLevel() {
+  if (!selectedStudent || !teacherActiveGradingLevel) return;
+
+  const pointsBadge = document.getElementById('teacherStudentTotalPoints');
+  const statusChip = document.getElementById('teacherStudentStatusChip');
+  const grid = document.getElementById('teacherUnitsGrid');
+
+  if (pointsBadge) pointsBadge.innerText = 'Cargando puntaje...';
+  if (statusChip) statusChip.innerHTML = '';
+  if (grid) grid.innerHTML = '<div style="color: var(--color-muted); padding: 30px; text-align: center;">Cargando libro de calificaciones de ' + teacherActiveGradingLevel + '...</div>';
 
   selectedStudentGrades = {};
   const client = getClient();
 
-  const { data, error } = await client
-    .from('student_grades')
-    .select('item_number, points_awarded')
-    .eq('student_id', selectedStudent.id)
-    .eq('course_level', selectedStudent.course_level);
+  if (client) {
+    const { data, error } = await client
+      .from('student_grades')
+      .select('item_number, points_awarded')
+      .eq('student_id', selectedStudent.id)
+      .eq('course_level', teacherActiveGradingLevel);
 
-  if (error) {
-    console.error("Error al obtener notas:", error);
-    showToast("Error al obtener notas de Supabase", "error");
-  } else if (data) {
-    data.forEach(item => {
-      selectedStudentGrades[item.item_number] = item.points_awarded;
-    });
+    if (error) {
+      console.error("Error al obtener notas:", error);
+      showToast("Error al obtener notas de Supabase", "error");
+    } else if (data) {
+      data.forEach(item => {
+        selectedStudentGrades[item.item_number] = item.points_awarded;
+      });
+    }
   }
 
-  // Cargar configuración curricular del alumno y renderizar agrupado por etapas
-  const config = getCourseConfig(selectedStudent.course_level);
+  // Cargar configuración curricular del nivel seleccionado
+  const config = getCourseConfig(teacherActiveGradingLevel);
   renderTeacherCurriculumGrades(config);
 }
 
@@ -909,7 +1063,7 @@ function renderTeacherCurriculumGrades(config) {
           <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, 0)" title="Poner cero">0</button>
           <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, '')" title="Borrar calificación">Borrar</button>
         </div>
-        <button class="btn-save-grade" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${selectedStudent.course_level}', ${item.number}, '${item.title.replace(/'/g, "\\'")}', '${item.type}', ${item.maxPoints})">Guardar</button>
+        <button class="btn-save-grade" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${teacherActiveGradingLevel}', ${item.number}, '${item.title.replace(/'/g, "\\'")}', '${item.type}', ${item.maxPoints})">Guardar</button>
       `;
       stageGrid.appendChild(box);
     });
@@ -947,8 +1101,8 @@ function quickSetGrade(itemNumber, value) {
 }
 
 function recalculateAllScreenPoints() {
-  if (!selectedStudent) return;
-  const config = getCourseConfig(selectedStudent.course_level);
+  if (!selectedStudent || !teacherActiveGradingLevel) return;
+  const config = getCourseConfig(teacherActiveGradingLevel);
   const inputs = document.querySelectorAll('#teacherUnitsGrid input[type="number"]');
 
   let sum = 0;
@@ -987,6 +1141,7 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
   const box = document.getElementById(`box_grade_${itemNumber}`);
   if (!inputElem) return;
 
+  const targetLevel = courseLevel || teacherActiveGradingLevel;
   const rawVal = inputElem.value.trim();
   const numericVal = parseFloat(rawVal);
 
@@ -1008,7 +1163,7 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
         .from('student_grades')
         .delete()
         .eq('student_id', studentId)
-        .eq('course_level', courseLevel)
+        .eq('course_level', targetLevel)
         .eq('item_number', itemNumber);
 
       if (error) throw error;
@@ -1017,13 +1172,13 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
       if (box) {
         box.classList.remove('graded', 'modified');
       }
-      showToast(`🗑️ Nota #${itemNumber} eliminada`, "info");
+      showToast(`🗑️ Nota #${itemNumber} eliminada de ${targetLevel}`, "info");
     } else {
       const { error } = await client
         .from('student_grades')
         .upsert({
           student_id: studentId,
-          course_level: courseLevel,
+          course_level: targetLevel,
           item_number: itemNumber,
           item_title: itemTitle,
           item_type: itemType,
@@ -1042,7 +1197,7 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
         box.classList.add('graded');
         box.classList.remove('modified');
       }
-      showToast(`✅ Nota #${itemNumber} guardada: ${numericVal} pts`, "success");
+      showToast(`✅ Nota #${itemNumber} guardada en ${targetLevel}: ${numericVal} pts`, "success");
     }
 
     recalculateAllScreenPoints();
@@ -1058,9 +1213,9 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
   }
 }
 
-// Guardado Masivo de Todas las Notas
+// Guardado Masivo de Todas las Notas en el nivel activo
 async function saveAllGrades() {
-  if (!selectedStudent) return;
+  if (!selectedStudent || !teacherActiveGradingLevel) return;
   const btn = document.getElementById('btnSaveAllGrades');
   const origText = btn ? btn.innerText : '';
 
@@ -1091,7 +1246,7 @@ async function saveAllGrades() {
 
       recordsToUpsert.push({
         student_id: selectedStudent.id,
-        course_level: selectedStudent.course_level,
+        course_level: teacherActiveGradingLevel,
         item_number: itemNum,
         item_title: itemTitle,
         item_type: itemType,
@@ -1137,7 +1292,7 @@ async function saveAllGrades() {
         .from('student_grades')
         .delete()
         .eq('student_id', selectedStudent.id)
-        .eq('course_level', selectedStudent.course_level)
+        .eq('course_level', teacherActiveGradingLevel)
         .eq('item_number', num);
 
       delete selectedStudentGrades[num];
@@ -1148,7 +1303,7 @@ async function saveAllGrades() {
     }
 
     recalculateAllScreenPoints();
-    showToast(`🎉 ¡Todas las calificaciones de ${selectedStudent.full_name} han sido guardadas con éxito!`, "success", 4000);
+    showToast(`🎉 ¡Todas las calificaciones de ${selectedStudent.full_name} (${teacherActiveGradingLevel}) han sido guardadas con éxito!`, "success", 4000);
 
   } catch (err) {
     console.error("Error al guardar todas las notas:", err);
@@ -1162,7 +1317,7 @@ async function saveAllGrades() {
 }
 
 // ==============================================================================
-// 10. ALTA Y EDICIÓN DE ESTUDIANTES CON CADUCIDAD
+// 10. ALTA DE ESTUDIANTES (CON CADUCIDAD POR DEFECTO A 1 AÑO)
 // ==============================================================================
 function toggleNewStudentModal(open) {
   const modal = document.getElementById('newStudentModal');
@@ -1171,8 +1326,8 @@ function toggleNewStudentModal(open) {
 
   if (open) {
     updateNewStudentLevelOptions();
-    // Por defecto sugerir 3 meses de caducidad
-    setNewStudentExpiryPreset(3);
+    // Requisito oficial: 1 año calendario exacto después de la fecha de registro
+    setNewStudentExpiryPreset(12);
     const nameInput = document.getElementById('newStudentFullName');
     if (nameInput) nameInput.focus();
   }
@@ -1188,7 +1343,8 @@ function setNewStudentExpiryPreset(months) {
   }
 
   const date = new Date();
-  date.setMonth(date.getMonth() + months);
+  date.setFullYear(date.getFullYear() + Math.floor(months / 12));
+  date.setMonth(date.getMonth() + (months % 12));
   dateInput.value = date.toISOString().split('T')[0];
 }
 
@@ -1318,7 +1474,132 @@ async function handleCreateNewStudent(e) {
 }
 
 // ==============================================================================
-// 10.5. MODAL DE EDICIÓN Y RENOVACIÓN DE ESTUDIANTE
+// 10.5. MODAL DE RENOVACIÓN DE MATRÍCULA Y SIGUIENTE NIVEL (+1 AÑO)
+// ==============================================================================
+function openRenewLevelModal() {
+  if (!selectedStudent) return;
+
+  const currentLevel = selectedStudent.course_level || 'Adultos 1';
+  const currentProg = selectedStudent.program || 'adultos';
+  const nextLvl = getNextCourseLevel(currentLevel);
+
+  document.getElementById('renewStudentName').innerText = selectedStudent.full_name;
+  document.getElementById('renewCurrentLevelText').innerText = `Nivel previo: ${currentLevel} (${currentProg})`;
+  document.getElementById('renewNewProgram').value = currentProg;
+
+  updateRenewLevelOptions();
+  document.getElementById('renewNewCourseLevel').value = nextLvl;
+
+  // Calcular nueva fecha de caducidad: +1 año (365 días) a partir de la fecha de caducidad actual o de hoy
+  let baseDate = new Date();
+  if (selectedStudent.expires_at) {
+    const parsed = new Date(selectedStudent.expires_at);
+    if (!isNaN(parsed.getTime()) && parsed > new Date()) {
+      baseDate = parsed;
+    }
+  }
+  baseDate.setFullYear(baseDate.getFullYear() + 1);
+  document.getElementById('renewExpiresAt').value = baseDate.toISOString().split('T')[0];
+
+  toggleRenewLevelModal(true);
+}
+
+function toggleRenewLevelModal(open) {
+  const modal = document.getElementById('renewLevelModal');
+  if (!modal) return;
+  modal.classList.toggle('hidden', !open);
+}
+
+function updateRenewLevelOptions() {
+  const programSelect = document.getElementById('renewNewProgram');
+  const levelSelect = document.getElementById('renewNewCourseLevel');
+  if (!programSelect || !levelSelect) return;
+
+  const prog = programSelect.value;
+  levelSelect.innerHTML = '';
+
+  const optionsMap = {
+    adultos: ['Adultos 1', 'Adultos 2', 'Adultos 3'],
+    teens: ['Teens 1', 'Teens 2', 'Teens 3'],
+    junior: ['Junior 1', 'Junior 2', 'Junior 3'],
+    kids: ['Kids 1', 'Kids 2', 'Kids 3'],
+    nursery: ['Nursery']
+  };
+
+  const list = optionsMap[prog] || optionsMap.adultos;
+  list.forEach(lvl => {
+    const opt = document.createElement('option');
+    opt.value = lvl;
+    opt.textContent = lvl === 'Adultos 1' ? 'Adultos 1 (Basic)' : (lvl === 'Teens 1' ? 'Teens 1 (Basic)' : lvl);
+    levelSelect.appendChild(opt);
+  });
+}
+
+async function handleConfirmRenewLevel(e) {
+  e.preventDefault();
+  if (!selectedStudent) return;
+
+  const newProg = document.getElementById('renewNewProgram').value;
+  const newLvl = document.getElementById('renewNewCourseLevel').value;
+  const newExpiresAt = document.getElementById('renewExpiresAt').value;
+
+  const btn = document.getElementById('btnConfirmRenew');
+  const origText = btn.innerText;
+  btn.disabled = true;
+  btn.innerText = 'Renovando matrícula...';
+
+  const client = getClient();
+
+  try {
+    // 1. Actualizar nivel y caducidad en profiles
+    const { error: updateErr } = await client
+      .from('profiles')
+      .update({
+        program: newProg,
+        course_level: newLvl,
+        expires_at: newExpiresAt
+      })
+      .eq('id', selectedStudent.id);
+
+    if (updateErr) {
+      console.warn("Actualización en Supabase profiles:", updateErr);
+    }
+
+    // 2. Guardar respaldo local
+    localStorage.setItem('le_student_expires_' + selectedStudent.id, newExpiresAt);
+
+    // 3. Actualizar memoria local del estudiante
+    selectedStudent.program = newProg;
+    selectedStudent.course_level = newLvl;
+    selectedStudent.expires_at = newExpiresAt;
+
+    const inList = teacherStudentsList.find(s => s.id === selectedStudent.id);
+    if (inList) {
+      inList.program = newProg;
+      inList.course_level = newLvl;
+      inList.expires_at = newExpiresAt;
+    }
+
+    updateTeacherMetrics();
+    renderStudentList();
+    toggleRenewLevelModal(false);
+
+    showToast(`🎓 ¡${selectedStudent.full_name} matriculado en ${newLvl}! Acceso renovado por 1 año.`, "success", 5000);
+
+    // Recargar vista para mostrar el nuevo libro de notas correspondiente al nuevo nivel
+    await selectStudent(selectedStudent.id);
+
+  } catch (err) {
+    console.error("Error al renovar nivel del alumno:", err);
+    showToast(`❌ Error: ${err.message}`, "error", 5000);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = origText;
+  }
+}
+
+// ==============================================================================
+// 10.6. MODAL DE EDICIÓN GENERAL DEL ESTUDIANTE
 // ==============================================================================
 function openEditStudentModal(studentId) {
   const targetId = studentId || (selectedStudent ? selectedStudent.id : null);
@@ -1367,9 +1648,9 @@ function setEditStudentExpiryPreset(months) {
   }
 
   const baseDate = dateInput.value ? new Date(dateInput.value) : new Date();
-  // Si la fecha actual ya estaba vencida, partir desde hoy
   const startingDate = (!isNaN(baseDate.getTime()) && baseDate > new Date()) ? baseDate : new Date();
-  startingDate.setMonth(startingDate.getMonth() + months);
+  startingDate.setFullYear(startingDate.getFullYear() + Math.floor(months / 12));
+  startingDate.setMonth(startingDate.getMonth() + (months % 12));
   dateInput.value = startingDate.toISOString().split('T')[0];
 }
 
@@ -1426,7 +1707,7 @@ async function handleSaveEditStudent(e) {
       .eq('id', studentId);
 
     if (profileErr) {
-      console.warn("Error al actualizar profiles directamente (posible columna expires_at):", profileErr);
+      console.warn("Error al actualizar profiles directamente:", profileErr);
     }
 
     // 2. Guardar en respaldo local
@@ -1549,6 +1830,8 @@ window.handleSendPasswordReset = handleSendPasswordReset;
 window.handleUpdateNewPassword = handleUpdateNewPassword;
 window.filterStudents = filterStudents;
 window.selectStudent = selectStudent;
+window.changeTeacherGradingLevel = changeTeacherGradingLevel;
+window.changeStudentViewLevel = changeStudentViewLevel;
 window.saveGrade = saveGrade;
 window.saveAllGrades = saveAllGrades;
 window.quickSetGrade = quickSetGrade;
@@ -1558,6 +1841,10 @@ window.updateNewStudentLevelOptions = updateNewStudentLevelOptions;
 window.handleCreateNewStudent = handleCreateNewStudent;
 window.setNewStudentExpiryPreset = setNewStudentExpiryPreset;
 window.generateNewStudentPassword = generateNewStudentPassword;
+window.openRenewLevelModal = openRenewLevelModal;
+window.toggleRenewLevelModal = toggleRenewLevelModal;
+window.updateRenewLevelOptions = updateRenewLevelOptions;
+window.handleConfirmRenewLevel = handleConfirmRenewLevel;
 window.openEditStudentModal = openEditStudentModal;
 window.toggleEditStudentModal = toggleEditStudentModal;
 window.setEditStudentExpiryPreset = setEditStudentExpiryPreset;
