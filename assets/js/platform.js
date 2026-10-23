@@ -317,24 +317,21 @@ function toggleRecoveryModal(open, event) {
 }
 
 // Helper para obtener la URL de retorno canónica de autenticación (GitHub Pages o local)
-function getAuthRedirectUrl() {
+function getAuthRedirectUrl(targetPage = 'cursos.html') {
   if (typeof window !== 'undefined' && window.location) {
     const origin = window.location.origin;
     let pathname = window.location.pathname;
 
-    // Normalizar a cursos.html
-    if (!pathname.endsWith('cursos.html')) {
-      if (pathname.endsWith('/')) {
-        pathname += 'cursos.html';
-      } else {
-        const lastSlash = pathname.lastIndexOf('/');
-        pathname = pathname.substring(0, lastSlash + 1) + 'cursos.html';
-      }
+    const lastSlash = pathname.lastIndexOf('/');
+    if (lastSlash !== -1) {
+      pathname = pathname.substring(0, lastSlash + 1) + targetPage;
+    } else {
+      pathname = '/' + targetPage;
     }
 
     return `${origin}${pathname}`;
   }
-  return 'https://trocostudios-projects.github.io/LivingEnglish/cursos.html';
+  return `https://trocostudios-projects.github.io/LivingEnglish/${targetPage}`;
 }
 
 async function handleSendPasswordReset(e) {
@@ -349,7 +346,7 @@ async function handleSendPasswordReset(e) {
 
   const client = getClient();
   try {
-    const redirectUrl = getAuthRedirectUrl();
+    const redirectUrl = getAuthRedirectUrl('recuperar.html');
     const { error } = await client.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl
     });

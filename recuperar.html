@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Contraseña — Academia Living English</title>
+  
+  <!-- Fuentes Google: Fredoka y Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos Modulares -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/platform.css">
+</head>
+<body>
+
+  <div class="app-viewport">
+    <!-- CABECERA DE LA NAVEGACIÓN -->
+    <header class="app-header">
+      <a href="index.html" class="brand-logo-link" aria-label="Academia Living English">
+        <img src="assets/img/logo.png" alt="Academia Living English Logo" class="brand-logo-img">
+      </a>
+
+      <div>
+        <a href="cursos.html" class="btn-talk" style="text-decoration: none; font-size: 13px;">
+          ← Volver a Iniciar Sesión
+        </a>
+      </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-container" style="display: flex; align-items: center; justify-content: center; min-height: 70vh;">
+
+      <!-- TARJETA 1: SOLICITAR ENLACE DE RECUPERACIÓN (SI ENTRA DIRECTO) -->
+      <section id="requestSection" class="auth-card" style="max-width: 460px; width: 100%;">
+        <div style="font-size: 38px; text-align: center; margin-bottom: 8px;">🔑</div>
+        <h2 class="page-title text-center" style="font-size: 24px; margin-bottom: 6px;">Recuperar Contraseña</h2>
+        <p class="page-description text-center" style="font-size: 13px; margin-bottom: 20px; line-height: 1.5;">
+          Ingresa tu correo institucional registrado y te enviaremos un enlace oficial para restablecer tu clave.
+        </p>
+
+        <form onsubmit="handleSendRecoveryEmail(event)">
+          <div class="form-group">
+            <label for="recoveryEmail">Correo Electrónico</label>
+            <input type="email" id="recoveryEmail" class="form-control" placeholder="tu_correo@livingenglish.com" required autocomplete="email">
+          </div>
+
+          <button type="submit" id="btnSendRecovery" class="btn-primary" style="width: 100%; margin-top: 6px;">
+            Enviar Enlace de Recuperación
+          </button>
+
+          <div style="margin-top: 18px; text-align: center; font-size: 13px;">
+            <a href="cursos.html" style="color: var(--color-primary-light); text-decoration: underline;">
+              ¿Recordaste tu contraseña? Inicia sesión
+            </a>
+          </div>
+        </form>
+      </section>
+
+      <!-- TARJETA 2: ESTABLECER NUEVA CONTRASEÑA (CUANDO LLEGA DESDE EL CORREO) -->
+      <section id="resetSection" class="auth-card hidden" style="max-width: 460px; width: 100%; border: 2px solid var(--color-primary-light);">
+        <div style="font-size: 38px; text-align: center; margin-bottom: 8px;">🔐</div>
+        <h2 class="page-title text-center" style="font-size: 24px; margin-bottom: 6px;">Nueva Contraseña</h2>
+        <p class="page-description text-center" style="font-size: 13px; margin-bottom: 20px;">
+          Ingresa y confirma tu nueva contraseña para actualizar tu cuenta oficial.
+        </p>
+
+        <form onsubmit="handleSaveNewPassword(event)">
+          <div class="form-group">
+            <label for="newPass1">Nueva Contraseña</label>
+            <input type="password" id="newPass1" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required autocomplete="new-password">
+          </div>
+
+          <div class="form-group">
+            <label for="newPass2">Confirmar Nueva Contraseña</label>
+            <input type="password" id="newPass2" class="form-control" placeholder="Repite la contraseña" minlength="6" required autocomplete="new-password">
+          </div>
+
+          <button type="submit" id="btnUpdatePassword" class="btn-primary" style="width: 100%; background: #22c55e; color: #0e387a; font-weight: 700; margin-top: 6px;">
+            Guardar Contraseña y Continuar
+          </button>
+        </form>
+      </section>
+
+      <!-- TARJETA 3: ÉXITO -->
+      <section id="successSection" class="auth-card hidden" style="max-width: 460px; width: 100%; text-align: center; border: 2px solid #22c55e;">
+        <div style="font-size: 46px; margin-bottom: 12px;">🎉</div>
+        <h2 class="page-title" style="font-size: 24px; color: #86efac; margin-bottom: 8px;">¡Contraseña Actualizada!</h2>
+        <p style="font-size: 14px; color: var(--color-muted); margin-bottom: 22px; line-height: 1.5;">
+          Tu contraseña ha sido restablecida exitosamente. Ya puedes ingresar a la plataforma con tu nueva clave.
+        </p>
+
+        <a href="cursos.html" class="btn-primary" style="width: 100%; text-decoration: none;">
+          Ir a Iniciar Sesión en la Plataforma
+        </a>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- TOAST DE NOTIFICACIONES -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- SCRIPTS -->
+  <script src="assets/js/supabase.js"></script>
+  <script>
+    if (typeof window.supabase === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>');
+    }
+  </script>
+  <script src="assets/js/supabaseClient.js"></script>
+
+  <!-- LÓGICA DE RECUPERACIÓN -->
+  <script>
+    function showToast(message, type = 'info', duration = 4000) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('toast-visible'));
+      setTimeout(() => {
+        toast.classList.remove('toast-visible');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    function getRecoveryRedirectUrl() {
+      const url = new URL(window.location.href);
+      url.hash = '';
+      url.search = '';
+      return url.toString();
+    }
+
+    async function handleSendRecoveryEmail(e) {
+      e.preventDefault();
+      const email = document.getElementById('recoveryEmail').value.trim();
+      const btn = document.getElementById('btnSendRecovery');
+      if (!email) return;
+
+      btn.disabled = true;
+      btn.innerText = 'Enviando enlace...';
+
+      const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+      if (!client) {
+        showToast("Error de conexión con el servidor.", "error");
+        btn.disabled = false;
+        btn.innerText = 'Enviar Enlace de Recuperación';
+        return;
+      }
+
+      try {
+        const redirectUrl = getRecoveryRedirectUrl();
+        const { error } = await client.auth.resetPasswordForEmail(email, {
+          redirectTo: redirectUrl
+        });
+
+        if (error) throw error;
+
+        showToast("📨 Enlace enviado con éxito. Revisa tu bandeja de entrada o spam.", "success", 7000);
+        document.getElementById('recoveryEmail').value = '';
+
+      } catch (err) {
+        console.error("Error al enviar recuperación:", err);
+        showToast(`❌ Error: ${err.message}`, "error", 5000);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Enviar Enlace de Recuperación';
+      }
+    }
+
+    async function handleSaveNewPassword(e) {
+      e.preventDefault();
+      const pass1 = document.getElementById('newPass1').value;
+      const pass2 = document.getElementById('newPass2').value;
+      const btn = document.getElementById('btnUpdatePassword');
+
+      if (!pass1 || pass1.length < 6) {
+        showToast("La contraseña debe tener mínimo 6 caracteres.", "error");
+        return;
+      }
+
+      if (pass1 !== pass2) {
+        showToast("Las contraseñas no coinciden. Verifícalas.", "error");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Actualizando contraseña...';
+
+      const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+
+      try {
+        const { error } = await client.auth.updateUser({ password: pass1 });
+        if (error) throw error;
+
+        document.getElementById('resetSection').classList.add('hidden');
+        document.getElementById('successSection').classList.remove('hidden');
+        showToast("🎉 Contraseña actualizada con éxito.", "success", 5000);
+
+      } catch (err) {
+        console.error("Error al actualizar contraseña:", err);
+        showToast(`❌ Error: ${err.message}`, "error", 5000);
+        btn.disabled = false;
+        btn.innerText = 'Guardar Contraseña y Continuar';
+      }
+    }
+
+    // Detección automática al cargar la página
+    document.addEventListener('DOMContentLoaded', async () => {
+      const client = window.getSupabaseClient ? window.getSupabaseClient() : window.supabaseClient;
+
+      // 1. Detección por hash o search param (?type=recovery o #type=recovery o access_token)
+      const hash = window.location.hash ? window.location.hash.substring(1) : '';
+      const hashParams = new URLSearchParams(hash);
+      const searchParams = new URLSearchParams(window.location.search);
+      const isRecovery = hashParams.get('type') === 'recovery' || 
+                         searchParams.get('type') === 'recovery' ||
+                         hash.includes('type=recovery') || 
+                         hash.includes('access_token=');
+
+      if (isRecovery) {
+        document.getElementById('requestSection').classList.add('hidden');
+        document.getElementById('resetSection').classList.remove('hidden');
+      }
+
+      // 2. Escuchar evento oficial de Supabase
+      if (client && client.auth) {
+        client.auth.onAuthStateChange((event, session) => {
+          if (event === 'PASSWORD_RECOVERY') {
+            document.getElementById('requestSection').classList.add('hidden');
+            document.getElementById('resetSection').classList.remove('hidden');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
