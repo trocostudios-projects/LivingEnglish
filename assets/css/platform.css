@@ -1,0 +1,437 @@
+/**
+ * Academia Living English - Educational Platform & Dashboard Styles
+ */
+
+/* ==========================================================================
+   Viewport y Contenedor Principal
+   ========================================================================== */
+.app-viewport {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+
+  /* Imagen de fondo por defecto */
+  background-image: var(--bg-hero-desktop);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+@media (max-width: 767px) {
+  .app-viewport {
+    background-image: var(--bg-hero-mobile);
+    background-position: center top;
+  }
+}
+
+.app-header {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-primary-glass-soft);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+@media (min-width: 768px) {
+  .app-header {
+    padding: 20px 48px;
+  }
+}
+
+.main-container {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+  position: relative;
+  z-index: 10;
+}
+
+@media (min-width: 768px) {
+  .main-container {
+    padding: 40px 48px;
+  }
+}
+
+/* ==========================================================================
+   Badge de Usuario y Sesión
+   ========================================================================== */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-primary-glass-strong);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(14, 56, 122, 0.4);
+}
+
+.user-badge-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.btn-logout {
+  background: var(--color-danger);
+  color: var(--color-white);
+  border: 1px solid var(--color-border);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-logout:hover {
+  opacity: 0.85;
+}
+
+/* ==========================================================================
+   Tarjeta de Autenticación (Glassmorphism)
+   ========================================================================== */
+.auth-card {
+  max-width: 480px;
+  margin: 30px auto;
+  background: var(--color-primary-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  padding: 32px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-lg);
+}
+
+.role-tabs {
+  display: flex;
+  background: var(--color-dark-bg);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  margin-bottom: 24px;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.role-tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  border: none;
+  background: none;
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.role-tab.active {
+  background: var(--color-primary);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   Panel de Resumen de Progreso y Puntos (Barra y Estadísticas)
+   ========================================================================== */
+.progress-summary-card {
+  background: var(--color-primary-glass-strong);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-bottom: 28px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-card);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin-bottom: 12px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #4ade80);
+  border-radius: var(--radius-pill);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progress-stats-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+/* ==========================================================================
+   Badges y Categorías de Evaluación
+   ========================================================================== */
+.eval-badge-type {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-written {
+  background: rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+  border: 1px solid rgba(147, 197, 253, 0.4);
+}
+
+.badge-oral {
+  background: rgba(245, 158, 11, 0.3);
+  color: #fde68a;
+  border: 1px solid rgba(253, 230, 138, 0.4);
+}
+
+.badge-formative {
+  background: rgba(168, 85, 247, 0.3);
+  color: #d8b4fe;
+  border: 1px solid rgba(216, 180, 254, 0.4);
+}
+
+.badge-kids {
+  background: rgba(236, 72, 153, 0.3);
+  color: #fbcfe8;
+  border: 1px solid rgba(251, 207, 232, 0.4);
+}
+
+/* ==========================================================================
+   Cuadrícula de Evaluaciones
+   ========================================================================== */
+.eval-section-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: #ffffff;
+  margin: 28px 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 8px;
+}
+
+.units-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.unit-card {
+  background: var(--color-primary-glass);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.unit-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.unit-number {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--color-primary-light);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.unit-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  text-shadow: var(--text-shadow-subtle);
+}
+
+.exam-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--color-dark-bg);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.score {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.score-passed {
+  color: var(--color-success);
+}
+
+.score-pending {
+  color: var(--color-warning);
+}
+
+/* ==========================================================================
+   Vista de Profesor
+   ========================================================================== */
+.teacher-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 860px) {
+  .teacher-section {
+    grid-template-columns: 340px 1fr;
+  }
+}
+
+.student-list {
+  background: var(--color-primary-glass);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.student-item {
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  margin-bottom: 8px;
+  background: var(--color-dark-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all var(--transition-fast);
+}
+
+.student-item:hover,
+.student-item.active {
+  border-color: var(--color-white);
+  background: rgba(14, 56, 122, 0.9);
+}
+
+.student-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.student-level {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 2px;
+}
+
+.grade-editor {
+  background: var(--color-primary-glass);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.teacher-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.grade-input-box {
+  background: var(--color-dark-bg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.grade-input-box label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.grade-input-box-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.grade-input-box input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--color-white);
+  padding: 8px 10px;
+  font-weight: 700;
+  font-size: 14px;
+  outline: none;
+}
+
+.grade-input-box input:focus {
+  border-color: var(--color-white);
+}
+
+.btn-save-grade {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  background: var(--color-success);
+  color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-save-grade:hover {
+  opacity: 0.9;
+}

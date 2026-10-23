@@ -26,10 +26,6 @@
       </a>
 
       <div style="display: flex; align-items: center; gap: 12px;">
-        <button id="btnConfigModal" class="btn-talk" style="padding: 6px 14px; font-size: 12px; background: rgba(0,0,0,0.3);" onclick="toggleConfigModal(true)">
-          ⚙️ Supabase
-        </button>
-
         <div id="userBadge" class="user-badge hidden">
           <span id="userName" class="user-badge-name">Usuario</span>
           <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
@@ -40,11 +36,11 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-container">
 
-      <!-- 1. FORMULARIO DE ACCESO / IDENTIFICACIÓN -->
+      <!-- 1. FORMULARIO DE ACCESO EXCLUSIVO (LOGIN INSTITUCIONAL) -->
       <section id="authSection" class="auth-card">
         <h2 class="page-title text-center" style="font-size: 28px;">Plataforma Educativa</h2>
-        <p class="page-description text-center" id="authSubtitle" style="font-size: 14px; margin-bottom: 20px;">
-          Ingresa con tu usuario para gestionar exámenes y notas
+        <p class="page-description text-center" style="font-size: 14px; margin-bottom: 20px;">
+          Ingresa con tu correo institucional y contraseña
         </p>
 
         <div class="role-tabs">
@@ -53,26 +49,21 @@
         </div>
 
         <form id="authForm" onsubmit="handleAuthSubmit(event)">
-          <div class="form-group hidden" id="groupFullName">
-            <label for="regFullName">Nombre Completo</label>
-            <input type="text" id="regFullName" class="form-control" placeholder="Juan Pérez">
-          </div>
-
           <div class="form-group">
             <label for="loginEmail">Correo Electrónico</label>
-            <input type="email" id="loginEmail" class="form-control" placeholder="ejemplo@livingenglish.com" required>
+            <input type="email" id="loginEmail" class="form-control" placeholder="usuario@livingenglish.com" required autocomplete="username">
           </div>
 
           <div class="form-group">
             <label for="loginPass">Contraseña</label>
-            <input type="password" id="loginPass" class="form-control" placeholder="••••••••" required>
+            <input type="password" id="loginPass" class="form-control" placeholder="••••••••" required autocomplete="current-password">
           </div>
 
           <button type="submit" class="btn-primary" id="btnAuthAction">Ingresar como Estudiante</button>
 
-          <div style="margin-top: 16px; text-align: center; font-size: 13px;">
-            <a href="#" id="toggleAuthModeLink" onclick="toggleAuthMode(event)" style="color: var(--color-primary-light); text-decoration: underline;">
-              ¿No tienes cuenta? Regístrate aquí
+          <div style="margin-top: 18px; text-align: center; font-size: 13px;">
+            <a href="#" onclick="toggleRecoveryModal(true, event)" style="color: var(--color-primary-light); text-decoration: underline;">
+              ¿Olvidaste tu contraseña?
             </a>
           </div>
         </form>
@@ -80,49 +71,89 @@
 
       <!-- 2. DASHBOARD DEL ESTUDIANTE -->
       <section id="studentDashboard" class="hidden">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+        <!-- Cabecera del Curso del Alumno -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
           <div>
-            <h1 class="page-title">Mis Exámenes por Módulo</h1>
-            <p class="page-description">Revisa tus calificaciones y progreso en cada unidad (Unit 1 a 16).</p>
+            <h1 class="page-title" id="studentCourseTitle">Mi Guía de Estudio</h1>
+            <p class="page-description" id="studentCourseSub">Control oficial de evaluaciones y progreso curricular.</p>
           </div>
-          <div style="background: rgba(0,0,0,0.25); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); font-size: 14px;">
-            Nivel asignado: <strong id="studentCurrentLevelBadge" style="color: var(--color-primary-light);">A1</strong>
+          <div style="background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); font-size: 14px;">
+            Curso actual: <strong id="studentCurrentLevelBadge" style="color: var(--color-primary-light);">Adultos 1</strong>
           </div>
         </div>
 
-        <div class="level-tabs">
-          <button class="level-btn active" onclick="filterLevel('A1', this)">Módulo A1</button>
-          <button class="level-btn" onclick="filterLevel('A2', this)">Módulo A2</button>
-          <button class="level-btn" onclick="filterLevel('B1', this)">Módulo B1</button>
-          <button class="level-btn" onclick="filterLevel('B2', this)">Módulo B2</button>
-          <button class="level-btn" onclick="filterLevel('C1', this)">Módulo C1</button>
+        <!-- Tarjeta de Progreso y Puntos Acumulados -->
+        <div id="studentProgressCard" class="progress-summary-card">
+          <div class="progress-header">
+            <div>
+              <span style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted);">Progreso de Calificaciones</span>
+              <div style="font-family: var(--font-display); font-size: 26px; color: #ffffff;" id="studentScoreDisplay">
+                0 / 2200 pts
+              </div>
+            </div>
+            <div id="studentStatusBadge" class="score score-pending" style="font-size: 14px; padding: 6px 14px; background: rgba(0,0,0,0.3); border-radius: 50px;">
+              En progreso
+            </div>
+          </div>
+
+          <div class="progress-bar-bg">
+            <div id="studentProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+          </div>
+
+          <div class="progress-stats-row">
+            <span id="studentApprovalTarget">Meta para aprobar: 1500 pts</span>
+            <span id="studentPercentText">0% completado</span>
+          </div>
         </div>
 
-        <div class="units-grid" id="unitsContainer">
-          <!-- Renderizado dinámicamente con JS / Supabase -->
+        <!-- Cuadrícula de Evaluaciones Reales -->
+        <div id="evaluationsContainer">
+          <!-- Renderizado dinámicamente según el curso (Adultos, Teens, Junior, Kids) -->
         </div>
       </section>
 
       <!-- 3. DASHBOARD DEL PROFESOR -->
       <section id="teacherDashboard" class="hidden">
-        <h1 class="page-title">Panel de Calificaciones</h1>
-        <p class="page-description">Busca a un estudiante para evaluar individualmente de la Unidad 1 a la 16 en Supabase.</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+          <div>
+            <h1 class="page-title" style="margin-bottom: 4px;">Panel de Calificaciones</h1>
+            <p class="page-description" style="margin-bottom: 0;">Gestiona las evaluaciones oficiales de Living English.</p>
+          </div>
+          <button class="btn-primary" onclick="toggleNewStudentModal(true)" style="width: auto; padding: 12px 22px; font-size: 14px; background: #2563eb;">
+            ➕ Registrar Nuevo Estudiante
+          </button>
+        </div>
 
         <div class="teacher-section">
           <!-- LISTA DE ESTUDIANTES -->
           <div class="student-list">
             <div class="form-group">
-              <input type="text" id="searchStudent" class="form-control" placeholder="Buscar estudiante..." onkeyup="filterStudents()">
+              <input type="text" id="searchStudent" class="form-control" placeholder="Buscar por nombre o correo..." onkeyup="filterStudents()">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <select id="filterProgramSelect" class="form-control" onchange="filterStudents()" style="font-size: 13px; padding: 8px 12px; background: rgba(0,0,0,0.5);">
+                <option value="all">Todos los programas</option>
+                <option value="adultos">Adultos</option>
+                <option value="teens">Teens</option>
+                <option value="junior">Junior</option>
+                <option value="kids">Kids</option>
+                <option value="nursery">Nursery</option>
+              </select>
             </div>
             <div id="studentsContainer">
-              <!-- Renderizado dinámicamente -->
+              <!-- Renderizado dinámicamente desde Supabase -->
             </div>
           </div>
 
-          <!-- EDITOR DE CALIFICACIONES -->
+          <!-- EDITOR DE CALIFICACIONES REALES -->
           <div class="grade-editor">
-            <h3 id="selectedStudentTitle" class="page-title" style="font-size: 24px;">Selecciona un estudiante</h3>
-            <p id="selectedStudentSub" class="page-description" style="font-size: 14px;">Haz clic en un alumno de la lista para gestionar sus unidades.</p>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h3 id="selectedStudentTitle" class="page-title" style="font-size: 24px;">Selecciona un estudiante</h3>
+                <p id="selectedStudentSub" class="page-description" style="font-size: 14px; margin-bottom: 10px;">Haz clic en un alumno de la lista para gestionar sus calificaciones.</p>
+              </div>
+              <div id="teacherStudentTotalPoints" style="font-size: 16px; font-weight: 700; color: var(--color-primary-light);"></div>
+            </div>
 
             <div class="teacher-grid" id="teacherUnitsGrid">
               <!-- Renderizado dinámicamente -->
@@ -134,28 +165,98 @@
     </main>
   </div>
 
-  <!-- MODAL DE CONFIGURACIÓN DE CREDENCIALES SUPABASE -->
-  <div id="configModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div class="auth-card" style="max-width: 500px; width: 100%; margin: 0; background: #0e387a; border: 1px solid rgba(255,255,255,0.4);">
-      <h3 class="page-title" style="font-size: 22px; margin-bottom: 12px;">Conectar con Supabase</h3>
-      <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 16px; line-height: 1.5;">
-        Pega tu URL del proyecto y tu <code>anon public key</code> de Supabase (Settings &rarr; API). Se guardarán en el navegador para conectar GitHub Pages a tu base de datos.
+  <!-- MODAL PARA QUE EL DOCENTE REGISTRE NUEVOS ESTUDIANTES -->
+  <div id="newStudentModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+    <div class="auth-card" style="max-width: 520px; width: 100%; margin: 20px auto; background: #0e387a; border: 1px solid rgba(255,255,255,0.4);">
+      <h3 class="page-title" style="font-size: 22px; margin-bottom: 6px;">➕ Registrar Nuevo Estudiante</h3>
+      <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 20px;">
+        Crea la cuenta del alumno en Supabase para que pueda acceder a su plataforma.
       </p>
 
-      <div class="form-group">
-        <label for="cfgSupabaseUrl">Project URL</label>
-        <input type="text" id="cfgSupabaseUrl" class="form-control" placeholder="https://xyzcompany.supabase.co">
-      </div>
+      <form onsubmit="handleCreateNewStudent(event)">
+        <div class="form-group">
+          <label for="newStudentFullName">Nombre Completo del Estudiante</label>
+          <input type="text" id="newStudentFullName" class="form-control" placeholder="Ej. Carlos Mendoza" required>
+        </div>
 
-      <div class="form-group">
-        <label for="cfgSupabaseKey">Anon / Public API Key</label>
-        <input type="password" id="cfgSupabaseKey" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-      </div>
+        <div class="form-group">
+          <label for="newStudentEmail">Correo Electrónico</label>
+          <input type="email" id="newStudentEmail" class="form-control" placeholder="alumno@livingenglish.com" required>
+        </div>
 
-      <div style="display: flex; gap: 12px; margin-top: 20px;">
-        <button class="btn-primary" style="flex: 1;" onclick="saveSupabaseConfig()">Guardar y Conectar</button>
-        <button class="btn-secondary" style="flex: 1;" onclick="toggleConfigModal(false)">Cancelar</button>
-      </div>
+        <div class="form-group">
+          <label for="newStudentPass">Contraseña Temporal</label>
+          <input type="password" id="newStudentPass" class="form-control" placeholder="Mínimo 6 caracteres (ej. Living2027*)" required minlength="6">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="newStudentProgram">Programa</label>
+            <select id="newStudentProgram" class="form-control" onchange="updateNewStudentLevelOptions()" style="background: rgba(0,0,0,0.5);">
+              <option value="adultos">Adultos (17+)</option>
+              <option value="teens">Teens (12-16)</option>
+              <option value="junior">Junior (8-11)</option>
+              <option value="kids">Kids (5-7)</option>
+              <option value="nursery">Nursery</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="newStudentCourseLevel">Nivel Asignado</label>
+            <select id="newStudentCourseLevel" class="form-control" style="background: rgba(0,0,0,0.5);">
+              <option value="Adultos 1">Adultos 1 (Basic)</option>
+              <option value="Adultos 2">Adultos 2</option>
+              <option value="Adultos 3">Adultos 3</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <button type="submit" id="btnSaveNewStudent" class="btn-primary" style="flex: 1; background: #22c55e; color: #0e387a;">Guardar y Crear Alumno</button>
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="toggleNewStudentModal(false)">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE RECUPERACIÓN DE CONTRASEÑA -->
+  <div id="recoveryModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div class="auth-card" style="max-width: 440px; width: 100%; margin: 0; background: #0e387a; border: 1px solid rgba(255,255,255,0.4);">
+      <h3 class="page-title" style="font-size: 22px; margin-bottom: 8px;">🔑 Recuperar Contraseña</h3>
+      <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 18px; line-height: 1.5;">
+        Ingresa tu correo institucional registrado y te enviaremos un enlace oficial para restablecer tu contraseña.
+      </p>
+
+      <form onsubmit="handleSendPasswordReset(event)">
+        <div class="form-group">
+          <label for="recoveryEmail">Correo Electrónico</label>
+          <input type="email" id="recoveryEmail" class="form-control" placeholder="tu_correo@livingenglish.com" required>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+          <button type="submit" id="btnSendRecovery" class="btn-primary" style="flex: 1;">Enviar Enlace</button>
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="toggleRecoveryModal(false)">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE ESTABLECER NUEVA CONTRASEÑA (RECOVERY CALLBACK) -->
+  <div id="resetPasswordModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div class="auth-card" style="max-width: 440px; width: 100%; margin: 0; background: #0e387a; border: 2px solid var(--color-success);">
+      <h3 class="page-title" style="font-size: 22px; margin-bottom: 8px;">🔐 Nueva Contraseña</h3>
+      <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 18px;">
+        Ingresa tu nueva contraseña para actualizar tu cuenta.
+      </p>
+
+      <form onsubmit="handleUpdateNewPassword(event)">
+        <div class="form-group">
+          <label for="updateNewPass">Nueva Contraseña</label>
+          <input type="password" id="updateNewPass" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
+        </div>
+
+        <button type="submit" id="btnUpdatePassword" class="btn-primary" style="background: #22c55e; color: #0e387a;">Guardar y Continuar</button>
+      </form>
     </div>
   </div>
 
@@ -163,11 +264,8 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- SCRIPTS -->
-  <!-- 1. SDK Oficial de Supabase vía CDN (compatible con GitHub Pages) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- 2. Cliente de Supabase -->
   <script src="assets/js/supabaseClient.js"></script>
-  <!-- 3. Lógica de la Plataforma -->
   <script src="assets/js/platform.js"></script>
 </body>
 </html>

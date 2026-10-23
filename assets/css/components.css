@@ -1,0 +1,211 @@
+/**
+ * Academia Living English - Reusable UI Components
+ */
+
+/* ==========================================================================
+   Logo de la Marca
+   ========================================================================== */
+.brand-logo-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-logo-img {
+  height: 72px;
+  width: auto;
+  object-fit: contain;
+  filter: var(--shadow-logo);
+  transition: transform var(--transition-fast);
+}
+
+.brand-logo-link:hover .brand-logo-img {
+  transform: scale(1.02);
+}
+
+@media (min-width: 768px) {
+  .brand-logo-img {
+    height: 84px;
+  }
+}
+
+/* ==========================================================================
+   Botones
+   ========================================================================== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 14px 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary-glass-soft);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 14px 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-focus);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(14, 56, 122, 0.9);
+  border-color: var(--color-white);
+}
+
+.btn-talk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 22px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-talk:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* ==========================================================================
+   Tipografía de Páginas
+   ========================================================================== */
+.page-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.1;
+  margin-bottom: 8px;
+  text-shadow: var(--text-shadow-hero);
+}
+
+@media (min-width: 768px) {
+  .page-title {
+    font-size: 48px;
+  }
+}
+
+.page-description {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-white);
+  margin-bottom: 24px;
+  text-shadow: var(--text-shadow-contrast);
+}
+
+/* ==========================================================================
+   Formularios y Controles
+   ========================================================================== */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: var(--color-dark-bg);
+  color: var(--color-white);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-control:focus {
+  border-color: var(--color-white);
+  box-shadow: 0 0 0 2px var(--color-border);
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ==========================================================================
+   Notificaciones Toast
+   ========================================================================== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 360px;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 14px 20px;
+  border-radius: var(--radius-lg);
+  color: var(--color-white);
+  background: rgba(14, 56, 122, 0.95);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  font-size: 14px;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.toast.toast-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.toast-success {
+  border-left: 4px solid var(--color-success);
+}
+
+.toast.toast-error {
+  border-left: 4px solid var(--color-danger);
+}
+
+.toast.toast-info {
+  border-left: 4px solid var(--color-primary-light);
+}
+
