@@ -316,6 +316,27 @@ function toggleRecoveryModal(open, event) {
   }
 }
 
+// Helper para obtener la URL de retorno canónica de autenticación (GitHub Pages o local)
+function getAuthRedirectUrl() {
+  if (typeof window !== 'undefined' && window.location) {
+    const origin = window.location.origin;
+    let pathname = window.location.pathname;
+
+    // Normalizar a cursos.html
+    if (!pathname.endsWith('cursos.html')) {
+      if (pathname.endsWith('/')) {
+        pathname += 'cursos.html';
+      } else {
+        const lastSlash = pathname.lastIndexOf('/');
+        pathname = pathname.substring(0, lastSlash + 1) + 'cursos.html';
+      }
+    }
+
+    return `${origin}${pathname}`;
+  }
+  return 'https://trocostudios-projects.github.io/LivingEnglish/cursos.html';
+}
+
 async function handleSendPasswordReset(e) {
   e.preventDefault();
   const email = document.getElementById('recoveryEmail').value.trim();
@@ -328,8 +349,9 @@ async function handleSendPasswordReset(e) {
 
   const client = getClient();
   try {
+    const redirectUrl = getAuthRedirectUrl();
     const { error } = await client.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.href
+      redirectTo: redirectUrl
     });
 
     if (error) throw error;
@@ -1425,10 +1447,12 @@ async function handleCreateNewStudent(e) {
       }
     );
 
+    const redirectUrl = getAuthRedirectUrl();
     const { data: authData, error } = await tempClient.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
           document_id: documentId,
@@ -1836,6 +1860,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (modal) modal.classList.remove('hidden');
     }
   });
+
+  // Detección directa por parámetros de URL (hash o query params de Supabase)
+  try {
+    const hash = window.location.hash ? window.location.hash.substring(1) : '';
+    const hashParams = new URLSearchParams(hash);
+    const searchParams = new URLSearchParams(window.location.search);
+    const authType = hashParams.get('type') || searchParams.get('type');
+
+    if (authType === 'recovery') {
+      const modal = document.getElementById('resetPasswordModal');
+      if (modal) modal.classList.remove('hidden');
+    } else if (authType === 'signup') {
+      showToast("🎉 ¡Correo verificado con éxito! Ya puedes iniciar sesión.", "success", 6000);
+    }
+  } catch (errParams) {
+    console.warn("Detección de parámetros URL:", errParams);
+  }
 
   // 2. Restaurar sesión existente
   try {
