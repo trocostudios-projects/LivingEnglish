@@ -53,6 +53,6 @@
   --transition-normal: 0.3s ease;
 
   /* Imágenes de Fondo */
-  --bg-hero-desktop: url('https://lh3.googleusercontent.com/d/19sb4amWXBo82wq92BbvMXkU90TgwK7Wr');
-  --bg-hero-mobile: url('https://lh3.googleusercontent.com/d/1xz2FkAU7GdVG7iQHW48IheyvTH4ooHMp');
+  --bg-hero-desktop: url('../img/hero-desktop.jpg');
+  --bg-hero-mobile: url('../img/hero-mobile.jpg');
 }
