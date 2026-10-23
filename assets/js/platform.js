@@ -540,6 +540,9 @@ async function logout() {
   currentSessionUser = null;
   selectedStudent = null;
 
+  switchStudentTab('grades');
+  closeGameLauncher();
+
   document.getElementById('authSection').classList.remove('hidden');
   document.getElementById('userBadge').classList.add('hidden');
   document.getElementById('studentDashboard').classList.add('hidden');
@@ -549,11 +552,78 @@ async function logout() {
 }
 
 // ==============================================================================
-// 8. DASHBOARD DEL ESTUDIANTE (CON DISCRIMINACIÓN POR NIVEL)
+// 8. DASHBOARD DEL ESTUDIANTE (CON DISCRIMINACIÓN POR NIVEL Y SUBMENÚS)
 // ==============================================================================
 let studentActiveViewingLevel = null;
 
+function switchStudentTab(tab) {
+  const btnGrades = document.getElementById('tabBtnGrades');
+  const btnGames = document.getElementById('tabBtnGames');
+  const contentGrades = document.getElementById('studentTabGrades');
+  const contentGames = document.getElementById('studentTabGames');
+
+  if (!btnGrades || !btnGames || !contentGrades || !contentGames) return;
+
+  if (tab === 'games') {
+    btnGrades.classList.remove('active');
+    btnGames.classList.add('active');
+    contentGrades.classList.add('hidden');
+    contentGames.classList.remove('hidden');
+  } else {
+    btnGrades.classList.add('active');
+    btnGames.classList.remove('active');
+    contentGrades.classList.remove('hidden');
+    contentGames.classList.add('hidden');
+  }
+}
+
+function openGameLauncher(gameId, title, icon, subtitle, desc, xp, category) {
+  const modal = document.getElementById('gameLauncherModal');
+  if (!modal) return;
+
+  const iconElem = document.getElementById('gameModalIcon');
+  const titleElem = document.getElementById('gameModalTitle');
+  const subElem = document.getElementById('gameModalSubtitle');
+  const descElem = document.getElementById('gameModalDesc');
+  const xpElem = document.getElementById('gameModalXp');
+  const badgeElem = document.getElementById('gameModalBadge');
+  const targetLevelElem = document.getElementById('gameModalTargetLevel');
+
+  if (iconElem) iconElem.innerText = icon || '🎮';
+  if (titleElem) titleElem.innerText = title || 'Juego Interactivo';
+  if (subElem) subElem.innerText = subtitle || 'Living English Games';
+  if (descElem) descElem.innerText = desc || 'Desafío interactivo para reforzar tu inglés.';
+  if (xpElem) xpElem.innerText = xp || '+50 XP';
+
+  if (badgeElem) {
+    badgeElem.innerText = category || 'Práctica';
+    badgeElem.className = 'game-category-tag';
+    const catLower = (category || '').toLowerCase();
+    if (catLower.includes('vocab')) badgeElem.classList.add('tag-vocab');
+    else if (catLower.includes('gram')) badgeElem.classList.add('tag-grammar');
+    else if (catLower.includes('memo') || catLower.includes('audio')) badgeElem.classList.add('tag-memory');
+    else if (catLower.includes('speak')) badgeElem.classList.add('tag-speaking');
+    else if (catLower.includes('triv') || catLower.includes('quiz')) badgeElem.classList.add('tag-trivia');
+    else badgeElem.classList.add('tag-situational');
+  }
+
+  const currentLevel = (currentUserProfile && currentUserProfile.course_level) ? currentUserProfile.course_level : 'Tu nivel actual';
+  if (targetLevelElem) {
+    targetLevelElem.innerText = currentLevel;
+  }
+
+  modal.classList.remove('hidden');
+}
+
+function closeGameLauncher() {
+  const modal = document.getElementById('gameLauncherModal');
+  if (modal) {
+    modal.classList.add('hidden');
+  }
+}
+
 async function setupStudentView() {
+  switchStudentTab('grades');
   const currentActualLevel = currentUserProfile.course_level || 'Adultos 1';
   if (!studentActiveViewingLevel) {
     studentActiveViewingLevel = currentActualLevel;

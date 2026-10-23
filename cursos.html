@@ -97,33 +97,180 @@
           </div>
         </div>
 
-        <!-- Tarjeta de Progreso y Puntos Acumulados -->
-        <div id="studentProgressCard" class="progress-summary-card">
-          <div class="progress-header">
-            <div>
-              <span style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted);">Progreso de Calificaciones</span>
-              <div style="font-family: var(--font-display); font-size: 26px; color: #ffffff;" id="studentScoreDisplay">
-                0 / 2200 pts
+        <!-- SUBMENÚ DE SECCIONES DEL ESTUDIANTE -->
+        <nav class="student-tabs-wrapper" aria-label="Navegación del Estudiante">
+          <button type="button" class="student-tab-pill active" id="tabBtnGrades" onclick="switchStudentTab('grades')">
+            <span style="font-size: 16px;">📊</span>
+            <span>Mis Evaluaciones & Notas</span>
+          </button>
+          <button type="button" class="student-tab-pill" id="tabBtnGames" onclick="switchStudentTab('games')">
+            <span style="font-size: 16px;">🎮</span>
+            <span>Juegos Interactivos</span>
+            <span class="badge-pill-accent">¡Nuevo!</span>
+          </button>
+        </nav>
+
+        <!-- SUBSECCIÓN 1: EVALUACIONES Y NOTAS -->
+        <div id="studentTabGrades">
+          <!-- Tarjeta de Progreso y Puntos Acumulados -->
+          <div id="studentProgressCard" class="progress-summary-card">
+            <div class="progress-header">
+              <div>
+                <span style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted);">Progreso de Calificaciones</span>
+                <div style="font-family: var(--font-display); font-size: 26px; color: #ffffff;" id="studentScoreDisplay">
+                  0 / 2200 pts
+                </div>
+              </div>
+              <div id="studentStatusBadge" class="score score-pending" style="font-size: 14px; padding: 6px 14px; background: rgba(0,0,0,0.3); border-radius: 50px;">
+                En progreso
               </div>
             </div>
-            <div id="studentStatusBadge" class="score score-pending" style="font-size: 14px; padding: 6px 14px; background: rgba(0,0,0,0.3); border-radius: 50px;">
-              En progreso
+
+            <div class="progress-bar-bg">
+              <div id="studentProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+
+            <div class="progress-stats-row">
+              <span id="studentApprovalTarget">Meta para aprobar: 1500 pts</span>
+              <span id="studentPercentText">0% completado</span>
             </div>
           </div>
 
-          <div class="progress-bar-bg">
-            <div id="studentProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
-          </div>
-
-          <div class="progress-stats-row">
-            <span id="studentApprovalTarget">Meta para aprobar: 1500 pts</span>
-            <span id="studentPercentText">0% completado</span>
+          <!-- Cuadrícula de Evaluaciones Reales -->
+          <div id="evaluationsContainer">
+            <!-- Renderizado dinámicamente según el curso (Adultos, Teens, Junior, Kids) -->
           </div>
         </div>
 
-        <!-- Cuadrícula de Evaluaciones Reales -->
-        <div id="evaluationsContainer">
-          <!-- Renderizado dinámicamente según el curso (Adultos, Teens, Junior, Kids) -->
+        <!-- SUBSECCIÓN 2: JUEGOS INTERACTIVOS (6 TARJETAS) -->
+        <div id="studentTabGames" class="hidden">
+          <!-- Banner motivacional de Juegos -->
+          <div class="games-header-banner">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                <span style="font-size: 26px;">🕹️</span>
+                <h2 style="font-family: var(--font-display); font-size: 22px; color: #ffffff; margin: 0;">Zona de Retos & Juegos Interactivos</h2>
+              </div>
+              <p style="color: var(--color-muted); font-size: 14px; margin: 0; line-height: 1.5;">
+                Refuerza tu vocabulario, fluidez oral y estructuras gramaticales de manera dinámica mientras ganas puntos de experiencia (XP).
+              </p>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.2); font-size: 13px; display: flex; align-items: center; gap: 8px;">
+              <span>🏆 Recompensa Total:</span>
+              <strong style="color: #fbbf24; font-size: 15px;">+405 XP</strong>
+            </div>
+          </div>
+
+          <!-- Cuadrícula con 6 Tarjetas de Juegos Interactivos -->
+          <div class="games-grid">
+            <!-- 1. Word Hunter -->
+            <div class="game-card" onclick="openGameLauncher('word-hunter', 'Word Hunter', '🔤', 'Sopa de Letras & Vocabulario', 'Encuentra palabras clave de tu unidad actual en una cuadrícula interactiva contra el cronómetro. ¡Entrena tu rapidez mental y ortografía!', '+50 XP', 'Vocabulario')">
+              <div class="game-card-badge-row">
+                <span class="game-category-tag tag-vocab">Vocabulario</span>
+                <span class="game-xp-tag">⚡ +50 XP</span>
+              </div>
+              <div class="game-card-icon">🔤</div>
+              <h3 class="game-card-title">Word Hunter</h3>
+              <p class="game-card-subtitle">Sopa de letras & Agilidad léxica</p>
+              <p class="game-card-desc">
+                Localiza palabras clave del vocabulario oficial antes de que acabe el tiempo. ¡Entrena tu rapidez mental y ortografía!
+              </p>
+              <div class="game-card-footer">
+                <span class="game-card-level">Todos los niveles</span>
+                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
+              </div>
+            </div>
+
+            <!-- 2. Grammar Rocket -->
+            <div class="game-card" onclick="openGameLauncher('grammar-rocket', 'Grammar Rocket', '🚀', 'Estructuras y Tiempos Verbales', 'Conecta y ordena sujetos, auxiliares y verbos en el orden sintáctico correcto para recargar el combustible del cohete.', '+75 XP', 'Gramática')">
+              <div class="game-card-badge-row">
+                <span class="game-category-tag tag-grammar">Gramática</span>
+                <span class="game-xp-tag">⚡ +75 XP</span>
+              </div>
+              <div class="game-card-icon">🚀</div>
+              <h3 class="game-card-title">Grammar Rocket</h3>
+              <p class="game-card-subtitle">Estructuras y tiempos verbales</p>
+              <p class="game-card-desc">
+                Conecta sujetos, auxiliares y verbos en el orden sintáctico correcto para recargar el combustible del cohete espacial.
+              </p>
+              <div class="game-card-footer">
+                <span class="game-card-level">Básico a Avanzado</span>
+                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
+              </div>
+            </div>
+
+            <!-- 3. Flash Cards Match -->
+            <div class="game-card" onclick="openGameLauncher('flash-match', 'Flash Cards Match', '🃏', 'Memoria & Fonética Nativa', 'Descubre pares de tarjetas volteadas relacionando imágenes, conceptos y expresiones en inglés con pronunciación de hablantes nativos.', '+40 XP', 'Memoria & Audio')">
+              <div class="game-card-badge-row">
+                <span class="game-category-tag tag-memory">Memoria & Audio</span>
+                <span class="game-xp-tag">⚡ +40 XP</span>
+              </div>
+              <div class="game-card-icon">🃏</div>
+              <h3 class="game-card-title">Flash Cards Match</h3>
+              <p class="game-card-subtitle">Emparejamiento y audios nativos</p>
+              <p class="game-card-desc">
+                Descubre pares de tarjetas volteadas relacionando imágenes, palabras y su pronunciación oficial con acento natural.
+              </p>
+              <div class="game-card-footer">
+                <span class="game-card-level">Todos los cursos</span>
+                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
+              </div>
+            </div>
+
+            <!-- 4. Speed Speaking Challenge -->
+            <div class="game-card" onclick="openGameLauncher('speed-speaking', 'Speed Speaking Challenge', '🎙️', 'Expresión Oral & Entonación', 'Escucha frases de conversaciones reales y repítelas con precisión ante el micrófono para ganar medallas de fluidez y claridad.', '+100 XP', 'Speaking')">
+              <div class="game-card-badge-row">
+                <span class="game-category-tag tag-speaking">Speaking</span>
+                <span class="game-xp-tag">⚡ +100 XP</span>
+              </div>
+              <div class="game-card-icon">🎙️</div>
+              <h3 class="game-card-title">Speed Speaking</h3>
+              <p class="game-card-subtitle">Reconocimiento oral & Fluidez</p>
+              <p class="game-card-desc">
+                Habla en voz alta frente al micrófono y recibe análisis de entonación y claridad para perfeccionar tu habla conversacional.
+              </p>
+              <div class="game-card-footer">
+                <span class="game-card-level">Conversacional</span>
+                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
+              </div>
+            </div>
+
+            <!-- 5. Trivia English Arena -->
+            <div class="game-card" onclick="openGameLauncher('trivia-arena', 'Trivia English Arena', '🏆', 'Cultura General & Idioms', 'Preguntas de opción múltiple contra el reloj sobre cultura anglosajona, modismos populares (idioms) y falsos amigos.', '+60 XP', 'Cultura & Quiz')">
+              <div class="game-card-badge-row">
+                <span class="game-category-tag tag-trivia">Cultura & Quiz</span>
+                <span class="game-xp-tag">⚡ +60 XP</span>
+              </div>
+              <div class="game-card-icon">🏆</div>
+              <h3 class="game-card-title">Trivia English Arena</h3>
+              <p class="game-card-subtitle">Modismos, cultura e idioms</p>
+              <p class="game-card-desc">
+                Supera rondas de preguntas rápidas sobre expresiones de la vida diaria, modismos anglosajones y datos culturales.
+              </p>
+              <div class="game-card-footer">
+                <span class="game-card-level">Multinivel</span>
+                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
+              </div>
+            </div>
+
+            <!-- 6. Sentence Builder Puzzle -->
+            <div class="game-card" onclick="openGameLauncher('sentence-puzzle', 'Sentence Builder Puzzle', '🧩', 'Diálogos de Situaciones Reales', 'Arma conversaciones cotidianas ordenando fragmentos en situaciones reales: en el aeropuerto, en un restaurante o de compras.', '+80 XP', 'Situaciones Reales')">
+              <div class="game-card-badge-row">
+                <span class="game-category-tag tag-situational">Situaciones Reales</span>
+                <span class="game-xp-tag">⚡ +80 XP</span>
+              </div>
+              <div class="game-card-icon">🧩</div>
+              <h3 class="game-card-title">Sentence Builder</h3>
+              <p class="game-card-subtitle">Diálogos situacionales interactivos</p>
+              <p class="game-card-desc">
+                Arrastra y organiza fragmentos de diálogo para resolver situaciones cotidianas: pedir comida, pedir indicaciones o compras.
+              </p>
+              <div class="game-card-footer">
+                <span class="game-card-level">Práctica Activa</span>
+                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -521,6 +668,37 @@
 
         <button type="submit" id="btnUpdatePassword" class="btn-primary" style="background: #22c55e; color: #0e387a;">Guardar y Continuar</button>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE LANZADOR DE JUEGOS INTERACTIVOS -->
+  <div id="gameLauncherModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1002; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+    <div class="auth-card" style="max-width: 480px; width: 100%; margin: auto; background: #0e387a; border: 2px solid var(--color-primary-light); text-align: center; position: relative;">
+      <button type="button" onclick="closeGameLauncher()" style="position: absolute; top: 14px; right: 16px; background: none; border: none; color: #ffffff; font-size: 26px; cursor: pointer; line-height: 1;">&times;</button>
+      
+      <div id="gameModalIcon" style="font-size: 52px; margin-bottom: 10px;">🎮</div>
+      <div id="gameModalBadge" class="game-category-tag tag-vocab" style="display: inline-block; margin-bottom: 8px;">Categoría</div>
+      <h3 id="gameModalTitle" class="page-title" style="font-size: 22px; margin-bottom: 4px;">Nombre del Juego</h3>
+      <p id="gameModalSubtitle" style="font-size: 13px; color: var(--color-accent); font-weight: 600; margin-bottom: 16px;">Subtítulo</p>
+      
+      <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 18px; text-align: left;">
+        <p id="gameModalDesc" style="font-size: 13px; color: #e2e8f0; line-height: 1.5; margin-bottom: 12px;">
+          Descripción detallada del juego.
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--color-muted); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; flex-wrap: wrap; gap: 6px;">
+          <span>Recompensa: <strong id="gameModalXp" style="color: #fbbf24;">+50 XP</strong></span>
+          <span>Nivel sugerido: <strong id="gameModalTargetLevel" style="color: #38bdf8;">Todos los niveles</strong></span>
+        </div>
+      </div>
+
+      <div style="background: rgba(37, 99, 235, 0.15); border: 1px dashed rgba(59, 130, 246, 0.5); border-radius: var(--radius-md); padding: 12px; margin-bottom: 20px; font-size: 12px; color: #93c5fd; text-align: center; line-height: 1.45;">
+        ⚙️ <strong>¡Módulo en preparación interactiva!</strong><br>
+        Estamos conectando este juego directamente con tu nivel académico actual. Muy pronto podrás iniciar partidas en vivo y acumular puntos XP en tu perfil.
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn-primary" style="flex: 1;" onclick="closeGameLauncher()">¡Entendido!</button>
+      </div>
     </div>
   </div>
 
