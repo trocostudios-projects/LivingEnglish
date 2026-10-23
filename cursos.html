@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Academia Living English — Plataforma Educativa</title>
+  
+  <!-- Fuentes Google: Fredoka y Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos Modulares -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/platform.css">
+</head>
+<body>
+
+  <div class="app-viewport">
+    <!-- CABECERA DE LA NAVEGACIÓN -->
+    <header class="app-header">
+      <a href="index.html" class="brand-logo-link" aria-label="Academia Living English">
+        <img src="https://lh3.googleusercontent.com/d/1C0v1Ly7YB-5Rtbj1a7Bj4CCRo3OMHYS6" alt="Academia Living English Logo" class="brand-logo-img">
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button id="btnConfigModal" class="btn-talk" style="padding: 6px 14px; font-size: 12px; background: rgba(0,0,0,0.3);" onclick="toggleConfigModal(true)">
+          ⚙️ Supabase
+        </button>
+
+        <div id="userBadge" class="user-badge hidden">
+          <span id="userName" class="user-badge-name">Usuario</span>
+          <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-container">
+
+      <!-- 1. FORMULARIO DE ACCESO / IDENTIFICACIÓN -->
+      <section id="authSection" class="auth-card">
+        <h2 class="page-title text-center" style="font-size: 28px;">Plataforma Educativa</h2>
+        <p class="page-description text-center" id="authSubtitle" style="font-size: 14px; margin-bottom: 20px;">
+          Ingresa con tu usuario para gestionar exámenes y notas
+        </p>
+
+        <div class="role-tabs">
+          <button class="role-tab active" id="tabStudent" onclick="switchRole('estudiante')">Estudiante</button>
+          <button class="role-tab" id="tabTeacher" onclick="switchRole('profesor')">Profesor</button>
+        </div>
+
+        <form id="authForm" onsubmit="handleAuthSubmit(event)">
+          <div class="form-group hidden" id="groupFullName">
+            <label for="regFullName">Nombre Completo</label>
+            <input type="text" id="regFullName" class="form-control" placeholder="Juan Pérez">
+          </div>
+
+          <div class="form-group">
+            <label for="loginEmail">Correo Electrónico</label>
+            <input type="email" id="loginEmail" class="form-control" placeholder="ejemplo@livingenglish.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPass">Contraseña</label>
+            <input type="password" id="loginPass" class="form-control" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" class="btn-primary" id="btnAuthAction">Ingresar como Estudiante</button>
+
+          <div style="margin-top: 16px; text-align: center; font-size: 13px;">
+            <a href="#" id="toggleAuthModeLink" onclick="toggleAuthMode(event)" style="color: var(--color-primary-light); text-decoration: underline;">
+              ¿No tienes cuenta? Regístrate aquí
+            </a>
+          </div>
+        </form>
+      </section>
+
+      <!-- 2. DASHBOARD DEL ESTUDIANTE -->
+      <section id="studentDashboard" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+          <div>
+            <h1 class="page-title">Mis Exámenes por Módulo</h1>
+            <p class="page-description">Revisa tus calificaciones y progreso en cada unidad (Unit 1 a 16).</p>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); font-size: 14px;">
+            Nivel asignado: <strong id="studentCurrentLevelBadge" style="color: var(--color-primary-light);">A1</strong>
+          </div>
+        </div>
+
+        <div class="level-tabs">
+          <button class="level-btn active" onclick="filterLevel('A1', this)">Módulo A1</button>
+          <button class="level-btn" onclick="filterLevel('A2', this)">Módulo A2</button>
+          <button class="level-btn" onclick="filterLevel('B1', this)">Módulo B1</button>
+          <button class="level-btn" onclick="filterLevel('B2', this)">Módulo B2</button>
+          <button class="level-btn" onclick="filterLevel('C1', this)">Módulo C1</button>
+        </div>
+
+        <div class="units-grid" id="unitsContainer">
+          <!-- Renderizado dinámicamente con JS / Supabase -->
+        </div>
+      </section>
+
+      <!-- 3. DASHBOARD DEL PROFESOR -->
+      <section id="teacherDashboard" class="hidden">
+        <h1 class="page-title">Panel de Calificaciones</h1>
+        <p class="page-description">Busca a un estudiante para evaluar individualmente de la Unidad 1 a la 16 en Supabase.</p>
+
+        <div class="teacher-section">
+          <!-- LISTA DE ESTUDIANTES -->
+          <div class="student-list">
+            <div class="form-group">
+              <input type="text" id="searchStudent" class="form-control" placeholder="Buscar estudiante..." onkeyup="filterStudents()">
+            </div>
+            <div id="studentsContainer">
+              <!-- Renderizado dinámicamente -->
+            </div>
+          </div>
+
+          <!-- EDITOR DE CALIFICACIONES -->
+          <div class="grade-editor">
+            <h3 id="selectedStudentTitle" class="page-title" style="font-size: 24px;">Selecciona un estudiante</h3>
+            <p id="selectedStudentSub" class="page-description" style="font-size: 14px;">Haz clic en un alumno de la lista para gestionar sus unidades.</p>
+
+            <div class="teacher-grid" id="teacherUnitsGrid">
+              <!-- Renderizado dinámicamente -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL DE CONFIGURACIÓN DE CREDENCIALES SUPABASE -->
+  <div id="configModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div class="auth-card" style="max-width: 500px; width: 100%; margin: 0; background: #0e387a; border: 1px solid rgba(255,255,255,0.4);">
+      <h3 class="page-title" style="font-size: 22px; margin-bottom: 12px;">Conectar con Supabase</h3>
+      <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 16px; line-height: 1.5;">
+        Pega tu URL del proyecto y tu <code>anon public key</code> de Supabase (Settings &rarr; API). Se guardarán en el navegador para conectar GitHub Pages a tu base de datos.
+      </p>
+
+      <div class="form-group">
+        <label for="cfgSupabaseUrl">Project URL</label>
+        <input type="text" id="cfgSupabaseUrl" class="form-control" placeholder="https://xyzcompany.supabase.co">
+      </div>
+
+      <div class="form-group">
+        <label for="cfgSupabaseKey">Anon / Public API Key</label>
+        <input type="password" id="cfgSupabaseKey" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 20px;">
+        <button class="btn-primary" style="flex: 1;" onclick="saveSupabaseConfig()">Guardar y Conectar</button>
+        <button class="btn-secondary" style="flex: 1;" onclick="toggleConfigModal(false)">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR TOAST PARA NOTIFICACIONES -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- SCRIPTS -->
+  <!-- 1. SDK Oficial de Supabase vía CDN (compatible con GitHub Pages) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. Cliente de Supabase -->
+  <script src="assets/js/supabaseClient.js"></script>
+  <!-- 3. Lógica de la Plataforma -->
+  <script src="assets/js/platform.js"></script>
+</body>
+</html>
