@@ -258,6 +258,12 @@ function switchRole(role) {
   }
 }
 
+// Helper para obtener el cliente oficial de Supabase
+function getClient() {
+  if (window.getSupabaseClient) return window.getSupabaseClient();
+  return window.supabaseClient || null;
+}
+
 // ==============================================================================
 // 5. INICIO DE SESIÓN CON SUPABASE AUTH (SIN MOCK NI DEMO)
 // ==============================================================================
@@ -266,7 +272,7 @@ async function handleAuthSubmit(e) {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPass').value;
 
-  const client = window.supabaseClient;
+  const client = getClient();
   if (!client) {
     showToast("❌ Error: No se pudo conectar con el servidor de Supabase.", "error");
     return;
@@ -320,7 +326,7 @@ async function handleSendPasswordReset(e) {
   btn.disabled = true;
   btn.innerText = 'Enviando...';
 
-  const client = window.supabaseClient;
+  const client = getClient();
   try {
     const { error } = await client.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.href
@@ -352,7 +358,7 @@ async function handleUpdateNewPassword(e) {
   btn.disabled = true;
   btn.innerText = 'Actualizando...';
 
-  const client = window.supabaseClient;
+  const client = getClient();
   try {
     const { error } = await client.auth.updateUser({ password: newPassword });
     if (error) throw error;
@@ -373,7 +379,7 @@ async function handleUpdateNewPassword(e) {
 // ==============================================================================
 async function initAuthenticatedUser(user) {
   currentSessionUser = user;
-  const client = window.supabaseClient;
+  const client = getClient();
 
   // Consultar perfil oficial en public.profiles
   const { data: profile, error } = await client
@@ -411,7 +417,7 @@ async function initAuthenticatedUser(user) {
 }
 
 async function logout() {
-  const client = window.supabaseClient;
+  const client = getClient();
   if (client) {
     await client.auth.signOut();
   }
@@ -446,7 +452,7 @@ function setupStudentView() {
 }
 
 async function loadStudentGrades() {
-  const client = window.supabaseClient;
+  const client = getClient();
   studentGradesCache = {};
 
   if (client && currentUserProfile) {
@@ -546,7 +552,7 @@ function renderStudentEvaluations() {
 // 9. DASHBOARD DEL PROFESOR (CONSULTA Y CALIFICACIÓN REAL EN SUPABASE)
 // ==============================================================================
 async function loadTeacherStudents() {
-  const client = window.supabaseClient;
+  const client = getClient();
   teacherStudentsList = [];
 
   const { data, error } = await client
@@ -623,7 +629,7 @@ async function selectStudent(studentId) {
   grid.innerHTML = '<div style="color: var(--color-muted); padding: 20px;">Cargando lista de evaluaciones...</div>';
 
   selectedStudentGrades = {};
-  const client = window.supabaseClient;
+  const client = getClient();
 
   const { data, error } = await client
     .from('student_grades')
@@ -683,7 +689,7 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
     btn.innerText = 'Guardando...';
   }
 
-  const client = window.supabaseClient;
+  const client = getClient();
 
   try {
     if (rawVal === '') {
@@ -842,7 +848,7 @@ async function handleCreateNewStudent(e) {
 // 11. INICIALIZACIÓN Y DETECCIÓN DE EVENTOS AUTH
 // ==============================================================================
 document.addEventListener('DOMContentLoaded', async () => {
-  const client = window.supabaseClient;
+  const client = getClient();
   if (!client) return;
 
   // 1. Detectar si el usuario viene de un enlace de recuperación de contraseña
