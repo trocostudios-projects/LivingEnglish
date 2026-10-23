@@ -375,6 +375,87 @@ async function handleUpdateNewPassword(e) {
 }
 
 // ==============================================================================
+// 6.5. GESTIÓN Y CÁLCULO DE CADUCIDAD DE MATRÍCULA
+// ==============================================================================
+function getExpirationInfo(expiresAt) {
+  if (!expiresAt) {
+    return {
+      status: 'unlimited',
+      label: 'Acceso continuo',
+      chipClass: 'chip-none',
+      days: Infinity,
+      formattedDate: 'Permanente'
+    };
+  }
+
+  const expDate = new Date(expiresAt);
+  if (isNaN(expDate.getTime())) {
+    return {
+      status: 'unlimited',
+      label: 'Acceso continuo',
+      chipClass: 'chip-none',
+      days: Infinity,
+      formattedDate: 'Permanente'
+    };
+  }
+
+  // Establecer hasta el final del día indicado
+  expDate.setHours(23, 59, 59, 999);
+  const now = new Date();
+  const diffMs = expDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  const day = String(expDate.getDate()).padStart(2, '0');
+  const month = String(expDate.getMonth() + 1).padStart(2, '0');
+  const year = expDate.getFullYear();
+  const formattedDate = `${day}/${month}/${year}`;
+
+  if (diffDays < 0) {
+    return {
+      status: 'expired',
+      label: `🔴 Caducado (${Math.abs(diffDays)}d)`,
+      chipClass: 'chip-expired',
+      days: diffDays,
+      formattedDate
+    };
+  } else if (diffDays <= 7) {
+    return {
+      status: 'warning',
+      label: `🟡 Vence en ${diffDays} día${diffDays === 1 ? '' : 's'}`,
+      chipClass: 'chip-warning',
+      days: diffDays,
+      formattedDate
+    };
+  } else {
+    return {
+      status: 'active',
+      label: `🟢 Vence: ${formattedDate}`,
+      chipClass: 'chip-active',
+      days: diffDays,
+      formattedDate
+    };
+  }
+}
+
+function showExpiredAccountModal(profile, expInfo) {
+  const modal = document.getElementById('expiredAccountModal');
+  const msgElem = document.getElementById('expiredAccountMessage');
+  if (msgElem) {
+    msgElem.innerHTML = `
+      Hola <strong>${profile.full_name}</strong>. El periodo oficial de tu matrícula en Living English finalizó el <strong>${expInfo.formattedDate}</strong>.<br><br>
+      Para reactivar tu plataforma y continuar con tus cursos, por favor comunícate con la administración académica o tu profesor.
+    `;
+  }
+  if (modal) modal.classList.remove('hidden');
+}
+
+async function logoutFromExpired() {
+  const modal = document.getElementById('expiredAccountModal');
+  if (modal) modal.classList.add('hidden');
+  await logout();
+}
+
+// ==============================================================================
 // 7. INICIALIZACIÓN DE USUARIO AUTENTICADO
 // ==============================================================================
 async function initAuthenticatedUser(user) {
@@ -392,6 +473,20 @@ async function initAuthenticatedUser(user) {
     console.error("No se encontró el perfil en public.profiles:", error);
     showToast("⚠️ No se encontró perfil institucional para este usuario.", "error");
     return;
+  }
+
+  // Sincronizar fecha de expiración si existe en metadata o en almacenamiento local
+  const studentExpiresAt = profile.expires_at || user.user_metadata?.expires_at || localStorage.getItem('le_student_expires_' + profile.id);
+  profile.expires_at = studentExpiresAt;
+
+  // Validación estricta de caducidad para estudiantes
+  if (profile.role === 'estudiante' && studentExpiresAt) {
+    const expInfo = getExpirationInfo(studentExpiresAt);
+    if (expInfo.status === 'expired') {
+      await client.auth.signOut();
+      showExpiredAccountModal(profile, expInfo);
+      return;
+    }
   }
 
   currentUserProfile = profile;
@@ -449,6 +544,34 @@ function setupStudentView() {
     : (config.isNursery ? 'Seguimiento de estimulación diaria' : `Meta para aprobar: ${config.passingScore} / ${config.maxPoints} pts`);
 
   document.getElementById('studentApprovalTarget').innerText = targetText;
+
+  // Mostrar aviso de caducidad / vigencia en el panel del alumno
+  const expiryNotice = document.getElementById('studentExpiryNotice');
+  const expiryText = document.getElementById('studentExpiryText');
+  const expiryBadge = document.getElementById('studentExpiryBadge');
+  const expiryIcon = document.getElementById('studentExpiryIcon');
+
+  if (expiryNotice && currentUserProfile.expires_at) {
+    const info = getExpirationInfo(currentUserProfile.expires_at);
+    expiryNotice.classList.remove('hidden');
+    if (info.status === 'warning') {
+      expiryNotice.style.background = 'rgba(234, 179, 8, 0.15)';
+      expiryNotice.style.border = '1px solid rgba(234, 179, 8, 0.4)';
+      expiryIcon.innerText = '⚠️';
+      expiryText.innerHTML = `Tu matrícula vence pronto: <strong>${info.formattedDate}</strong> (${info.days} días restantes). Contacta a la academia para renovar.`;
+      expiryBadge.className = 'expiry-chip chip-warning';
+      expiryBadge.innerText = 'Por vencer';
+    } else {
+      expiryNotice.style.background = 'rgba(34, 197, 94, 0.12)';
+      expiryNotice.style.border = '1px solid rgba(34, 197, 94, 0.35)';
+      expiryIcon.innerText = '🗓️';
+      expiryText.innerHTML = `Acceso oficial activo hasta: <strong>${info.formattedDate}</strong> (${info.days} días de vigencia).`;
+      expiryBadge.className = 'expiry-chip chip-active';
+      expiryBadge.innerText = 'Activo';
+    }
+  } else if (expiryNotice) {
+    expiryNotice.classList.add('hidden');
+  }
 }
 
 async function loadStudentGrades() {
@@ -549,7 +672,7 @@ function renderStudentEvaluations() {
 }
 
 // ==============================================================================
-// 9. DASHBOARD DEL PROFESOR (CONSULTA Y CALIFICACIÓN REAL EN SUPABASE)
+// 9. DASHBOARD DEL PROFESOR (CONSULTA, EVALUACIONES Y CADUCIDAD EN SUPABASE)
 // ==============================================================================
 async function loadTeacherStudents() {
   const client = getClient();
@@ -557,7 +680,7 @@ async function loadTeacherStudents() {
 
   const { data, error } = await client
     .from('profiles')
-    .select('id, full_name, email, program, course_level')
+    .select('*')
     .eq('role', 'estudiante')
     .order('full_name', { ascending: true });
 
@@ -565,10 +688,41 @@ async function loadTeacherStudents() {
     console.error("Error al listar estudiantes de Supabase:", error);
     showToast("Error al obtener la lista de alumnos", "error");
   } else {
-    teacherStudentsList = data || [];
+    teacherStudentsList = (data || []).map(student => {
+      // Si profiles aún no tiene la columna en la BD, consultar respaldo de metadata / localStorage
+      const cachedExpiry = localStorage.getItem('le_student_expires_' + student.id);
+      if (!student.expires_at && cachedExpiry) {
+        student.expires_at = cachedExpiry;
+      }
+      return student;
+    });
   }
 
+  updateTeacherMetrics();
   renderStudentList();
+}
+
+function updateTeacherMetrics() {
+  let active = 0;
+  let warning = 0;
+  let expired = 0;
+
+  teacherStudentsList.forEach(s => {
+    const info = getExpirationInfo(s.expires_at);
+    if (info.status === 'expired') expired++;
+    else if (info.status === 'warning') warning++;
+    else active++;
+  });
+
+  const totalElem = document.getElementById('metricTotalStudents');
+  const activeElem = document.getElementById('metricActiveStudents');
+  const warnElem = document.getElementById('metricWarningStudents');
+  const expElem = document.getElementById('metricExpiredStudents');
+
+  if (totalElem) totalElem.innerText = teacherStudentsList.length;
+  if (activeElem) activeElem.innerText = active;
+  if (warnElem) warnElem.innerText = warning;
+  if (expElem) expElem.innerText = expired;
 }
 
 function renderStudentList() {
@@ -577,18 +731,26 @@ function renderStudentList() {
   container.innerHTML = '';
 
   const progFilter = document.getElementById('filterProgramSelect')?.value || 'all';
+  const expiryFilter = document.getElementById('filterExpirySelect')?.value || 'all';
   const q = document.getElementById('searchStudent')?.value?.toLowerCase() || '';
 
   const filtered = teacherStudentsList.filter(student => {
     const matchesProg = progFilter === 'all' || student.program === progFilter;
     const matchesSearch = !q || (student.full_name && student.full_name.toLowerCase().includes(q)) || (student.email && student.email.toLowerCase().includes(q));
-    return matchesProg && matchesSearch;
+
+    const expInfo = getExpirationInfo(student.expires_at);
+    let matchesExpiry = true;
+    if (expiryFilter === 'active') matchesExpiry = expInfo.status === 'active' || expInfo.status === 'unlimited';
+    else if (expiryFilter === 'warning') matchesExpiry = expInfo.status === 'warning';
+    else if (expiryFilter === 'expired') matchesExpiry = expInfo.status === 'expired';
+
+    return matchesProg && matchesSearch && matchesExpiry;
   });
 
   if (filtered.length === 0) {
     container.innerHTML = `
       <div style="font-size: 13px; color: var(--color-muted); padding: 18px; text-align: center; line-height: 1.5;">
-        No hay estudiantes registrados para este filtro.<br>
+        No hay estudiantes con los filtros seleccionados.<br>
         Usa el botón <strong>➕ Registrar Nuevo Estudiante</strong> para agregar uno.
       </div>`;
     return;
@@ -597,11 +759,26 @@ function renderStudentList() {
   filtered.forEach(student => {
     const item = document.createElement('div');
     const isSelected = selectedStudent && selectedStudent.id === student.id;
+    const expInfo = getExpirationInfo(student.expires_at);
+
     item.className = `student-item ${isSelected ? 'active' : ''}`;
-    item.onclick = () => selectStudent(student.id);
+    item.onclick = (e) => {
+      // Evitar que el clic en el botón de edición active la selección inmediata
+      if (e.target.closest('.student-quick-edit-btn')) return;
+      selectStudent(student.id);
+    };
+
     item.innerHTML = `
-      <div class="student-name">${student.full_name}</div>
+      <div class="student-item-header">
+        <span class="student-name">${student.full_name}</span>
+        <button type="button" class="student-quick-edit-btn" onclick="openEditStudentModal('${student.id}')" title="Editar estudiante o vigencia">
+          ✏️
+        </button>
+      </div>
       <div class="student-level">📚 ${student.course_level} · ${student.email}</div>
+      <div style="margin-top: 6px;">
+        <span class="expiry-chip ${expInfo.chipClass}">${expInfo.label}</span>
+      </div>
     `;
     container.appendChild(item);
   });
@@ -619,14 +796,31 @@ async function selectStudent(studentId) {
 
   const titleElem = document.getElementById('selectedStudentTitle');
   const subElem = document.getElementById('selectedStudentSub');
+  const expiryChip = document.getElementById('selectedStudentExpiryChip');
+  const actionsBar = document.getElementById('studentActionsBar');
+  const gradeActionsArea = document.getElementById('teacherGradeActionsArea');
   const pointsBadge = document.getElementById('teacherStudentTotalPoints');
+  const statusChip = document.getElementById('teacherStudentStatusChip');
   const grid = document.getElementById('teacherUnitsGrid');
 
   titleElem.innerText = selectedStudent.full_name;
   subElem.innerText = `Evaluaciones asignadas para ${selectedStudent.course_level} (${selectedStudent.email})`;
-  pointsBadge.innerText = 'Cargando puntaje...';
 
-  grid.innerHTML = '<div style="color: var(--color-muted); padding: 20px;">Cargando lista de evaluaciones...</div>';
+  // Configuración del chip de caducidad en el encabezado
+  if (expiryChip) {
+    const expInfo = getExpirationInfo(selectedStudent.expires_at);
+    expiryChip.className = `expiry-chip ${expInfo.chipClass}`;
+    expiryChip.innerText = expInfo.label;
+    expiryChip.classList.remove('hidden');
+  }
+
+  if (actionsBar) actionsBar.classList.remove('hidden');
+  if (gradeActionsArea) gradeActionsArea.classList.remove('hidden');
+
+  pointsBadge.innerText = 'Cargando puntaje...';
+  if (statusChip) statusChip.innerHTML = '';
+
+  grid.innerHTML = '<div style="color: var(--color-muted); padding: 30px; text-align: center;">Cargando lista de evaluaciones...</div>';
 
   selectedStudentGrades = {};
   const client = getClient();
@@ -639,41 +833,158 @@ async function selectStudent(studentId) {
 
   if (error) {
     console.error("Error al obtener notas:", error);
+    showToast("Error al obtener notas de Supabase", "error");
   } else if (data) {
     data.forEach(item => {
       selectedStudentGrades[item.item_number] = item.points_awarded;
     });
   }
 
-  // Cargar configuración curricular del alumno
+  // Cargar configuración curricular del alumno y renderizar agrupado por etapas
   const config = getCourseConfig(selectedStudent.course_level);
+  renderTeacherCurriculumGrades(config);
+}
+
+function renderTeacherCurriculumGrades(config) {
+  const grid = document.getElementById('teacherUnitsGrid');
+  if (!grid) return;
   grid.innerHTML = '';
 
   let totalPts = 0;
 
-  config.stages.forEach(stage => {
+  config.stages.forEach((stage, stageIdx) => {
+    const stageBlock = document.createElement('div');
+    stageBlock.className = 'teacher-stage-block';
+
+    let stageEarned = 0;
+    let stageMax = 0;
+    stage.items.forEach(it => {
+      stageMax += Number(it.maxPoints || 0);
+      const val = selectedStudentGrades[it.number];
+      if (val !== undefined && val !== null && val !== '') stageEarned += Number(val);
+    });
+
+    stageBlock.innerHTML = `
+      <div class="teacher-stage-header">
+        <div>📖 ${stage.name}</div>
+        <div style="font-size: 13px; color: var(--color-primary-light); font-weight: 700;">
+          Puntaje: <span id="stage_pts_${stageIdx}">${stageEarned} / ${stageMax} pts</span>
+        </div>
+      </div>
+      <div class="teacher-stage-grid" id="stage_grid_${stageIdx}"></div>
+    `;
+
+    const stageGrid = stageBlock.querySelector(`#stage_grid_${stageIdx}`);
+
     stage.items.forEach(item => {
       const currentPts = selectedStudentGrades[item.number] !== undefined ? selectedStudentGrades[item.number] : '';
       if (currentPts !== '') totalPts += Number(currentPts);
 
+      const hasScore = currentPts !== '';
+      const typeBadgeClass = item.type === 'Oral' ? 'badge-oral' : (item.type === 'Formativo' ? 'badge-formative' : (item.type === 'Sticker' || item.type === 'Lúdico' ? 'badge-kids' : 'badge-written'));
+
       const box = document.createElement('div');
-      box.className = 'grade-input-box';
+      box.className = `grade-input-box ${hasScore ? 'graded' : ''}`;
+      box.id = `box_grade_${item.number}`;
       box.innerHTML = `
-        <label>#${item.number} (${item.type} · ${item.lesson})</label>
-        <div class="grade-input-box-title">${item.title}</div>
-        <input type="number" step="0.5" min="0" max="${item.maxPoints}" id="grade_input_${item.number}" value="${currentPts}" placeholder="0 a ${item.maxPoints} pts">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--color-muted);">#${item.number} · ${item.lesson}</span>
+          <span class="eval-badge-type ${typeBadgeClass}" style="font-size: 10px; padding: 2px 6px;">${item.type}</span>
+        </div>
+        <div class="grade-input-box-title" title="${item.title}">${item.title}</div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <input type="number" step="0.5" min="0" max="${item.maxPoints}" 
+                 id="grade_input_${item.number}" 
+                 value="${currentPts}" 
+                 placeholder="0 a ${item.maxPoints}"
+                 data-item-number="${item.number}"
+                 data-item-title="${item.title.replace(/"/g, '&quot;')}"
+                 data-item-type="${item.type}"
+                 data-max-points="${item.maxPoints}"
+                 data-initial-val="${currentPts}"
+                 oninput="handleGradeInputChange(${item.number}, ${item.maxPoints})">
+        </div>
+        <div class="grade-shortcuts">
+          <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, ${item.maxPoints})" title="Poner puntaje máximo">Máx (${item.maxPoints})</button>
+          <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, 0)" title="Poner cero">0</button>
+          <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, '')" title="Borrar calificación">Borrar</button>
+        </div>
         <button class="btn-save-grade" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${selectedStudent.course_level}', ${item.number}, '${item.title.replace(/'/g, "\\'")}', '${item.type}', ${item.maxPoints})">Guardar</button>
       `;
-      grid.appendChild(box);
+      stageGrid.appendChild(box);
     });
+
+    grid.appendChild(stageBlock);
   });
 
-  pointsBadge.innerText = `Total: ${totalPts} / ${config.maxPoints} pts`;
+  updateTotalHeaderPoints(totalPts, config);
+}
+
+function handleGradeInputChange(itemNumber, maxPoints) {
+  const input = document.getElementById(`grade_input_${itemNumber}`);
+  const box = document.getElementById(`box_grade_${itemNumber}`);
+  if (!input || !box) return;
+
+  const currentVal = input.value.trim();
+  const initVal = input.getAttribute('data-initial-val') || '';
+
+  if (currentVal !== initVal) {
+    box.classList.add('modified');
+  } else {
+    box.classList.remove('modified');
+  }
+
+  // Recalcular total en tiempo real
+  recalculateAllScreenPoints();
+}
+
+function quickSetGrade(itemNumber, value) {
+  const input = document.getElementById(`grade_input_${itemNumber}`);
+  if (!input) return;
+  input.value = value;
+  const maxPts = parseFloat(input.getAttribute('data-max-points') || '100');
+  handleGradeInputChange(itemNumber, maxPts);
+}
+
+function recalculateAllScreenPoints() {
+  if (!selectedStudent) return;
+  const config = getCourseConfig(selectedStudent.course_level);
+  const inputs = document.querySelectorAll('#teacherUnitsGrid input[type="number"]');
+
+  let sum = 0;
+  inputs.forEach(inp => {
+    const v = inp.value.trim();
+    if (v !== '' && !isNaN(parseFloat(v))) {
+      sum += parseFloat(v);
+    }
+  });
+
+  updateTotalHeaderPoints(sum, config);
+}
+
+function updateTotalHeaderPoints(totalPts, config) {
+  const pointsBadge = document.getElementById('teacherStudentTotalPoints');
+  const statusChip = document.getElementById('teacherStudentStatusChip');
+  if (!pointsBadge) return;
+
+  const pct = Math.min(100, Math.round((totalPts / config.maxPoints) * 100));
+  const isApproved = totalPts >= config.passingScore;
+
+  pointsBadge.innerText = `Total: ${totalPts} / ${config.maxPoints} pts (${pct}%)`;
+
+  if (statusChip) {
+    if (isApproved) {
+      statusChip.innerHTML = `<span class="score score-passed">🎉 Nivel Aprobado (Meta: ${config.passingScore} pts)</span>`;
+    } else {
+      statusChip.innerHTML = `<span class="score score-pending">⏳ En progreso (Meta: ${config.passingScore} pts)</span>`;
+    }
+  }
 }
 
 async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType, maxPoints) {
   const inputElem = document.getElementById(`grade_input_${itemNumber}`);
   const btn = document.getElementById(`btn_save_${itemNumber}`);
+  const box = document.getElementById(`box_grade_${itemNumber}`);
   if (!inputElem) return;
 
   const rawVal = inputElem.value.trim();
@@ -702,7 +1013,11 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
 
       if (error) throw error;
       delete selectedStudentGrades[itemNumber];
-      showToast(`🗑️ Nota eliminada para #${itemNumber}`, "info");
+      inputElem.setAttribute('data-initial-val', '');
+      if (box) {
+        box.classList.remove('graded', 'modified');
+      }
+      showToast(`🗑️ Nota #${itemNumber} eliminada`, "info");
     } else {
       const { error } = await client
         .from('student_grades')
@@ -722,14 +1037,15 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
 
       if (error) throw error;
       selectedStudentGrades[itemNumber] = numericVal;
-      showToast(`✅ Nota #${itemNumber} guardada en Supabase: ${numericVal} pts`, "success");
+      inputElem.setAttribute('data-initial-val', String(numericVal));
+      if (box) {
+        box.classList.add('graded');
+        box.classList.remove('modified');
+      }
+      showToast(`✅ Nota #${itemNumber} guardada: ${numericVal} pts`, "success");
     }
 
-    // Recalcular total en pantalla
-    let sum = 0;
-    Object.values(selectedStudentGrades).forEach(val => sum += Number(val || 0));
-    const config = getCourseConfig(courseLevel);
-    document.getElementById('teacherStudentTotalPoints').innerText = `Total: ${sum} / ${config.maxPoints} pts`;
+    recalculateAllScreenPoints();
 
   } catch (err) {
     console.error("Error al guardar nota en Supabase:", err);
@@ -742,8 +1058,111 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
   }
 }
 
+// Guardado Masivo de Todas las Notas
+async function saveAllGrades() {
+  if (!selectedStudent) return;
+  const btn = document.getElementById('btnSaveAllGrades');
+  const origText = btn ? btn.innerText : '';
+
+  const inputs = document.querySelectorAll('#teacherUnitsGrid input[type="number"]');
+  if (inputs.length === 0) return;
+
+  const recordsToUpsert = [];
+  const numbersToDelete = [];
+
+  for (const input of inputs) {
+    const itemNum = parseInt(input.getAttribute('data-item-number'), 10);
+    const itemTitle = input.getAttribute('data-item-title') || '';
+    const itemType = input.getAttribute('data-item-type') || 'Escrito';
+    const maxPoints = parseFloat(input.getAttribute('data-max-points') || '100');
+    const rawVal = input.value.trim();
+
+    if (rawVal === '') {
+      if (selectedStudentGrades[itemNum] !== undefined) {
+        numbersToDelete.push(itemNum);
+      }
+    } else {
+      const numericVal = parseFloat(rawVal);
+      if (isNaN(numericVal) || numericVal < 0 || numericVal > maxPoints) {
+        showToast(`⚠️ Nota inválida en actividad #${itemNum}. Debe estar entre 0 y ${maxPoints}.`, "error");
+        input.focus();
+        return;
+      }
+
+      recordsToUpsert.push({
+        student_id: selectedStudent.id,
+        course_level: selectedStudent.course_level,
+        item_number: itemNum,
+        item_title: itemTitle,
+        item_type: itemType,
+        max_points: maxPoints,
+        points_awarded: numericVal,
+        graded_by: currentUserProfile?.id || null,
+        updated_at: new Date().toISOString()
+      });
+    }
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = '⏳ Guardando en Supabase...';
+  }
+
+  const client = getClient();
+
+  try {
+    // 1. Guardar notas cargadas
+    if (recordsToUpsert.length > 0) {
+      const { error: upsertErr } = await client
+        .from('student_grades')
+        .upsert(recordsToUpsert, { onConflict: 'student_id,course_level,item_number' });
+
+      if (upsertErr) throw upsertErr;
+
+      recordsToUpsert.forEach(r => {
+        selectedStudentGrades[r.item_number] = r.points_awarded;
+        const inp = document.getElementById(`grade_input_${r.item_number}`);
+        const bx = document.getElementById(`box_grade_${r.item_number}`);
+        if (inp) inp.setAttribute('data-initial-val', String(r.points_awarded));
+        if (bx) {
+          bx.classList.add('graded');
+          bx.classList.remove('modified');
+        }
+      });
+    }
+
+    // 2. Eliminar notas vacías
+    for (const num of numbersToDelete) {
+      await client
+        .from('student_grades')
+        .delete()
+        .eq('student_id', selectedStudent.id)
+        .eq('course_level', selectedStudent.course_level)
+        .eq('item_number', num);
+
+      delete selectedStudentGrades[num];
+      const inp = document.getElementById(`grade_input_${num}`);
+      const bx = document.getElementById(`box_grade_${num}`);
+      if (inp) inp.setAttribute('data-initial-val', '');
+      if (bx) bx.classList.remove('graded', 'modified');
+    }
+
+    recalculateAllScreenPoints();
+    showToast(`🎉 ¡Todas las calificaciones de ${selectedStudent.full_name} han sido guardadas con éxito!`, "success", 4000);
+
+  } catch (err) {
+    console.error("Error al guardar todas las notas:", err);
+    showToast(`❌ Error al guardar notas: ${err.message}`, "error", 5000);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = origText;
+    }
+  }
+}
+
 // ==============================================================================
-// 10. ALTA DE ESTUDIANTES DESDE EL PANEL DE PROFESOR
+// 10. ALTA Y EDICIÓN DE ESTUDIANTES CON CADUCIDAD
 // ==============================================================================
 function toggleNewStudentModal(open) {
   const modal = document.getElementById('newStudentModal');
@@ -752,9 +1171,39 @@ function toggleNewStudentModal(open) {
 
   if (open) {
     updateNewStudentLevelOptions();
+    // Por defecto sugerir 3 meses de caducidad
+    setNewStudentExpiryPreset(3);
     const nameInput = document.getElementById('newStudentFullName');
     if (nameInput) nameInput.focus();
   }
+}
+
+function setNewStudentExpiryPreset(months) {
+  const dateInput = document.getElementById('newStudentExpiresAt');
+  if (!dateInput) return;
+
+  if (months === 0) {
+    dateInput.value = '';
+    return;
+  }
+
+  const date = new Date();
+  date.setMonth(date.getMonth() + months);
+  dateInput.value = date.toISOString().split('T')[0];
+}
+
+function generateNewStudentPassword() {
+  const passInput = document.getElementById('newStudentPass');
+  if (!passInput) return;
+
+  const year = new Date().getFullYear();
+  const randNum = Math.floor(100 + Math.random() * 900);
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const randChar = chars.charAt(Math.floor(Math.random() * chars.length));
+
+  passInput.value = `Living${year}#${randNum}${randChar}`;
+  passInput.type = 'text'; // Mostrar para que el profesor la pueda copiar
+  showToast("🎲 Contraseña generada. Puedes copiarla para el alumno.", "info", 3500);
 }
 
 function updateNewStudentLevelOptions() {
@@ -789,6 +1238,7 @@ async function handleCreateNewStudent(e) {
   const password = document.getElementById('newStudentPass').value;
   const program = document.getElementById('newStudentProgram').value;
   const courseLevel = document.getElementById('newStudentCourseLevel').value;
+  const expiresAt = document.getElementById('newStudentExpiresAt').value || null;
 
   const btn = document.getElementById('btnSaveNewStudent');
   const origText = btn.innerText;
@@ -809,7 +1259,7 @@ async function handleCreateNewStudent(e) {
       }
     );
 
-    const { error } = await tempClient.auth.signUp({
+    const { data: authData, error } = await tempClient.auth.signUp({
       email,
       password,
       options: {
@@ -817,12 +1267,34 @@ async function handleCreateNewStudent(e) {
           full_name: fullName,
           role: 'estudiante',
           program: program,
-          course_level: courseLevel
+          course_level: courseLevel,
+          expires_at: expiresAt
         }
       }
     });
 
     if (error) throw error;
+
+    // Intentar sincronizar en tabla profiles directamente
+    if (authData && authData.user) {
+      const studentId = authData.user.id;
+      if (expiresAt) {
+        localStorage.setItem('le_student_expires_' + studentId, expiresAt);
+      }
+
+      const client = getClient();
+      if (client) {
+        try {
+          await client.from('profiles').update({
+            expires_at: expiresAt,
+            course_level: courseLevel,
+            program: program
+          }).eq('id', studentId);
+        } catch (dbErr) {
+          console.warn("Actualización complementaria de profiles:", dbErr);
+        }
+      }
+    }
 
     showToast(`🎉 Estudiante ${fullName} registrado con éxito en ${courseLevel}.`, "success", 5000);
 
@@ -830,6 +1302,7 @@ async function handleCreateNewStudent(e) {
     document.getElementById('newStudentFullName').value = '';
     document.getElementById('newStudentEmail').value = '';
     document.getElementById('newStudentPass').value = '';
+    document.getElementById('newStudentExpiresAt').value = '';
     toggleNewStudentModal(false);
 
     // Recargar lista de alumnos de Supabase en el panel
@@ -841,6 +1314,202 @@ async function handleCreateNewStudent(e) {
   } finally {
     btn.disabled = false;
     btn.innerText = origText;
+  }
+}
+
+// ==============================================================================
+// 10.5. MODAL DE EDICIÓN Y RENOVACIÓN DE ESTUDIANTE
+// ==============================================================================
+function openEditStudentModal(studentId) {
+  const targetId = studentId || (selectedStudent ? selectedStudent.id : null);
+  if (!targetId) return;
+
+  const student = teacherStudentsList.find(s => s.id === targetId);
+  if (!student) return;
+
+  document.getElementById('editStudentId').value = student.id;
+  document.getElementById('editStudentFullName').value = student.full_name || '';
+  document.getElementById('editStudentEmail').value = student.email || '';
+  document.getElementById('editStudentProgram').value = student.program || 'adultos';
+
+  updateEditStudentLevelOptions();
+  document.getElementById('editStudentCourseLevel').value = student.course_level || 'Adultos 1';
+
+  const expInput = document.getElementById('editStudentExpiresAt');
+  const statusLabel = document.getElementById('editStudentCurrentStatus');
+
+  if (student.expires_at) {
+    const expDateStr = student.expires_at.split('T')[0];
+    expInput.value = expDateStr;
+    const info = getExpirationInfo(student.expires_at);
+    statusLabel.innerHTML = `<span class="expiry-chip ${info.chipClass}">${info.label}</span>`;
+  } else {
+    expInput.value = '';
+    statusLabel.innerHTML = `<span class="expiry-chip chip-none">Sin límite</span>`;
+  }
+
+  toggleEditStudentModal(true);
+}
+
+function toggleEditStudentModal(open) {
+  const modal = document.getElementById('editStudentModal');
+  if (!modal) return;
+  modal.classList.toggle('hidden', !open);
+}
+
+function setEditStudentExpiryPreset(months) {
+  const dateInput = document.getElementById('editStudentExpiresAt');
+  if (!dateInput) return;
+
+  if (months === 0) {
+    dateInput.value = '';
+    return;
+  }
+
+  const baseDate = dateInput.value ? new Date(dateInput.value) : new Date();
+  // Si la fecha actual ya estaba vencida, partir desde hoy
+  const startingDate = (!isNaN(baseDate.getTime()) && baseDate > new Date()) ? baseDate : new Date();
+  startingDate.setMonth(startingDate.getMonth() + months);
+  dateInput.value = startingDate.toISOString().split('T')[0];
+}
+
+function updateEditStudentLevelOptions() {
+  const programSelect = document.getElementById('editStudentProgram');
+  const levelSelect = document.getElementById('editStudentCourseLevel');
+  if (!programSelect || !levelSelect) return;
+
+  const prog = programSelect.value;
+  levelSelect.innerHTML = '';
+
+  const optionsMap = {
+    adultos: ['Adultos 1', 'Adultos 2', 'Adultos 3'],
+    teens: ['Teens 1', 'Teens 2', 'Teens 3'],
+    junior: ['Junior 1', 'Junior 2', 'Junior 3'],
+    kids: ['Kids 1', 'Kids 2', 'Kids 3'],
+    nursery: ['Nursery']
+  };
+
+  const list = optionsMap[prog] || optionsMap.adultos;
+  list.forEach(lvl => {
+    const opt = document.createElement('option');
+    opt.value = lvl;
+    opt.textContent = lvl === 'Adultos 1' ? 'Adultos 1 (Basic)' : (lvl === 'Teens 1' ? 'Teens 1 (Basic)' : lvl);
+    levelSelect.appendChild(opt);
+  });
+}
+
+async function handleSaveEditStudent(e) {
+  e.preventDefault();
+  const studentId = document.getElementById('editStudentId').value;
+  const fullName = document.getElementById('editStudentFullName').value.trim();
+  const program = document.getElementById('editStudentProgram').value;
+  const courseLevel = document.getElementById('editStudentCourseLevel').value;
+  const expiresAt = document.getElementById('editStudentExpiresAt').value || null;
+
+  const btn = document.getElementById('btnSaveEditStudent');
+  const origText = btn.innerText;
+  btn.disabled = true;
+  btn.innerText = 'Guardando cambios...';
+
+  const client = getClient();
+
+  try {
+    // 1. Actualizar tabla public.profiles en Supabase
+    const { error: profileErr } = await client
+      .from('profiles')
+      .update({
+        full_name: fullName,
+        program: program,
+        course_level: courseLevel,
+        expires_at: expiresAt
+      })
+      .eq('id', studentId);
+
+    if (profileErr) {
+      console.warn("Error al actualizar profiles directamente (posible columna expires_at):", profileErr);
+    }
+
+    // 2. Guardar en respaldo local
+    if (expiresAt) {
+      localStorage.setItem('le_student_expires_' + studentId, expiresAt);
+    } else {
+      localStorage.removeItem('le_student_expires_' + studentId);
+    }
+
+    // 3. Actualizar memoria local de estudiantes
+    const student = teacherStudentsList.find(s => s.id === studentId);
+    if (student) {
+      student.full_name = fullName;
+      student.program = program;
+      student.course_level = courseLevel;
+      student.expires_at = expiresAt;
+    }
+
+    if (selectedStudent && selectedStudent.id === studentId) {
+      selectedStudent.full_name = fullName;
+      selectedStudent.program = program;
+      selectedStudent.course_level = courseLevel;
+      selectedStudent.expires_at = expiresAt;
+      await selectStudent(studentId);
+    }
+
+    updateTeacherMetrics();
+    renderStudentList();
+    toggleEditStudentModal(false);
+
+    showToast(`✅ Datos y vigencia de ${fullName} actualizados con éxito.`, "success");
+
+  } catch (err) {
+    console.error("Error al actualizar estudiante:", err);
+    showToast(`❌ Error: ${err.message}`, "error", 5000);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = origText;
+  }
+}
+
+// Renovación rápida de 30 días con un clic
+async function quickRenewStudent(days = 30) {
+  if (!selectedStudent) return;
+
+  const currentExp = selectedStudent.expires_at;
+  let baseDate = new Date();
+  if (currentExp) {
+    const parsed = new Date(currentExp);
+    if (!isNaN(parsed.getTime()) && parsed > new Date()) {
+      baseDate = parsed;
+    }
+  }
+
+  baseDate.setDate(baseDate.getDate() + days);
+  const newExpiryStr = baseDate.toISOString().split('T')[0];
+
+  const client = getClient();
+  try {
+    await client
+      .from('profiles')
+      .update({ expires_at: newExpiryStr })
+      .eq('id', selectedStudent.id);
+
+    localStorage.setItem('le_student_expires_' + selectedStudent.id, newExpiryStr);
+    selectedStudent.expires_at = newExpiryStr;
+
+    updateTeacherMetrics();
+    renderStudentList();
+
+    // Actualizar chip en cabecera
+    const expiryChip = document.getElementById('selectedStudentExpiryChip');
+    if (expiryChip) {
+      const expInfo = getExpirationInfo(newExpiryStr);
+      expiryChip.className = `expiry-chip ${expInfo.chipClass}`;
+      expiryChip.innerText = expInfo.label;
+    }
+
+    showToast(`⚡ Acceso renovado por +${days} días hasta el ${baseDate.toLocaleDateString('es-ES')}.`, "success", 4000);
+
+  } catch (err) {
+    console.error("Error en renovación rápida:", err);
+    showToast(`❌ Error: ${err.message}`, "error");
   }
 }
 
@@ -874,12 +1543,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 window.switchRole = switchRole;
 window.handleAuthSubmit = handleAuthSubmit;
 window.logout = logout;
+window.logoutFromExpired = logoutFromExpired;
 window.toggleRecoveryModal = toggleRecoveryModal;
 window.handleSendPasswordReset = handleSendPasswordReset;
 window.handleUpdateNewPassword = handleUpdateNewPassword;
 window.filterStudents = filterStudents;
 window.selectStudent = selectStudent;
 window.saveGrade = saveGrade;
+window.saveAllGrades = saveAllGrades;
+window.quickSetGrade = quickSetGrade;
+window.handleGradeInputChange = handleGradeInputChange;
 window.toggleNewStudentModal = toggleNewStudentModal;
 window.updateNewStudentLevelOptions = updateNewStudentLevelOptions;
 window.handleCreateNewStudent = handleCreateNewStudent;
+window.setNewStudentExpiryPreset = setNewStudentExpiryPreset;
+window.generateNewStudentPassword = generateNewStudentPassword;
+window.openEditStudentModal = openEditStudentModal;
+window.toggleEditStudentModal = toggleEditStudentModal;
+window.setEditStudentExpiryPreset = setEditStudentExpiryPreset;
+window.updateEditStudentLevelOptions = updateEditStudentLevelOptions;
+window.handleSaveEditStudent = handleSaveEditStudent;
+window.quickRenewStudent = quickRenewStudent;

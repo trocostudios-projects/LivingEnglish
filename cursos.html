@@ -71,6 +71,15 @@
 
       <!-- 2. DASHBOARD DEL ESTUDIANTE -->
       <section id="studentDashboard" class="hidden">
+        <!-- Aviso de Caducidad de Cuenta -->
+        <div id="studentExpiryNotice" class="hidden" style="margin-bottom: 16px; padding: 12px 18px; border-radius: var(--radius-lg); font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="studentExpiryIcon" style="font-size: 18px;">🗓️</span>
+            <span id="studentExpiryText">Acceso activo hasta: <strong>--/--/----</strong></span>
+          </div>
+          <span id="studentExpiryBadge" class="expiry-chip chip-active">Vigente</span>
+        </div>
+
         <!-- Cabecera del Curso del Alumno -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
           <div>
@@ -114,31 +123,63 @@
 
       <!-- 3. DASHBOARD DEL PROFESOR -->
       <section id="teacherDashboard" class="hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 18px;">
           <div>
-            <h1 class="page-title" style="margin-bottom: 4px;">Panel de Calificaciones</h1>
-            <p class="page-description" style="margin-bottom: 0;">Gestiona las evaluaciones oficiales de Living English.</p>
+            <h1 class="page-title" style="margin-bottom: 4px;">Panel de Profesores & Calificaciones</h1>
+            <p class="page-description" style="margin-bottom: 0;">Gestiona evaluaciones oficiales, progreso y caducidad de matrículas.</p>
           </div>
           <button class="btn-primary" onclick="toggleNewStudentModal(true)" style="width: auto; padding: 12px 22px; font-size: 14px; background: #2563eb;">
             ➕ Registrar Nuevo Estudiante
           </button>
         </div>
 
+        <!-- BARRA RESUMEN DE ESTADÍSTICAS DEL PROFESOR -->
+        <div class="teacher-metrics-bar">
+          <div class="metric-pill">
+            <span class="metric-number" id="metricTotalStudents">0</span>
+            <span class="metric-label">Estudiantes</span>
+          </div>
+          <div class="metric-pill">
+            <span class="metric-number metric-active" id="metricActiveStudents">0</span>
+            <span class="metric-label">Activos</span>
+          </div>
+          <div class="metric-pill">
+            <span class="metric-number metric-warning" id="metricWarningStudents">0</span>
+            <span class="metric-label">Por vencer (≤ 7 días)</span>
+          </div>
+          <div class="metric-pill">
+            <span class="metric-number metric-expired" id="metricExpiredStudents">0</span>
+            <span class="metric-label">Caducados</span>
+          </div>
+        </div>
+
         <div class="teacher-section">
           <!-- LISTA DE ESTUDIANTES -->
           <div class="student-list">
-            <div class="form-group">
-              <input type="text" id="searchStudent" class="form-control" placeholder="Buscar por nombre o correo..." onkeyup="filterStudents()">
+            <div class="form-group" style="margin-bottom: 10px;">
+              <input type="text" id="searchStudent" class="form-control" placeholder="🔍 Buscar por nombre o correo..." onkeyup="filterStudents()">
             </div>
-            <div class="form-group" style="margin-bottom: 12px;">
-              <select id="filterProgramSelect" class="form-control" onchange="filterStudents()" style="font-size: 13px; padding: 8px 12px; background: rgba(0,0,0,0.5);">
-                <option value="all">Todos los programas</option>
-                <option value="adultos">Adultos</option>
-                <option value="teens">Teens</option>
-                <option value="junior">Junior</option>
-                <option value="kids">Kids</option>
-                <option value="nursery">Nursery</option>
-              </select>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+              <div>
+                <label style="font-size: 11px; text-transform: uppercase; color: var(--color-muted); margin-bottom: 4px; display: block; font-weight: 600;">Programa</label>
+                <select id="filterProgramSelect" class="form-control" onchange="filterStudents()" style="font-size: 12px; padding: 8px 10px; background: rgba(0,0,0,0.5);">
+                  <option value="all">Todos</option>
+                  <option value="adultos">Adultos</option>
+                  <option value="teens">Teens</option>
+                  <option value="junior">Junior</option>
+                  <option value="kids">Kids</option>
+                  <option value="nursery">Nursery</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 11px; text-transform: uppercase; color: var(--color-muted); margin-bottom: 4px; display: block; font-weight: 600;">Vigencia</label>
+                <select id="filterExpirySelect" class="form-control" onchange="filterStudents()" style="font-size: 12px; padding: 8px 10px; background: rgba(0,0,0,0.5);">
+                  <option value="all">Todos</option>
+                  <option value="active">🟢 Activos</option>
+                  <option value="warning">🟡 Por vencer</option>
+                  <option value="expired">🔴 Caducados</option>
+                </select>
+              </div>
             </div>
             <div id="studentsContainer">
               <!-- Renderizado dinámicamente desde Supabase -->
@@ -147,16 +188,41 @@
 
           <!-- EDITOR DE CALIFICACIONES REALES -->
           <div class="grade-editor">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
-              <div>
-                <h3 id="selectedStudentTitle" class="page-title" style="font-size: 24px;">Selecciona un estudiante</h3>
-                <p id="selectedStudentSub" class="page-description" style="font-size: 14px; margin-bottom: 10px;">Haz clic en un alumno de la lista para gestionar sus calificaciones.</p>
+            <!-- ENCABEZADO DEL ESTUDIANTE SELECCIONADO -->
+            <div id="studentHeaderPanel" class="selected-student-header">
+              <div style="flex: 1; min-width: 260px;">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px;">
+                  <h3 id="selectedStudentTitle" class="page-title" style="font-size: 22px; margin-bottom: 0;">Selecciona un estudiante</h3>
+                  <span id="selectedStudentExpiryChip" class="hidden"></span>
+                </div>
+                <p id="selectedStudentSub" class="page-description" style="font-size: 13px; margin-bottom: 6px;">Haz clic en un alumno de la lista para gestionar sus calificaciones y matrícula.</p>
+                
+                <!-- Acciones rápidas sobre el estudiante -->
+                <div id="studentActionsBar" class="hidden" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+                  <button class="btn-sm-action" onclick="openEditStudentModal()" title="Editar información del estudiante">
+                    ✏️ Editar datos / Vigencia
+                  </button>
+                  <button class="btn-sm-action btn-sm-renew" onclick="quickRenewStudent(30)" title="Extender acceso por 30 días">
+                    ⚡ +30 días acceso
+                  </button>
+                </div>
               </div>
-              <div id="teacherStudentTotalPoints" style="font-size: 16px; font-weight: 700; color: var(--color-primary-light);"></div>
+
+              <!-- RESUMEN DE PUNTOS Y BOTÓN DE GUARDAR TODO -->
+              <div id="teacherGradeActionsArea" class="hidden" style="text-align: right; min-width: 220px;">
+                <div id="teacherStudentTotalPoints" style="font-size: 18px; font-weight: 700; color: #ffffff; margin-bottom: 4px;"></div>
+                <div id="teacherStudentStatusChip" style="font-size: 12px; margin-bottom: 10px;"></div>
+                <button id="btnSaveAllGrades" class="btn-save-all" onclick="saveAllGrades()">
+                  💾 Guardar todas las notas
+                </button>
+              </div>
             </div>
 
-            <div class="teacher-grid" id="teacherUnitsGrid">
-              <!-- Renderizado dinámicamente -->
+            <!-- CUADRÍCULA DE ETAPAS Y EVALUACIONES -->
+            <div id="teacherUnitsGrid" style="margin-top: 18px;">
+              <div style="color: var(--color-muted); padding: 40px 20px; text-align: center;">
+                👈 Selecciona un estudiante de la columna izquierda para cargar sus notas oficiales y gestionar su acceso.
+              </div>
             </div>
           </div>
         </div>
@@ -185,7 +251,12 @@
         </div>
 
         <div class="form-group">
-          <label for="newStudentPass">Contraseña Temporal</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label for="newStudentPass" style="margin-bottom: 0;">Contraseña Temporal</label>
+            <button type="button" onclick="generateNewStudentPassword()" class="btn-link-action" style="font-size: 11px;">
+              🎲 Generar clave segura
+            </button>
+          </div>
           <input type="password" id="newStudentPass" class="form-control" placeholder="Mínimo 6 caracteres (ej. Living2027*)" required minlength="6">
         </div>
 
@@ -211,10 +282,116 @@
           </div>
         </div>
 
+        <!-- FECHA DE CADUCIDAD / VENCIMIENTO DEL ALUMNO -->
+        <div class="form-group" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); padding: 12px; border-radius: var(--radius-md); margin-top: 4px;">
+          <label for="newStudentExpiresAt" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>🗓️ Fecha de Caducidad de la Matrícula</span>
+            <span style="font-size: 11px; color: var(--color-muted); font-weight: normal;">(Acceso a la plataforma)</span>
+          </label>
+          <input type="date" id="newStudentExpiresAt" class="form-control" style="background: rgba(0,0,0,0.5); margin-bottom: 8px;">
+          
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(1)">+1 Mes</button>
+            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(3)">+3 Meses</button>
+            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(6)">+6 Meses</button>
+            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(12)">+1 Año</button>
+            <button type="button" class="btn-preset-date" onclick="setNewStudentExpiryPreset(0)">Sin caducidad</button>
+          </div>
+        </div>
+
         <div style="display: flex; gap: 12px; margin-top: 16px;">
           <button type="submit" id="btnSaveNewStudent" class="btn-primary" style="flex: 1; background: #22c55e; color: #0e387a;">Guardar y Crear Alumno</button>
           <button type="button" class="btn-secondary" style="flex: 1;" onclick="toggleNewStudentModal(false)">Cancelar</button>
         </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL PARA EDITAR ESTUDIANTE / VIGENCIA DE MATRÍCULA -->
+  <div id="editStudentModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+    <div class="auth-card" style="max-width: 520px; width: 100%; margin: 20px auto; background: #0e387a; border: 1px solid rgba(255,255,255,0.4);">
+      <h3 class="page-title" style="font-size: 22px; margin-bottom: 6px;">✏️ Editar Información del Estudiante</h3>
+      <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 20px;">
+        Actualiza los datos académicos o renueva el acceso a la plataforma.
+      </p>
+
+      <form onsubmit="handleSaveEditStudent(event)">
+        <input type="hidden" id="editStudentId">
+
+        <div class="form-group">
+          <label for="editStudentFullName">Nombre Completo</label>
+          <input type="text" id="editStudentFullName" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editStudentEmail">Correo Institucional (Solo lectura)</label>
+          <input type="email" id="editStudentEmail" class="form-control" readonly style="opacity: 0.7; cursor: not-allowed; background: rgba(0,0,0,0.3);">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="editStudentProgram">Programa</label>
+            <select id="editStudentProgram" class="form-control" onchange="updateEditStudentLevelOptions()" style="background: rgba(0,0,0,0.5);">
+              <option value="adultos">Adultos</option>
+              <option value="teens">Teens</option>
+              <option value="junior">Junior</option>
+              <option value="kids">Kids</option>
+              <option value="nursery">Nursery</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editStudentCourseLevel">Nivel Asignado</label>
+            <select id="editStudentCourseLevel" class="form-control" style="background: rgba(0,0,0,0.5);">
+              <!-- Dinámico -->
+            </select>
+          </div>
+        </div>
+
+        <!-- FECHA DE CADUCIDAD Y EXTENSIÓN RÁPIDA -->
+        <div class="form-group" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); padding: 12px; border-radius: var(--radius-md); margin-top: 4px;">
+          <label for="editStudentExpiresAt" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>🗓️ Fecha de Caducidad de la Matrícula</span>
+            <span id="editStudentCurrentStatus" style="font-size: 11px;"></span>
+          </label>
+          <input type="date" id="editStudentExpiresAt" class="form-control" style="background: rgba(0,0,0,0.5); margin-bottom: 8px;">
+          
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn-preset-date" onclick="setEditStudentExpiryPreset(1)">+1 Mes</button>
+            <button type="button" class="btn-preset-date" onclick="setEditStudentExpiryPreset(3)">+3 Meses</button>
+            <button type="button" class="btn-preset-date" onclick="setEditStudentExpiryPreset(6)">+6 Meses</button>
+            <button type="button" class="btn-preset-date" onclick="setEditStudentExpiryPreset(12)">+1 Año</button>
+            <button type="button" class="btn-preset-date" onclick="setEditStudentExpiryPreset(0)">Sin caducidad</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <button type="submit" id="btnSaveEditStudent" class="btn-primary" style="flex: 1; background: #3b82f6;">Guardar Cambios</button>
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="toggleEditStudentModal(false)">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE ACCESO CADUCADO PARA ESTUDIANTE -->
+  <div id="expiredAccountModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1001; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div class="auth-card" style="max-width: 480px; width: 100%; margin: 0; background: #0e387a; border: 2px solid #ef4444; text-align: center;">
+      <div style="font-size: 48px; margin-bottom: 12px;">⏳</div>
+      <h3 class="page-title" style="font-size: 24px; color: #fca5a5; margin-bottom: 8px;">Tu Matrícula ha Caducado</h3>
+      <p id="expiredAccountMessage" style="font-size: 14px; color: var(--color-muted); margin-bottom: 22px; line-height: 1.6;">
+        El periodo de acceso oficial de tu cuenta ha finalizado. Para reactivar tu plataforma y continuar con tus cursos en Living English, por favor comunícate con la administración académica.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <a href="https://wa.me/573000000000?text=Hola,%20mi%20acceso%20a%20la%20plataforma%20de%20Living%20English%20ha%20caducado%20y%20deseo%20renovarlo" target="_blank" rel="noopener noreferrer" class="btn-primary" style="background: #22c55e; color: #0e387a; text-decoration: none;">
+          💬 Contactar por WhatsApp para Renovar
+        </a>
+        <button type="button" class="btn-secondary" onclick="logoutFromExpired()">
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
       </form>
     </div>
   </div>
