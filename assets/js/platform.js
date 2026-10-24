@@ -521,7 +521,9 @@ async function initAuthenticatedUser(user) {
   if (profile.role === 'profesor') {
     document.getElementById('teacherDashboard').classList.remove('hidden');
     document.getElementById('studentDashboard').classList.add('hidden');
+    switchTeacherTab('students');
     await loadTeacherStudents();
+    updateTeacherClassesBadge();
   } else {
     document.getElementById('studentDashboard').classList.remove('hidden');
     document.getElementById('teacherDashboard').classList.add('hidden');
@@ -542,6 +544,9 @@ async function logout() {
 
   switchStudentTab('grades');
   closeGameLauncher();
+  switchTeacherTab('students');
+  closePublishClassModal();
+  closeClassBookingsModal();
 
   document.getElementById('authSection').classList.remove('hidden');
   document.getElementById('userBadge').classList.add('hidden');
@@ -1987,3 +1992,378 @@ window.setEditStudentExpiryPreset = setEditStudentExpiryPreset;
 window.updateEditStudentLevelOptions = updateEditStudentLevelOptions;
 window.handleSaveEditStudent = handleSaveEditStudent;
 window.quickRenewStudent = quickRenewStudent;
+
+// ==============================================================================
+// 12. GESTIÓN DE CLASES ONLINE EN EL PANEL DEL DOCENTE
+// ==============================================================================
+let teacherLoadedClasses = [];
+let currentViewingClassForBookings = null;
+
+function switchTeacherTab(tab) {
+  const btnStudents = document.getElementById('tabBtnTeacherStudents');
+  const btnClasses = document.getElementById('tabBtnTeacherClasses');
+  const contentStudents = document.getElementById('teacherTabStudents');
+  const contentClasses = document.getElementById('teacherTabClasses');
+
+  if (!btnStudents || !btnClasses || !contentStudents || !contentClasses) return;
+
+  if (tab === 'classes') {
+    btnStudents.classList.remove('active');
+    btnClasses.classList.add('active');
+    contentStudents.classList.add('hidden');
+    contentClasses.classList.remove('hidden');
+    loadTeacherOnlineClasses();
+  } else {
+    btnStudents.classList.add('active');
+    btnClasses.classList.remove('active');
+    contentStudents.classList.remove('hidden');
+    contentClasses.classList.add('hidden');
+  }
+}
+
+async function updateTeacherClassesBadge() {
+  if (!window.OnlineClassesService) return;
+  try {
+    const classes = await window.OnlineClassesService.fetchOnlineClasses(false);
+    const badge = document.getElementById('teacherClassesPillCount');
+    if (badge) {
+      badge.innerText = `${classes.length} activas`;
+    }
+  } catch (e) {}
+}
+
+async function loadTeacherOnlineClasses() {
+  const container = document.getElementById('teacherClassesContainer');
+  if (!container || !window.OnlineClassesService) return;
+
+  container.innerHTML = '<div style="color: var(--color-muted); text-align: center; padding: 30px; grid-column: 1/-1;">Cargando clases online...</div>';
+
+  try {
+    const classes = await window.OnlineClassesService.fetchOnlineClasses(true);
+    teacherLoadedClasses = classes;
+
+    // Calcular métricas
+    const activeClasses = classes.filter(c => c.status === 'active');
+    const totalBookings = activeClasses.reduce((acc, c) => acc + (c.bookings_count || 0), 0);
+    const maxPossibleSpots = activeClasses.length * 4;
+    const freeSpots = Math.max(0, maxPossibleSpots - totalBookings);
+    const confirmedBookings = activeClasses.reduce((acc, c) => acc + (c.confirmed_count || 0), 0);
+
+    const mClasses = document.getElementById('metricTotalClasses');
+    const mBookings = document.getElementById('metricTotalClassBookings');
+    const mFree = document.getElementById('metricFreeClassSpots');
+    const mConfirmed = document.getElementById('metricConfirmedBookings');
+
+    if (mClasses) mClasses.innerText = activeClasses.length;
+    if (mBookings) mBookings.innerText = `${totalBookings} / ${maxPossibleSpots}`;
+    if (mFree) mFree.innerText = freeSpots;
+    if (mConfirmed) mConfirmed.innerText = confirmedBookings;
+
+    if (classes.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: rgba(0,0,0,0.25); border-radius: var(--radius-xl); border: 1px dashed rgba(255,255,255,0.2);">
+          <div style="font-size: 40px; margin-bottom: 8px;">🌐</div>
+          <h3 style="font-size: 18px; margin-bottom: 6px;">Aún no has publicado clases online</h3>
+          <p style="color: var(--color-muted); font-size: 13px; margin-bottom: 16px;">
+            Haz clic en «Publicar Nueva Clase Online» para programar sesiones de máximo 4 personas.
+          </p>
+          <button class="btn-primary" onclick="openPublishClassModal()" style="width: auto; padding: 10px 20px;">➕ Publicar Primera Clase</button>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = '';
+    classes.forEach(cls => {
+      const card = document.createElement('div');
+      const isCancelled = cls.status === 'cancelled';
+      const isFull = cls.is_full;
+      card.className = 'class-card';
+      if (isCancelled) {
+        card.style.opacity = '0.6';
+        card.style.filter = 'grayscale(0.5)';
+      }
+
+      const formattedDate = window.OnlineClassesService.formatClassDate(cls.class_date);
+      const startTime = window.OnlineClassesService.formatClassTime(cls.start_time);
+      const endTime = window.OnlineClassesService.formatClassTime(cls.end_time);
+
+      // Bloques de cupos (máx 4)
+      let blocksHtml = '';
+      for (let i = 0; i < 4; i++) {
+        if (i < (cls.bookings_count || 0)) {
+          blocksHtml += `<div class="spot-block ${isFull ? 'occupied-full' : 'occupied'}"></div>`;
+        } else {
+          blocksHtml += `<div class="spot-block free"></div>`;
+        }
+      }
+
+      const statusBadge = isCancelled
+        ? '<span style="background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">Cancelada</span>'
+        : (isFull 
+            ? '<span style="background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">Completa (4/4)</span>'
+            : `<span style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">${cls.remaining_spots} cupos libres</span>`);
+
+      card.innerHTML = `
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap;">
+            <span class="game-category-tag tag-vocab" style="font-size: 11px;">${cls.course_level}</span>
+            ${statusBadge}
+          </div>
+
+          <h3 style="font-family: var(--font-display); font-size: 18px; color: #ffffff; margin: 0 0 4px 0;">${cls.title}</h3>
+          
+          <div style="font-size: 12px; color: #93c5fd; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span>📅 ${formattedDate}</span>
+            <span>·</span>
+            <span>🕒 ${startTime} - ${endTime}</span>
+          </div>
+
+          ${cls.meeting_link ? `
+            <div style="margin-bottom: 12px;">
+              <a href="${cls.meeting_link}" target="_blank" style="color: #60a5fa; font-size: 12px; text-decoration: underline; display: inline-flex; align-items: center; gap: 4px;">
+                🔗 Enlace de videollamada
+              </a>
+            </div>
+          ` : ''}
+
+          <div class="spots-indicator-box" style="margin: 10px 0 16px 0;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px;">
+              <span>Inscritos: <strong>${cls.bookings_count || 0} de 4 máx</strong></span>
+              <span style="color: #4ade80;">(${cls.confirmed_count || 0} confirmados)</span>
+            </div>
+            <div class="spots-gauge">
+              ${blocksHtml}
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+          <button type="button" class="btn-primary" style="flex: 2; padding: 8px 12px; font-size: 12px;" onclick="openClassBookingsModal('${cls.id}')">
+            👥 Ver Alumnos (${cls.bookings_count || 0})
+          </button>
+          ${!isCancelled ? `
+            <button type="button" class="btn-secondary" style="flex: 1; padding: 8px 8px; font-size: 12px; color: #f87171; border-color: rgba(239,68,68,0.4);" onclick="handleCancelClass('${cls.id}')" title="Cancelar esta sesión">
+              🗑️ Cancelar
+            </button>
+          ` : ''}
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error("Error al cargar clases de profesor:", err);
+    container.innerHTML = '<div style="color: #f87171; text-align: center; padding: 30px; grid-column: 1/-1;">Error al cargar las clases online.</div>';
+  }
+}
+
+function openPublishClassModal() {
+  const modal = document.getElementById('publishClassModal');
+  if (!modal) return;
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const dateInput = document.getElementById('newClassDate');
+  if (dateInput && !dateInput.value) {
+    dateInput.value = tomorrow.toISOString().split('T')[0];
+  }
+  const startInput = document.getElementById('newClassStartTime');
+  const endInput = document.getElementById('newClassEndTime');
+  if (startInput && !startInput.value) startInput.value = "18:00";
+  if (endInput && !endInput.value) endInput.value = "19:00";
+
+  modal.classList.remove('hidden');
+}
+
+function closePublishClassModal() {
+  const modal = document.getElementById('publishClassModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function handlePublishClassSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnPublishClass');
+  btn.disabled = true;
+  btn.innerText = 'Publicando clase...';
+
+  try {
+    const title = document.getElementById('newClassTitle').value;
+    const level = document.getElementById('newClassLevel').value;
+    const date = document.getElementById('newClassDate').value;
+    const startTime = document.getElementById('newClassStartTime').value;
+    const endTime = document.getElementById('newClassEndTime').value;
+    const meetLink = document.getElementById('newClassMeetingLink').value;
+    const desc = document.getElementById('newClassDesc').value;
+
+    const teacherName = currentUserProfile && currentUserProfile.full_name 
+      ? `Prof. ${currentUserProfile.full_name}` 
+      : 'Profesor Living English';
+
+    await window.OnlineClassesService.createOnlineClass({
+      teacher_id: currentUserProfile ? currentUserProfile.id : null,
+      teacher_name: teacherName,
+      title: title,
+      course_level: level,
+      class_date: date,
+      start_time: startTime,
+      end_time: endTime,
+      meeting_link: meetLink,
+      description: desc
+    });
+
+    closePublishClassModal();
+    showToast("🎉 ¡Clase online publicada con éxito! Ya está disponible en el portal.", "success", 5000);
+    
+    document.getElementById('newClassTitle').value = '';
+    document.getElementById('newClassDesc').value = '';
+    document.getElementById('newClassMeetingLink').value = '';
+
+    await loadTeacherOnlineClasses();
+    updateTeacherClassesBadge();
+
+  } catch (err) {
+    showToast(`❌ Error: ${err.message}`, "error", 5000);
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'Publicar Clase en el Portal';
+  }
+}
+
+async function handleCancelClass(classId) {
+  if (!confirm("¿Estás seguro de que deseas cancelar esta clase online? Ya no se admitirán más reservas.")) {
+    return;
+  }
+  try {
+    await window.OnlineClassesService.cancelOnlineClass(classId);
+    showToast("Clase cancelada.", "info");
+    await loadTeacherOnlineClasses();
+  } catch (err) {
+    showToast("Error al cancelar la clase.", "error");
+  }
+}
+
+async function openClassBookingsModal(classId) {
+  const modal = document.getElementById('viewClassBookingsModal');
+  if (!modal || !window.OnlineClassesService) return;
+
+  const target = teacherLoadedClasses.find(c => c.id === classId);
+  if (!target) return;
+  currentViewingClassForBookings = target;
+
+  document.getElementById('viewBookingsClassTitle').innerText = target.title;
+  document.getElementById('viewBookingsClassSchedule').innerText = 
+    `📅 ${window.OnlineClassesService.formatClassDate(target.class_date)} · 🕒 ${window.OnlineClassesService.formatClassTime(target.start_time)} - ${window.OnlineClassesService.formatClassTime(target.end_time)}`;
+
+  const meetWrapper = document.getElementById('viewBookingsMeetLinkWrapper');
+  if (meetWrapper) {
+    meetWrapper.innerHTML = target.meeting_link 
+      ? `<a href="${target.meeting_link}" target="_blank" class="btn-talk" style="font-size: 12px; padding: 6px 12px; text-decoration: none;">🎥 Iniciar Llamada</a>` 
+      : '';
+  }
+
+  const container = document.getElementById('viewBookingsListContainer');
+  container.innerHTML = '<div style="color: var(--color-muted); text-align: center; padding: 20px;">Cargando inscritos...</div>';
+
+  modal.classList.remove('hidden');
+
+  try {
+    const bookings = await window.OnlineClassesService.fetchBookingsForClass(classId);
+    const countText = document.getElementById('viewBookingsCountText');
+    if (countText) {
+      countText.innerText = `${bookings.length} de 4 cupos ocupados`;
+    }
+
+    if (bookings.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 30px; background: rgba(0,0,0,0.25); border-radius: var(--radius-md); border: 1px dashed rgba(255,255,255,0.15);">
+          <div style="font-size: 32px; margin-bottom: 6px;">👥</div>
+          <p style="margin: 0; color: var(--color-muted); font-size: 13px;">Aún no se ha agendado ningún estudiante para esta sesión.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = `
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); color: var(--color-muted); text-align: left;">
+              <th style="padding: 10px 8px;">Estudiante</th>
+              <th style="padding: 10px 8px;">Cédula Vzla</th>
+              <th style="padding: 10px 8px;">Teléfono Vzla</th>
+              <th style="padding: 10px 8px;">Correo</th>
+              <th style="padding: 10px 8px;">Estado</th>
+              <th style="padding: 10px 8px; text-align: right;">Contacto</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    bookings.forEach((b) => {
+      const isConfirmed = b.status === 'confirmed';
+      const statusChip = isConfirmed 
+        ? '<span style="background: rgba(34,197,94,0.2); color: #4ade80; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">🟢 Confirmado</span>'
+        : '<span style="background: rgba(234,179,8,0.2); color: #fde047; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">🟡 Pendiente</span>';
+
+      const cleanPhone = (b.phone || '').replace(/\D/g, '');
+      const waNumber = cleanPhone.startsWith('0') ? '58' + cleanPhone.substring(1) : (cleanPhone.startsWith('58') ? cleanPhone : '58' + cleanPhone);
+      const waMsg = encodeURIComponent(`Hola ${b.full_name}, te escribo de la Academia Living English sobre tu clase online de "${target.title}".`);
+
+      html += `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+          <td style="padding: 10px 8px;">
+            <strong style="color: #ffffff; display: block;">${b.full_name}</strong>
+            <span style="font-size: 11px; color: var(--color-muted);">${b.student_level || 'General'}</span>
+          </td>
+          <td style="padding: 10px 8px; font-family: monospace; font-size: 12px; color: #93c5fd;">
+            ${b.document_id}
+          </td>
+          <td style="padding: 10px 8px; font-family: monospace; font-size: 12px; color: #e2e8f0;">
+            ${b.phone}
+          </td>
+          <td style="padding: 10px 8px; font-size: 12px; color: #cbd5e1;">
+            ${b.email}
+          </td>
+          <td style="padding: 10px 8px;">
+            ${statusChip}
+          </td>
+          <td style="padding: 10px 8px; text-align: right;">
+            <a href="https://wa.me/${waNumber}?text=${waMsg}" target="_blank" style="background: #25d366; color: #ffffff; text-decoration: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+              📲 WhatsApp
+            </a>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    container.innerHTML = html;
+
+  } catch (err) {
+    console.error("Error al cargar postulantes:", err);
+    container.innerHTML = '<div style="color: #f87171; padding: 20px;">Error al cargar la lista de postulantes.</div>';
+  }
+}
+
+function closeClassBookingsModal() {
+  const modal = document.getElementById('viewClassBookingsModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+// Exposición global
+window.switchTeacherTab = switchTeacherTab;
+window.loadTeacherOnlineClasses = loadTeacherOnlineClasses;
+window.openPublishClassModal = openPublishClassModal;
+window.closePublishClassModal = closePublishClassModal;
+window.handlePublishClassSubmit = handlePublishClassSubmit;
+window.handleCancelClass = handleCancelClass;
+window.openClassBookingsModal = openClassBookingsModal;
+window.closeClassBookingsModal = closeClassBookingsModal;
+window.updateTeacherClassesBadge = updateTeacherClassesBadge;
+

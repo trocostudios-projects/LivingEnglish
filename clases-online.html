@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clases Online en Vivo — Academia Living English</title>
+  
+  <!-- Fuentes Google: Fredoka y Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos Modulares -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/platform.css">
+  <link rel="stylesheet" href="assets/css/landing.css">
+
+  <style>
+    /* Estilos dedicados del portal de clases online */
+    .portal-body {
+      background: radial-gradient(circle at 50% 10%, #173b75 0%, #0a2558 45%, #051636 100%);
+      min-height: 100vh;
+      color: #ffffff;
+    }
+
+    .portal-hero {
+      padding: 40px 24px 24px 24px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .portal-features-strip {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    .feature-strip-pill {
+      background: rgba(14, 56, 122, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-full);
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #cbd5e1;
+      backdrop-filter: blur(8px);
+    }
+
+    .feature-strip-pill strong {
+      color: #ffffff;
+    }
+
+    .classes-filter-bar {
+      background: rgba(14, 56, 122, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-xl);
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      backdrop-filter: blur(10px);
+    }
+
+    .class-card {
+      background: rgba(14, 56, 122, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .class-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(96, 165, 250, 0.5);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    .class-card.card-full {
+      opacity: 0.8;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .class-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd);
+    }
+
+    .class-card.card-full::before {
+      background: #ef4444;
+    }
+
+    .spots-indicator-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-lg);
+      padding: 10px 14px;
+      margin: 14px 0 18px 0;
+    }
+
+    .spots-gauge {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .spot-block {
+      flex: 1;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      transition: background 0.3s;
+    }
+
+    .spot-block.occupied {
+      background: #3b82f6;
+    }
+
+    .spot-block.occupied-full {
+      background: #ef4444;
+    }
+
+    .spot-block.free {
+      background: #22c55e;
+      box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+    }
+
+    .btn-reserve-class {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-reserve-class:hover:not(:disabled) {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-reserve-class:disabled {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: var(--color-muted);
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body class="portal-body">
+
+  <div class="app-viewport">
+    <!-- CABECERA DE LA NAVEGACIÓN -->
+    <header class="app-header">
+      <a href="index.html" class="brand-logo-link" aria-label="Academia Living English">
+        <img src="assets/img/logo.png" alt="Academia Living English Logo" class="brand-logo-img">
+      </a>
+
+      <nav style="display: flex; align-items: center; gap: 14px;">
+        <a href="index.html" class="btn-talk" style="text-decoration: none; font-size: 13px;">
+          🏠 Inicio
+        </a>
+        <a href="cursos.html" class="btn-talk" style="text-decoration: none; font-size: 13px; background: rgba(37, 99, 235, 0.3); border-color: rgba(96, 165, 250, 0.4);">
+          👨‍🎓 Portal de Alumnos & Profesores
+        </a>
+      </nav>
+    </header>
+
+    <!-- BANNER DE CONFIRMACIÓN AUTOMÁTICA POR TOKEN (SI VIENE DE UN CORREO) -->
+    <div id="tokenConfirmedNotice" class="hidden" style="max-width: 1100px; margin: 16px auto; padding: 16px 22px; background: rgba(34, 197, 94, 0.2); border: 2px solid #22c55e; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 26px;">🎉</span>
+        <div>
+          <strong style="color: #4ade80; font-size: 16px;">¡Tu reserva ha sido confirmada con éxito!</strong>
+          <p id="tokenConfirmedText" style="margin: 2px 0 0 0; font-size: 13px; color: #e2e8f0;">
+            Tu cupo está garantizado en la sesión. Te esperamos puntualmente en la clase online.
+          </p>
+        </div>
+      </div>
+      <button type="button" onclick="document.getElementById('tokenConfirmedNotice').classList.add('hidden')" style="background: none; border: none; color: #ffffff; font-size: 20px; cursor: pointer;">&times;</button>
+    </div>
+
+    <!-- HERO DEL PORTAL -->
+    <div class="portal-hero">
+      <span class="section-badge">🌐 Clases Online en Vivo</span>
+      <h1 class="section-title" style="margin-bottom: 8px;">Agenda tu Clase de Inglés</h1>
+      <p class="section-subtitle" style="margin: 0 auto; max-width: 680px;">
+        Participa en sesiones interactivas con profesores certificados. Cada clase cuenta con un 
+        <strong>máximo estricto de 4 personas</strong> para garantizar tu participación activa y corrección en tiempo real.
+      </p>
+
+      <div class="portal-features-strip">
+        <div class="feature-strip-pill">
+          <span>👥</span>
+          <span>Máximo <strong>4 cupos</strong> por clase</span>
+        </div>
+        <div class="feature-strip-pill">
+          <span>🇻🇪</span>
+          <span>Registro con <strong>Cédula & Teléfono Vzla</strong></span>
+        </div>
+        <div class="feature-strip-pill">
+          <span>📩</span>
+          <span>Confirmación directa <strong>por correo</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL DEL CATÁLOGO DE CLASES -->
+    <main class="main-container" style="max-width: 1200px; margin: 0 auto 50px auto; padding: 0 20px;">
+
+      <!-- BARRA DE FILTROS DE BÚSQUEDA -->
+      <div class="classes-filter-bar">
+        <div style="flex: 2; min-width: 220px;">
+          <input type="text" id="classSearchInput" class="form-control" placeholder="🔍 Buscar por tema, docente o contenido..." oninput="filterOnlineClassesView()">
+        </div>
+
+        <div style="flex: 1; min-width: 180px;">
+          <select id="classLevelFilter" class="form-control" onchange="filterOnlineClassesView()" style="background: rgba(0,0,0,0.4);">
+            <option value="all">Todos los niveles</option>
+            <option value="Adultos">Adultos</option>
+            <option value="Teens">Teens</option>
+            <option value="Conversacional">Conversacional / Speaking</option>
+            <option value="Avanzado">Avanzado / Profesional</option>
+          </select>
+        </div>
+
+        <div style="flex: 1; min-width: 160px;">
+          <select id="classDateFilter" class="form-control" onchange="filterOnlineClassesView()" style="background: rgba(0,0,0,0.4);">
+            <option value="all">Todas las fechas</option>
+            <option value="today">Hoy</option>
+            <option value="week">Próximos 7 días</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- CUADRÍCULA DE CLASES ONLINE DISPONIBLES -->
+      <div id="onlineClassesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+        <!-- Se renderizan dinámicamente -->
+      </div>
+
+      <!-- MENSAJE VACÍO SI NO HAY CLASES -->
+      <div id="emptyClassesState" class="hidden" style="text-align: center; padding: 60px 20px; background: rgba(14, 56, 122, 0.3); border-radius: var(--radius-xl); border: 1px dashed rgba(255,255,255,0.2);">
+        <div style="font-size: 48px; margin-bottom: 12px;">🗓️</div>
+        <h3 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 6px;">No se encontraron clases con los filtros seleccionados</h3>
+        <p style="color: var(--color-muted); font-size: 14px; max-width: 480px; margin: 0 auto 16px auto;">
+          Intenta cambiar el nivel o la fecha de búsqueda. Los profesores publican nuevos horarios constantemente.
+        </p>
+        <button class="btn-primary" onclick="resetFilters()" style="width: auto; padding: 10px 20px; font-size: 13px;">Ver todas las clases</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==============================================================================
+       MODAL 1: FORMULARIO DE RESERVA DE CUPO (MÁX 4 PERSONAS)
+       ============================================================================== -->
+  <div id="bookingModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
+    <div class="auth-card" style="max-width: 520px; width: 100%; margin: auto; background: #0e387a; border: 2px solid var(--color-primary-light); padding: 24px;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+        <div>
+          <span class="section-badge" style="font-size: 11px; padding: 3px 10px; margin-bottom: 6px;">Reserva de Cupo</span>
+          <h3 id="modalClassTitle" class="page-title" style="font-size: 20px; margin: 0;">Título de la Clase</h3>
+        </div>
+        <button type="button" onclick="closeBookingModal()" style="background: none; border: none; color: #ffffff; font-size: 26px; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <!-- Resumen visual de la clase seleccionada -->
+      <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-lg); padding: 12px 16px; margin-bottom: 20px; font-size: 13px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--color-muted);">Docente:</span>
+          <strong id="modalClassTeacher" style="color: #ffffff;">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: var(--color-muted);">Fecha y Hora:</span>
+          <strong id="modalClassSchedule" style="color: #93c5fd;">--</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-muted);">Cupos Disponibles:</span>
+          <strong id="modalClassSpots" style="color: #4ade80;">-- de 4 disponibles</strong>
+        </div>
+      </div>
+
+      <!-- FORMULARIO DE CONTACTO (REQUERIDO: CÉDULA VENEZOLANA, TELÉFONO VZLA, CORREO) -->
+      <form onsubmit="handleConfirmBooking(event)">
+        <input type="hidden" id="selectedClassId">
+
+        <div class="form-group">
+          <label for="bookFullName">Nombre Completo *</label>
+          <input type="text" id="bookFullName" class="form-control" placeholder="Ej: Valentina Rodríguez" required autocomplete="name">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 100px 1fr; gap: 10px; margin-bottom: 16px;">
+          <div>
+            <label for="bookDocType">Nacionalidad *</label>
+            <select id="bookDocType" class="form-control" style="background: rgba(0,0,0,0.4);">
+              <option value="V-">V-</option>
+              <option value="E-">E-</option>
+            </select>
+          </div>
+          <div>
+            <label for="bookDocNum">Cédula de Identidad *</label>
+            <input type="text" id="bookDocNum" class="form-control" placeholder="Ej: 24123456" required maxlength="9" pattern="\d{5,9}" title="Ingresa entre 5 y 9 dígitos sin puntos">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 10px; margin-bottom: 16px;">
+          <div>
+            <label for="bookPhonePrefix">Operadora *</label>
+            <select id="bookPhonePrefix" class="form-control" style="background: rgba(0,0,0,0.4);">
+              <option value="0414">0414</option>
+              <option value="0424">0424</option>
+              <option value="0412">0412</option>
+              <option value="0416">0416</option>
+              <option value="0426">0426</option>
+            </select>
+          </div>
+          <div>
+            <label for="bookPhoneNum">Teléfono Venezolano *</label>
+            <input type="tel" id="bookPhoneNum" class="form-control" placeholder="Ej: 1234567" required maxlength="7" pattern="\d{7}" title="Ingresa exactamente 7 dígitos del número">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bookEmail">Correo Electrónico (Para recibir confirmación) *</label>
+          <input type="email" id="bookEmail" class="form-control" placeholder="tu_correo@ejemplo.com" required autocomplete="email">
+          <small style="color: #93c5fd; font-size: 11px; display: block; margin-top: 4px;">
+            📩 Te enviaremos un correo con el botón oficial para confirmar tu asistencia a la clase.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="bookStudentLevel">Tu Nivel de Inglés Actual</label>
+          <select id="bookStudentLevel" class="form-control" style="background: rgba(0,0,0,0.4);">
+            <option value="Básico">Básico / Principiante (A1-A2)</option>
+            <option value="Intermedio" selected>Intermedio (B1-B2)</option>
+            <option value="Avanzado">Avanzado (C1)</option>
+            <option value="Por Evaluar">No estoy seguro / Por evaluar</option>
+          </select>
+        </div>
+
+        <div style="background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.3); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 18px; font-size: 12px; color: #fef08a;">
+          ⚠️ <strong>Regla de puntualidad</strong>: Al agendar, te comprometes a conectarte a la hora pautada. Si no confirmas tu correo, tu cupo quedará libre para otro postulante.
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button type="submit" id="btnSubmitBooking" class="btn-primary" style="flex: 2; background: #22c55e; color: #0e387a; font-weight: 700;">
+            Confirmar Reserva de Cupo
+          </button>
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeBookingModal()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==============================================================================
+       MODAL 2: CONFIRMACIÓN EXITOSA DE SOLICITUD DE RESERVA
+       ============================================================================== -->
+  <div id="bookingSuccessModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1001; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div class="auth-card" style="max-width: 480px; width: 100%; margin: auto; background: #0e387a; border: 2px solid #22c55e; text-align: center; padding: 26px;">
+      
+      <div style="font-size: 54px; margin-bottom: 10px;">🎉</div>
+      <h3 class="page-title" style="font-size: 22px; color: #4ade80; margin-bottom: 8px;">¡Solicitud de Reserva Registrada!</h3>
+      <p style="font-size: 14px; color: #cbd5e1; line-height: 1.5; margin-bottom: 18px;">
+        Hemos reservado provisionalmente tu lugar en la clase online (<strong style="color: #ffffff;">Máx 4 estudiantes</strong>).
+      </p>
+
+      <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-lg); padding: 14px; text-align: left; font-size: 13px; margin-bottom: 18px;">
+        <div style="margin-bottom: 6px;"><strong>Clase:</strong> <span id="successModalClass">--</span></div>
+        <div style="margin-bottom: 6px;"><strong>Horario:</strong> <span id="successModalSchedule" style="color: #93c5fd;">--</span></div>
+        <div style="margin-bottom: 6px;"><strong>Estudiante:</strong> <span id="successModalStudent">--</span></div>
+        <div><strong>Correo:</strong> <span id="successModalEmail" style="color: #fbbf24;">--</span></div>
+      </div>
+
+      <div style="background: rgba(59, 130, 246, 0.15); border: 1px dashed rgba(96, 165, 250, 0.5); border-radius: var(--radius-md); padding: 12px; font-size: 12px; color: #93c5fd; text-align: left; line-height: 1.45; margin-bottom: 20px;">
+        📩 <strong>Revisa tu correo ahora:</strong><br>
+        Te hemos enviado un correo de confirmación. Abre el mensaje y haz clic en <strong>«Confirmar Asistencia»</strong> para activar definitivamente tu cupo.
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Botón para previsualizar/simular el correo recibido -->
+        <button type="button" class="btn-talk" onclick="openSimulatedEmailModal()" style="font-size: 13px; text-decoration: none; padding: 10px;">
+          ✉️ Ver y Simular Correo de Confirmación
+        </button>
+        <button type="button" class="btn-primary" onclick="closeSuccessModal()" style="font-size: 14px;">
+          Entendido, volver al catálogo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================================================
+       MODAL 3: VISTA PREVIA DEL CORREO DE CONFIRMACIÓN RECIBIDO
+       ============================================================================== -->
+  <div id="simulatedEmailModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1002; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div style="max-width: 500px; width: 100%; background: #ffffff; color: #1e293b; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); font-family: sans-serif;">
+      
+      <!-- Cabecera de Email -->
+      <div style="background: #0e387a; padding: 18px 24px; color: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; font-size: 16px;">Academia Living English</span>
+        <span style="font-size: 12px; opacity: 0.8;">Bandeja de Entrada</span>
+      </div>
+
+      <!-- Cuerpo del Email -->
+      <div style="padding: 24px;">
+        <p style="font-size: 14px; margin-top: 0;">Hola <strong id="emailPreviewName">Estudiante</strong>,</p>
+        <p style="font-size: 14px; line-height: 1.5; color: #475569;">
+          Has solicitado uno de los <strong>4 cupos disponibles</strong> para la clase online:
+        </p>
+        
+        <div style="background: #f1f5f9; border-left: 4px solid #2563eb; padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-size: 13px;">
+          <p style="margin: 0 0 4px 0; font-weight: 700; color: #0f172a;" id="emailPreviewTitle">Clase Online</p>
+          <p style="margin: 0; color: #64748b;" id="emailPreviewSchedule">Horario</p>
+        </div>
+
+        <p style="font-size: 13px; color: #475569; line-height: 1.5;">
+          Para asegurar que asistirás puntualmente y validar tu cupo, por favor haz clic en el siguiente botón:
+        </p>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <button type="button" onclick="confirmCurrentSimulatedBooking()" style="background: #22c55e; color: #0e387a; font-weight: 700; font-size: 15px; border: none; padding: 12px 26px; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.4);">
+            ✅ Confirmar mi Asistencia a la Clase
+          </button>
+        </div>
+
+        <p style="font-size: 11px; color: #94a3b8; text-align: center; margin-bottom: 0;">
+          Si no puedes asistir, por favor no confirmes para que otro estudiante pueda aprovechar el cupo.
+        </p>
+      </div>
+
+      <div style="background: #f8fafc; padding: 12px 24px; border-top: 1px solid #e2e8f0; text-align: right;">
+        <button type="button" onclick="document.getElementById('simulatedEmailModal').classList.add('hidden')" style="background: none; border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; color: #64748b;">
+          Cerrar Vista Previa
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICACIONES -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- SCRIPTS -->
+  <script src="assets/js/supabase.js"></script>
+  <script>
+    if (typeof window.supabase === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>');
+    }
+  </script>
+  <script src="assets/js/supabaseClient.js"></script>
+  <script src="assets/js/onlineClasses.js"></script>
+
+  <script>
+    let currentClassesList = [];
+    let lastBookedResult = null;
+
+    // Toast helper
+    function showToast(msg, type = 'info', duration = 4000) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerText = msg;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 400);
+      }, duration);
+    }
+
+    // Cargar clases al iniciar
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Revisar si viene un token de confirmación en la URL (?confirm_token=...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenParam = urlParams.get('confirm_token');
+      if (tokenParam) {
+        try {
+          const res = await window.OnlineClassesService.confirmBookingToken(tokenParam);
+          if (res) {
+            document.getElementById('tokenConfirmedNotice').classList.remove('hidden');
+            document.getElementById('tokenConfirmedText').innerText = 
+              `¡Hola ${res.full_name}! Tu asistencia ha sido confirmada con éxito con documento ${res.document_id}.`;
+          }
+        } catch (e) {
+          console.error("Error confirmando token:", e);
+        }
+      }
+
+      // 2. Cargar clases
+      await loadAndRenderClasses();
+    });
+
+    async function loadAndRenderClasses() {
+      try {
+        currentClassesList = await window.OnlineClassesService.fetchOnlineClasses();
+        renderClassesGrid(currentClassesList);
+      } catch (err) {
+        console.error("Error cargando clases:", err);
+        showToast("Error al cargar las clases online.", "error");
+      }
+    }
+
+    function renderClassesGrid(classes) {
+      const grid = document.getElementById('onlineClassesGrid');
+      const emptyState = document.getElementById('emptyClassesState');
+      if (!grid) return;
+
+      grid.innerHTML = '';
+
+      if (!classes || classes.length === 0) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      classes.forEach(cls => {
+        const card = document.createElement('div');
+        const isFull = cls.is_full;
+        card.className = `class-card ${isFull ? 'card-full' : ''}`;
+
+        const formattedDate = window.OnlineClassesService.formatClassDate(cls.class_date);
+        const startTime = window.OnlineClassesService.formatClassTime(cls.start_time);
+        const endTime = window.OnlineClassesService.formatClassTime(cls.end_time);
+
+        // Generar los 4 bloques gráficos de cupos
+        const totalSpots = 4;
+        const bookedSpots = cls.bookings_count || 0;
+        let blocksHtml = '';
+        for (let i = 0; i < totalSpots; i++) {
+          if (i < bookedSpots) {
+            blocksHtml += `<div class="spot-block ${isFull ? 'occupied-full' : 'occupied'}"></div>`;
+          } else {
+            blocksHtml += `<div class="spot-block free"></div>`;
+          }
+        }
+
+        const spotsStatusText = isFull
+          ? `<strong style="color: #ef4444;">🔴 Cupos Agotados (4/4)</strong>`
+          : `<strong style="color: #22c55e;">🟢 ${cls.remaining_spots} cupos disponibles</strong> (de 4 máx)`;
+
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+              <span class="game-category-tag tag-vocab" style="font-size: 11px;">${cls.course_level}</span>
+              <span style="font-size: 12px; color: var(--color-muted); display: inline-flex; align-items: center; gap: 4px;">
+                <span>📅</span>
+                <strong>${formattedDate}</strong>
+              </span>
+            </div>
+
+            <h3 style="font-family: var(--font-display); font-size: 20px; color: #ffffff; margin: 0 0 6px 0;">${cls.title}</h3>
+            
+            <div style="font-size: 13px; color: #93c5fd; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              <span>👨‍🏫 ${cls.teacher_name}</span>
+              <span>·</span>
+              <span>🕒 ${startTime} - ${endTime}</span>
+            </div>
+
+            <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 16px;">
+              ${cls.description || 'Sesión práctica en vivo para potenciar tu inglés.'}
+            </p>
+          </div>
+
+          <div>
+            <div class="spots-indicator-box">
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
+                <span>Ocupación de la sesión:</span>
+                ${spotsStatusText}
+              </div>
+              <div class="spots-gauge">
+                ${blocksHtml}
+              </div>
+            </div>
+
+            <button type="button" 
+                    class="btn-reserve-class" 
+                    ${isFull ? 'disabled' : ''} 
+                    onclick="openBookingModal('${cls.id}')">
+              ${isFull ? '🔒 Cupo Completo (4/4)' : '🎯 Solicitar Cupo'}
+            </button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    function filterOnlineClassesView() {
+      const search = (document.getElementById('classSearchInput').value || '').toLowerCase().trim();
+      const level = document.getElementById('classLevelFilter').value;
+      const dateFilter = document.getElementById('classDateFilter').value;
+
+      const filtered = currentClassesList.filter(c => {
+        // Filtro texto
+        const matchText = !search || 
+          c.title.toLowerCase().includes(search) || 
+          c.teacher_name.toLowerCase().includes(search) || 
+          (c.description && c.description.toLowerCase().includes(search));
+
+        // Filtro nivel
+        const matchLevel = level === 'all' || 
+          c.course_level.toLowerCase().includes(level.toLowerCase());
+
+        // Filtro fecha
+        let matchDate = true;
+        if (dateFilter === 'today') {
+          const today = new Date().toISOString().split('T')[0];
+          matchDate = c.class_date === today;
+        }
+
+        return matchText && matchLevel && matchDate;
+      });
+
+      renderClassesGrid(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('classSearchInput').value = '';
+      document.getElementById('classLevelFilter').value = 'all';
+      document.getElementById('classDateFilter').value = 'all';
+      renderClassesGrid(currentClassesList);
+    }
+
+    // Modal de Reserva
+    function openBookingModal(classId) {
+      const cls = currentClassesList.find(c => c.id === classId);
+      if (!cls) return;
+
+      document.getElementById('selectedClassId').value = cls.id;
+      document.getElementById('modalClassTitle').innerText = cls.title;
+      document.getElementById('modalClassTeacher').innerText = cls.teacher_name;
+      document.getElementById('modalClassSchedule').innerText = 
+        `${window.OnlineClassesService.formatClassDate(cls.class_date)} (${window.OnlineClassesService.formatClassTime(cls.start_time)} - ${window.OnlineClassesService.formatClassTime(cls.end_time)})`;
+      document.getElementById('modalClassSpots').innerText = `${cls.remaining_spots} de 4 disponibles`;
+
+      document.getElementById('bookingModal').classList.remove('hidden');
+    }
+
+    function closeBookingModal() {
+      document.getElementById('bookingModal').classList.add('hidden');
+    }
+
+    async function handleConfirmBooking(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitBooking');
+      const classId = document.getElementById('selectedClassId').value;
+      const fullName = document.getElementById('bookFullName').value;
+      const docType = document.getElementById('bookDocType').value;
+      const docNum = document.getElementById('bookDocNum').value;
+      const phonePrefix = document.getElementById('bookPhonePrefix').value;
+      const phoneNum = document.getElementById('bookPhoneNum').value;
+      const email = document.getElementById('bookEmail').value;
+      const studentLevel = document.getElementById('bookStudentLevel').value;
+
+      btn.disabled = true;
+      btn.innerText = 'Procesando reserva...';
+
+      try {
+        const studentData = {
+          full_name: fullName,
+          document_id: `${docType}${docNum.trim()}`,
+          phone: `${phonePrefix}-${phoneNum.trim()}`,
+          email: email,
+          student_level: studentLevel
+        };
+
+        const result = await window.OnlineClassesService.bookOnlineClass(classId, studentData);
+        lastBookedResult = result;
+
+        // Cerrar modal de formulario y abrir modal de éxito
+        closeBookingModal();
+
+        document.getElementById('successModalClass').innerText = result.targetClass.title;
+        document.getElementById('successModalSchedule').innerText = 
+          `${window.OnlineClassesService.formatClassDate(result.targetClass.class_date)} · ${window.OnlineClassesService.formatClassTime(result.targetClass.start_time)}`;
+        document.getElementById('successModalStudent').innerText = `${result.booking.full_name} (${result.booking.document_id})`;
+        document.getElementById('successModalEmail').innerText = result.booking.email;
+
+        // Datos para modal simulado de correo
+        document.getElementById('emailPreviewName').innerText = result.booking.full_name;
+        document.getElementById('emailPreviewTitle').innerText = result.targetClass.title;
+        document.getElementById('emailPreviewSchedule').innerText = 
+          `${window.OnlineClassesService.formatClassDate(result.targetClass.class_date)} a las ${window.OnlineClassesService.formatClassTime(result.targetClass.start_time)}`;
+
+        document.getElementById('bookingSuccessModal').classList.remove('hidden');
+        showToast("🎉 ¡Solicitud de reserva registrada! Revisa tu correo.", "success", 6000);
+
+        // Recargar catálogo para actualizar cupos
+        await loadAndRenderClasses();
+
+      } catch (err) {
+        showToast(`❌ Error: ${err.message}`, "error", 6000);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Confirmar Reserva de Cupo';
+      }
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('bookingSuccessModal').classList.add('hidden');
+    }
+
+    function openSimulatedEmailModal() {
+      document.getElementById('simulatedEmailModal').classList.remove('hidden');
+    }
+
+    async function confirmCurrentSimulatedBooking() {
+      if (!lastBookedResult) return;
+      try {
+        const res = await window.OnlineClassesService.confirmBookingToken(lastBookedResult.confirmationToken);
+        document.getElementById('simulatedEmailModal').classList.add('hidden');
+        document.getElementById('bookingSuccessModal').classList.add('hidden');
+        showToast("✅ ¡Asistencia confirmada exitosamente! Tu cupo está asegurado.", "success", 7000);
+        await loadAndRenderClasses();
+      } catch (e) {
+        showToast("Error al confirmar.", "error");
+      }
+    }
+  </script>
+</body>
+</html>

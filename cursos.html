@@ -276,15 +276,30 @@
 
       <!-- 3. DASHBOARD DEL PROFESOR -->
       <section id="teacherDashboard" class="hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 18px;">
-          <div>
-            <h1 class="page-title" style="margin-bottom: 4px;">Panel de Profesores & Calificaciones</h1>
-            <p class="page-description" style="margin-bottom: 0;">Gestiona evaluaciones oficiales, progreso y caducidad de matrículas.</p>
-          </div>
-          <button class="btn-primary" onclick="toggleNewStudentModal(true)" style="width: auto; padding: 12px 22px; font-size: 14px; background: #2563eb;">
-            ➕ Registrar Nuevo Estudiante
+        <!-- SUBMENÚ DE NAVEGACIÓN DEL PROFESOR -->
+        <nav class="student-tabs-wrapper" aria-label="Secciones del Profesor" style="margin-bottom: 22px;">
+          <button type="button" class="student-tab-pill active" id="tabBtnTeacherStudents" onclick="switchTeacherTab('students')">
+            <span style="font-size: 16px;">👨‍🎓</span>
+            <span>Estudiantes & Calificaciones</span>
           </button>
-        </div>
+          <button type="button" class="student-tab-pill" id="tabBtnTeacherClasses" onclick="switchTeacherTab('classes')">
+            <span style="font-size: 16px;">🌐</span>
+            <span>Clases Online & Reservas</span>
+            <span class="badge-pill-accent" id="teacherClassesPillCount">4 cupos máx</span>
+          </button>
+        </nav>
+
+        <!-- SUBSECCIÓN 1: ESTUDIANTES Y CALIFICACIONES -->
+        <div id="teacherTabStudents">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 18px;">
+            <div>
+              <h1 class="page-title" style="margin-bottom: 4px;">Panel de Profesores & Calificaciones</h1>
+              <p class="page-description" style="margin-bottom: 0;">Gestiona evaluaciones oficiales, progreso y caducidad de matrículas.</p>
+            </div>
+            <button class="btn-primary" onclick="toggleNewStudentModal(true)" style="width: auto; padding: 12px 22px; font-size: 14px; background: #2563eb;">
+              ➕ Registrar Nuevo Estudiante
+            </button>
+          </div>
 
         <!-- BARRA RESUMEN DE ESTADÍSTICAS DEL PROFESOR -->
         <div class="teacher-metrics-bar">
@@ -392,7 +407,54 @@
             </div>
           </div>
         </div>
-      </section>
+      </div>
+
+      <!-- SUBSECCIÓN 2: CLASES ONLINE & RESERVAS -->
+      <div id="teacherTabClasses" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+          <div>
+            <h1 class="page-title" style="margin-bottom: 4px;">Gestión de Clases Online en Vivo</h1>
+            <p class="page-description" style="margin-bottom: 0;">
+              Publica horarios y sesiones con <strong>máximo 4 estudiantes por clase</strong>. Consulta los postulantes y sus datos de contacto.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="clases-online.html" target="_blank" class="btn-talk" style="text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+              <span>🌐 Ver Portal Público de Clases</span>
+              <span>↗</span>
+            </a>
+            <button class="btn-primary" onclick="openPublishClassModal()" style="width: auto; padding: 12px 22px; font-size: 14px; background: #2563eb;">
+              ➕ Publicar Nueva Clase Online
+            </button>
+          </div>
+        </div>
+
+        <!-- BARRA RESUMEN DE CLASES ONLINE -->
+        <div class="teacher-metrics-bar">
+          <div class="metric-pill">
+            <span class="metric-number" id="metricTotalClasses">0</span>
+            <span class="metric-label">Clases Activas</span>
+          </div>
+          <div class="metric-pill">
+            <span class="metric-number metric-active" id="metricTotalClassBookings">0</span>
+            <span class="metric-label">Cupos Ocupados</span>
+          </div>
+          <div class="metric-pill">
+            <span class="metric-number metric-warning" id="metricFreeClassSpots">0</span>
+            <span class="metric-label">Cupos Libres</span>
+          </div>
+          <div class="metric-pill">
+            <span class="metric-number" style="color: #a855f7;" id="metricConfirmedBookings">0</span>
+            <span class="metric-label">Confirmados por Correo</span>
+          </div>
+        </div>
+
+        <!-- CUADRÍCULA DE CLASES PUBLICADAS POR PROFESORES -->
+        <div id="teacherClassesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top: 10px;">
+          <!-- Renderizado dinámicamente -->
+        </div>
+      </div>
+    </section>
 
     </main>
   </div>
@@ -702,6 +764,118 @@
     </div>
   </div>
 
+  <!-- MODAL PARA PUBLICAR NUEVA CLASE ONLINE (DOCENTE) -->
+  <div id="publishClassModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1003; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
+    <div class="auth-card" style="max-width: 540px; width: 100%; margin: auto; background: #0e387a; border: 2px solid var(--color-primary-light); padding: 24px;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+        <div>
+          <span class="section-badge" style="font-size: 11px; padding: 3px 10px; margin-bottom: 6px;">Nueva Sesión en Vivo</span>
+          <h3 class="page-title" style="font-size: 20px; margin: 0;">➕ Publicar Clase Online</h3>
+        </div>
+        <button type="button" onclick="closePublishClassModal()" style="background: none; border: none; color: #ffffff; font-size: 26px; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <form onsubmit="handlePublishClassSubmit(event)">
+        <div class="form-group">
+          <label for="newClassTitle">Título o Tema de la Clase *</label>
+          <input type="text" id="newClassTitle" class="form-control" placeholder="Ej: Speaking Club: Job Interviews & Fluency" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+          <div>
+            <label for="newClassLevel">Nivel Recomendado *</label>
+            <select id="newClassLevel" class="form-control" style="background: rgba(0,0,0,0.4);" required>
+              <option value="Adultos & Conversacional">Adultos & Conversacional</option>
+              <option value="Adultos 1 (Básico)">Adultos 1 (Básico)</option>
+              <option value="Adultos 2 - 3 (Intermedio)">Adultos 2 - 3 (Intermedio)</option>
+              <option value="Teens & Jóvenes">Teens & Jóvenes</option>
+              <option value="Kids & Niños">Kids & Niños</option>
+              <option value="Avanzado & Profesional">Avanzado & Profesional</option>
+            </select>
+          </div>
+          <div>
+            <label for="newClassDate">Fecha de la Sesión *</label>
+            <input type="date" id="newClassDate" class="form-control" required style="background: rgba(0,0,0,0.4); color: #ffffff;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+          <div>
+            <label for="newClassStartTime">Hora Inicio *</label>
+            <input type="time" id="newClassStartTime" class="form-control" required style="background: rgba(0,0,0,0.4); color: #ffffff;">
+          </div>
+          <div>
+            <label for="newClassEndTime">Hora Fin *</label>
+            <input type="time" id="newClassEndTime" class="form-control" required style="background: rgba(0,0,0,0.4); color: #ffffff;">
+          </div>
+          <div>
+            <label for="newClassMaxCap">Cupo Máximo</label>
+            <input type="number" id="newClassMaxCap" class="form-control" value="4" readonly disabled style="background: rgba(255,255,255,0.1); font-weight: 700; text-align: center; color: #fbbf24;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newClassMeetingLink">Enlace de Videollamada (Google Meet / Zoom)</label>
+          <input type="url" id="newClassMeetingLink" class="form-control" placeholder="https://meet.google.com/xxx-xxxx-xxx">
+        </div>
+
+        <div class="form-group">
+          <label for="newClassDesc">Descripción u Objetivos de la Sesión</label>
+          <textarea id="newClassDesc" class="form-control" rows="2" placeholder="Describe brevemente qué aprenderán o qué dinámicas se realizarán..." style="resize: vertical;"></textarea>
+        </div>
+
+        <div style="background: rgba(37, 99, 235, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 18px; font-size: 12px; color: #93c5fd;">
+          🔒 <strong>Cupo estricto:</strong> Se fija exactamente en 4 personas por clase para preservar la metodología participativa 1 a 4. En cuanto se completen los 4 cupos, la clase no permitirá más reservas en el portal.
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button type="submit" id="btnPublishClass" class="btn-primary" style="flex: 2; background: #2563eb;">
+            Publicar Clase en el Portal
+          </button>
+          <button type="button" class="btn-secondary" style="flex: 1;" onclick="closePublishClassModal()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL PARA VER ESTUDIANTES AGENDADOS EN UNA CLASE (DOCENTE) -->
+  <div id="viewClassBookingsModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1004; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
+    <div class="auth-card" style="max-width: 680px; width: 100%; margin: auto; background: #0e387a; border: 2px solid var(--color-primary-light); padding: 24px;">
+      
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+        <div>
+          <span class="section-badge" style="font-size: 11px; padding: 3px 10px; margin-bottom: 6px;">Control de Asistencia</span>
+          <h3 id="viewBookingsClassTitle" class="page-title" style="font-size: 20px; margin: 0;">Estudiantes Inscritos</h3>
+          <p id="viewBookingsClassSchedule" style="font-size: 13px; color: #93c5fd; margin: 4px 0 0 0;">Horario</p>
+        </div>
+        <button type="button" onclick="closeClassBookingsModal()" style="background: none; border: none; color: #ffffff; font-size: 26px; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <!-- Barra de cupos ocupados -->
+      <div id="viewBookingsGaugeBar" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); border-radius: var(--radius-lg); padding: 12px 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <span style="font-size: 12px; color: var(--color-muted);">Ocupación:</span>
+          <strong id="viewBookingsCountText" style="color: #4ade80; font-size: 14px; margin-left: 6px;">0 de 4 cupos</strong>
+        </div>
+        <div id="viewBookingsMeetLinkWrapper"></div>
+      </div>
+
+      <!-- Contenedor con la lista de alumnos agendados -->
+      <div id="viewBookingsListContainer">
+        <!-- Renderizado dinámico -->
+      </div>
+
+      <div style="margin-top: 20px; text-align: right;">
+        <button type="button" class="btn-primary" onclick="closeClassBookingsModal()" style="width: auto; padding: 10px 24px;">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- CONTENEDOR TOAST PARA NOTIFICACIONES -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
@@ -716,7 +890,9 @@
   </script>
   <!-- 2. Cliente de Supabase -->
   <script src="assets/js/supabaseClient.js"></script>
-  <!-- 3. Lógica de la Plataforma -->
+  <!-- 3. Módulo Oficial de Clases Online -->
+  <script src="assets/js/onlineClasses.js"></script>
+  <!-- 4. Lógica de la Plataforma -->
   <script src="assets/js/platform.js"></script>
 </body>
 </html>

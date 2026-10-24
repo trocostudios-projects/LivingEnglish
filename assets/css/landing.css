@@ -287,3 +287,123 @@
     animation: none;
   }
 }
+
+
+/* ==========================================================================
+   Sección de Clases Online (En sustitución de Metodología)
+   ========================================================================== */
+.online-classes-section {
+  position: relative;
+  background: radial-gradient(circle at 50% 0%, #1e40af 0%, #0a2558 50%, #061838 100%);
+  color: var(--color-white);
+  padding: clamp(60px, 8vw, 100px) 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.online-classes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(37, 99, 235, 0.25);
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  color: #93c5fd;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5vw, 46px);
+  line-height: 1.15;
+  color: #ffffff;
+  margin-bottom: 14px;
+}
+
+.section-subtitle {
+  font-size: clamp(15px, 2vw, 18px);
+  color: #cbd5e1;
+  max-width: 720px;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.online-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.online-feature-card {
+  background: rgba(14, 56, 122, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
+  padding: 26px;
+  backdrop-filter: blur(8px);
+  transition: transform var(--transition-normal), border-color var(--transition-normal);
+}
+
+.online-feature-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(96, 165, 250, 0.5);
+  background: rgba(14, 56, 122, 0.65);
+}
+
+.online-feature-icon {
+  font-size: 36px;
+  margin-bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.online-feature-title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.online-feature-desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.online-cta-banner {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(30, 64, 175, 0.25));
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  border-radius: var(--radius-2xl);
+  padding: clamp(28px, 5vw, 44px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
+.landing-footer {
+  background: #030d1e;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 32px 24px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
