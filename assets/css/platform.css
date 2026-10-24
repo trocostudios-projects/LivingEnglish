@@ -13,14 +13,20 @@
   display: flex;
   flex-direction: column;
 
-  /* Fondo degradado profundo para máxima legibilidad y confort visual */
-  background: radial-gradient(circle at 50% 0%, #173f7c 0%, #0d2c60 38%, #06183a 75%, #030d20 100%);
+  /* Hero image de fondo con capa oscurecedora para contraste y diferenciación */
+  background: linear-gradient(rgba(6, 20, 48, 0.80), rgba(4, 14, 34, 0.88)), var(--bg-hero-desktop);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   background-attachment: fixed;
 }
 
 @media (max-width: 767px) {
   .app-viewport {
-    background: radial-gradient(circle at 50% 0%, #173f7c 0%, #0d2c60 45%, #06183a 85%, #030d20 100%);
+    background: linear-gradient(rgba(6, 20, 48, 0.84), rgba(4, 14, 34, 0.90)), var(--bg-hero-mobile);
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
   }
 }
 

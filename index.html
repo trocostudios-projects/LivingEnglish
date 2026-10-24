@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/landing.css">
 </head>
-<body>
+<body class="landing-page">
 
   <!-- HERO SECTION PRINCIPAL -->
   <section class="hero-section">
@@ -29,8 +29,8 @@
       <!-- NAVEGACIÓN ESCRITORIO -->
       <nav class="desktop-nav" aria-label="Navegación principal">
         <a href="index.html" class="nav-link">Inicio</a>
-        <a href="cursos.html" class="nav-link">Cursos</a>
-        <a href="clases-online.html" class="nav-link" style="color: #93c5fd; font-weight: 700;">🌐 Clases Online</a>
+        <a href="cursos.html" class="nav-link">Portal Estudiantil</a>
+        <a href="clases-online.html" class="nav-link">Clases Online</a>
         <a href="#sedes" class="nav-link">Sedes</a>
         <a href="cursos.html" class="btn-talk">Inscríbete hoy</a>
       </nav>
@@ -55,17 +55,17 @@
       </p>
 
       <div class="hero-actions reveal-item reveal-delay-5">
-        <a href="cursos.html" class="btn-primary">Ver cursos</a>
-        <a href="clases-online.html" class="btn-secondary" style="border-color: rgba(147, 197, 253, 0.6); color: #ffffff;">🌐 Clases Online (En Vivo)</a>
+        <a href="cursos.html" class="btn-primary">Portal Estudiantil</a>
+        <a href="clases-online.html" class="btn-secondary">Clases Online (En Vivo)</a>
       </div>
     </div>
   </section>
 
-  <!-- SECCIÓN DE CLASES ONLINE (SUSTITUYE A METODOLOGÍA) -->
+  <!-- SECCIÓN DE CLASES ONLINE (COHERENTE CON EL ESTILO GLOBAL) -->
   <section class="online-classes-section" id="clases-online">
     <div class="online-classes-container">
       <div style="text-align: center; max-width: 800px; margin: 0 auto 50px auto;">
-        <span class="section-badge">✨ Nueva Modalidad en Vivo</span>
+        <span class="section-badge">Modalidad en Vivo</span>
         <h2 class="section-title">Clases Online Ultra-Personalizadas</h2>
         <p class="section-subtitle">
           Diseñadas para maximizar tu fluidez. Cada sesión se imparte en vivo con docentes certificados y con un <strong>máximo de 4 estudiantes por clase</strong> para garantizar que hables, participes y resuelvas dudas en tiempo real.
@@ -110,17 +110,17 @@
       <!-- Banner de Llamada a la Acción para entrar al portal -->
       <div class="online-cta-banner">
         <div>
-          <h3 style="font-family: var(--font-display); font-size: 26px; color: #ffffff; margin-bottom: 6px;">
+          <h3 class="online-cta-title">
             ¿Listo para tu próxima clase en vivo?
           </h3>
-          <p style="color: #cbd5e1; font-size: 15px; margin: 0; max-width: 580px; line-height: 1.5;">
+          <p class="online-cta-desc">
             Explora las clases disponibles publicadas por los profesores, revisa los cupos libres en tiempo real y reserva tu lugar.
           </p>
         </div>
         <div>
-          <a href="clases-online.html" class="btn-primary" style="padding: 14px 28px; font-size: 15px; background: #2563eb; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
+          <a href="clases-online.html" class="btn-primary" style="padding: 14px 28px; font-size: 15px; text-decoration: none;">
             <span>Ver Horarios y Reservar Clase</span>
-            <span>➔</span>
+            <span style="margin-left: 6px;">➔</span>
           </a>
         </div>
       </div>
@@ -128,15 +128,15 @@
   </section>
 
   <!-- SECCIÓN DE SEDES / CONTACTO -->
-  <section id="sedes" style="background: #061838; padding: 60px 24px; border-top: 1px solid rgba(255,255,255,0.1); color: #ffffff;">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 30px;">
+  <section id="sedes" class="sedes-section">
+    <div class="sedes-container">
       <div>
-        <h3 style="font-family: var(--font-display); font-size: 24px; margin-bottom: 8px;">Academia Living English</h3>
-        <p style="color: #94a3b8; font-size: 14px; max-width: 450px; line-height: 1.5; margin-bottom: 0;">
+        <h3 class="sedes-title">Academia Living English</h3>
+        <p class="sedes-desc">
           Formando líderes bilingües con programas presenciales y clases online en vivo para niños, jóvenes y adultos.
         </p>
       </div>
-      <div style="display: flex; gap: 30px; flex-wrap: wrap; font-size: 14px; color: #cbd5e1;">
+      <div style="display: flex; gap: 30px; flex-wrap: wrap; font-size: 14px; color: rgba(255, 255, 255, 0.85);">
         <div>
           <strong style="color: #ffffff; display: block; margin-bottom: 4px;">📍 Modalidades</strong>
           <span>Presencial & Clases Online en Vivo</span>
@@ -154,9 +154,9 @@
     <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
       <span>&copy; 2026 Academia Living English. Todos los derechos reservados.</span>
       <div style="display: flex; gap: 16px;">
-        <a href="index.html" style="color: #94a3b8; text-decoration: none;">Inicio</a>
-        <a href="cursos.html" style="color: #94a3b8; text-decoration: none;">Cursos & Notas</a>
-        <a href="clases-online.html" style="color: #93c5fd; text-decoration: none; font-weight: 600;">Clases Online</a>
+        <a href="index.html">Inicio</a>
+        <a href="cursos.html">Portal Estudiantil</a>
+        <a href="clases-online.html">Clases Online</a>
       </div>
     </div>
   </footer>
@@ -172,14 +172,14 @@
     
     <nav class="mobile-menu-links">
       <a href="index.html" class="nav-link">Inicio</a>
-      <a href="cursos.html" class="nav-link">Cursos</a>
-      <a href="clases-online.html" class="nav-link" style="color: #93c5fd; font-weight: 700;">🌐 Clases Online</a>
+      <a href="cursos.html" class="nav-link">Portal Estudiantil</a>
+      <a href="clases-online.html" class="nav-link">Clases Online</a>
       <a href="#sedes" class="nav-link">Sedes</a>
     </nav>
 
     <div class="mobile-menu-footer">
-      <a href="clases-online.html" class="btn-talk" style="margin-bottom: 10px;">Ver Clases Online</a>
-      <a href="cursos.html" class="btn-primary">Portal de Alumnos</a>
+      <a href="clases-online.html" class="btn-talk" style="margin-bottom: 10px;">Clases Online</a>
+      <a href="cursos.html" class="btn-primary">Portal Estudiantil</a>
     </div>
   </div>
 

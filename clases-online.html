@@ -20,9 +20,26 @@
   <style>
     /* Estilos dedicados del portal de clases online */
     .portal-body {
-      background: radial-gradient(circle at 50% 10%, #173b75 0%, #0a2558 45%, #051636 100%);
+      background: linear-gradient(rgba(6, 20, 48, 0.80), rgba(4, 14, 34, 0.88)), var(--bg-hero-desktop);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
       min-height: 100vh;
       color: #ffffff;
+    }
+
+    @media (max-width: 767px) {
+      .portal-body {
+        background: linear-gradient(rgba(6, 20, 48, 0.84), rgba(4, 14, 34, 0.90)), var(--bg-hero-mobile);
+        background-size: cover;
+        background-position: center top;
+        background-attachment: fixed;
+      }
+    }
+
+    .portal-body .app-viewport {
+      background: transparent;
     }
 
     .portal-hero {
@@ -190,8 +207,8 @@
         <a href="index.html" class="btn-talk" style="text-decoration: none; font-size: 13px;">
           🏠 Inicio
         </a>
-        <a href="cursos.html" class="btn-talk" style="text-decoration: none; font-size: 13px; background: rgba(37, 99, 235, 0.3); border-color: rgba(96, 165, 250, 0.4);">
-          👨‍🎓 Portal de Alumnos & Profesores
+        <a href="cursos.html" class="btn-talk" style="text-decoration: none; font-size: 13px;">
+          🎓 Portal Estudiantil
         </a>
       </nav>
     </header>
