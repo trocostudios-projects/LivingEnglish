@@ -2107,7 +2107,7 @@ async function loadTeacherOnlineClasses() {
       card.innerHTML = `
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap;">
-            <span class="game-category-tag tag-vocab" style="font-size: 11px;">${cls.course_level}</span>
+            <span class="game-category-tag tag-vocab" style="font-size: 11px;">🌐 Abierto a todo público</span>
             ${statusBadge}
           </div>
 
@@ -2189,7 +2189,6 @@ async function handlePublishClassSubmit(e) {
 
   try {
     const title = document.getElementById('newClassTitle').value;
-    const level = document.getElementById('newClassLevel').value;
     const date = document.getElementById('newClassDate').value;
     const startTime = document.getElementById('newClassStartTime').value;
     const endTime = document.getElementById('newClassEndTime').value;
@@ -2204,7 +2203,7 @@ async function handlePublishClassSubmit(e) {
       teacher_id: currentUserProfile ? currentUserProfile.id : null,
       teacher_name: teacherName,
       title: title,
-      course_level: level,
+      course_level: 'Abierto a Todo Público',
       class_date: date,
       start_time: startTime,
       end_time: endTime,
@@ -2314,7 +2313,6 @@ async function openClassBookingsModal(classId) {
         <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
           <td style="padding: 10px 8px;">
             <strong style="color: #ffffff; display: block;">${b.full_name}</strong>
-            <span style="font-size: 11px; color: var(--color-muted);">${b.student_level || 'General'}</span>
           </td>
           <td style="padding: 10px 8px; font-family: monospace; font-size: 12px; color: #93c5fd;">
             ${b.document_id}

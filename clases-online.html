@@ -240,21 +240,11 @@
 
       <!-- BARRA DE FILTROS DE BÚSQUEDA -->
       <div class="classes-filter-bar">
-        <div style="flex: 2; min-width: 220px;">
+        <div style="flex: 2; min-width: 240px;">
           <input type="text" id="classSearchInput" class="form-control" placeholder="🔍 Buscar por tema, docente o contenido..." oninput="filterOnlineClassesView()">
         </div>
 
         <div style="flex: 1; min-width: 180px;">
-          <select id="classLevelFilter" class="form-control" onchange="filterOnlineClassesView()" style="background: rgba(0,0,0,0.4);">
-            <option value="all">Todos los niveles</option>
-            <option value="Adultos">Adultos</option>
-            <option value="Teens">Teens</option>
-            <option value="Conversacional">Conversacional / Speaking</option>
-            <option value="Avanzado">Avanzado / Profesional</option>
-          </select>
-        </div>
-
-        <div style="flex: 1; min-width: 160px;">
           <select id="classDateFilter" class="form-control" onchange="filterOnlineClassesView()" style="background: rgba(0,0,0,0.4);">
             <option value="all">Todas las fechas</option>
             <option value="today">Hoy</option>
@@ -357,16 +347,6 @@
           <small style="color: #93c5fd; font-size: 11px; display: block; margin-top: 4px;">
             📩 Te enviaremos un correo con el botón oficial para confirmar tu asistencia a la clase.
           </small>
-        </div>
-
-        <div class="form-group">
-          <label for="bookStudentLevel">Tu Nivel de Inglés Actual</label>
-          <select id="bookStudentLevel" class="form-control" style="background: rgba(0,0,0,0.4);">
-            <option value="Básico">Básico / Principiante (A1-A2)</option>
-            <option value="Intermedio" selected>Intermedio (B1-B2)</option>
-            <option value="Avanzado">Avanzado (C1)</option>
-            <option value="Por Evaluar">No estoy seguro / Por evaluar</option>
-          </select>
         </div>
 
         <div style="background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.3); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 18px; font-size: 12px; color: #fef08a;">
@@ -572,7 +552,7 @@
         card.innerHTML = `
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-              <span class="game-category-tag tag-vocab" style="font-size: 11px;">${cls.course_level}</span>
+              <span class="game-category-tag tag-vocab" style="font-size: 11px;">🌐 Abierto a todo público</span>
               <span style="font-size: 12px; color: var(--color-muted); display: inline-flex; align-items: center; gap: 4px;">
                 <span>📅</span>
                 <strong>${formattedDate}</strong>
@@ -618,7 +598,6 @@
 
     function filterOnlineClassesView() {
       const search = (document.getElementById('classSearchInput').value || '').toLowerCase().trim();
-      const level = document.getElementById('classLevelFilter').value;
       const dateFilter = document.getElementById('classDateFilter').value;
 
       const filtered = currentClassesList.filter(c => {
@@ -628,10 +607,6 @@
           c.teacher_name.toLowerCase().includes(search) || 
           (c.description && c.description.toLowerCase().includes(search));
 
-        // Filtro nivel
-        const matchLevel = level === 'all' || 
-          c.course_level.toLowerCase().includes(level.toLowerCase());
-
         // Filtro fecha
         let matchDate = true;
         if (dateFilter === 'today') {
@@ -639,7 +614,7 @@
           matchDate = c.class_date === today;
         }
 
-        return matchText && matchLevel && matchDate;
+        return matchText && matchDate;
       });
 
       renderClassesGrid(filtered);
@@ -647,7 +622,6 @@
 
     function resetFilters() {
       document.getElementById('classSearchInput').value = '';
-      document.getElementById('classLevelFilter').value = 'all';
       document.getElementById('classDateFilter').value = 'all';
       renderClassesGrid(currentClassesList);
     }
@@ -681,7 +655,6 @@
       const phonePrefix = document.getElementById('bookPhonePrefix').value;
       const phoneNum = document.getElementById('bookPhoneNum').value;
       const email = document.getElementById('bookEmail').value;
-      const studentLevel = document.getElementById('bookStudentLevel').value;
 
       btn.disabled = true;
       btn.innerText = 'Procesando reserva...';
@@ -692,7 +665,7 @@
           document_id: `${docType}${docNum.trim()}`,
           phone: `${phonePrefix}-${phoneNum.trim()}`,
           email: email,
-          student_level: studentLevel
+          student_level: 'General'
         };
 
         const result = await window.OnlineClassesService.bookOnlineClass(classId, studentData);
