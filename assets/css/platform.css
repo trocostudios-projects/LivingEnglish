@@ -13,18 +13,14 @@
   display: flex;
   flex-direction: column;
 
-  /* Imagen de fondo por defecto */
-  background-image: var(--bg-hero-desktop);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  /* Fondo degradado profundo para máxima legibilidad y confort visual */
+  background: radial-gradient(circle at 50% 0%, #173f7c 0%, #0d2c60 38%, #06183a 75%, #030d20 100%);
   background-attachment: fixed;
 }
 
 @media (max-width: 767px) {
   .app-viewport {
-    background-image: var(--bg-hero-mobile);
-    background-position: center top;
+    background: radial-gradient(circle at 50% 0%, #173f7c 0%, #0d2c60 45%, #06183a 85%, #030d20 100%);
   }
 }
 
