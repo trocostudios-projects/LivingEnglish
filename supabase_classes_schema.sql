@@ -53,6 +53,12 @@ CREATE POLICY "Profesores gestionan clases"
   ON public.online_classes FOR ALL
   USING (auth.role() = 'authenticated');
 
+-- Permitir borrado automático de clases finalizadas
+DROP POLICY IF EXISTS "Borrado automatico de clases finalizadas" ON public.online_classes;
+CREATE POLICY "Borrado automatico de clases finalizadas"
+  ON public.online_classes FOR DELETE
+  USING (class_date < CURRENT_DATE OR (class_date = CURRENT_DATE AND end_time <= CURRENT_TIME));
+
 -- 5. POLÍTICAS DE ACCESO: RESERVAS
 -- Cualquier visitante puede registrar una reserva (INSERT público)
 DROP POLICY IF EXISTS "Insercion publica de reservas" ON public.class_bookings;

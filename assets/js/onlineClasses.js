@@ -88,6 +88,41 @@ function getOnlineSupabase() {
   return window.supabaseClient || null;
 }
 
+/**
+ * Determina si una clase ya terminó según su fecha y hora de fin
+ */
+function isClassFinished(cls) {
+  if (!cls || !cls.class_date) return false;
+  try {
+    const dateParts = cls.class_date.split('-');
+    if (dateParts.length !== 3) return false;
+    const year = parseInt(dateParts[0], 10);
+    const month = parseInt(dateParts[1], 10) - 1;
+    const day = parseInt(dateParts[2], 10);
+
+    let hours = 23;
+    let minutes = 59;
+
+    if (cls.end_time && cls.end_time.includes(':')) {
+      const parts = cls.end_time.split(':');
+      hours = parseInt(parts[0], 10) || 0;
+      minutes = parseInt(parts[1], 10) || 0;
+    } else if (cls.start_time && cls.start_time.includes(':')) {
+      const parts = cls.start_time.split(':');
+      hours = (parseInt(parts[0], 10) || 0) + 1; // Por defecto 1 hora si no tiene fin
+      minutes = parseInt(parts[1], 10) || 0;
+    }
+
+    const classEndDateTime = new Date(year, month, day, hours, minutes, 0);
+    const now = new Date();
+
+    return now.getTime() >= classEndDateTime.getTime();
+  } catch (err) {
+    console.error("Error comprobando expiración de clase:", err);
+    return false;
+  }
+}
+
 // Helpers de almacenamiento local (fallback resiliente)
 function getLocalClasses() {
   try {
@@ -96,7 +131,13 @@ function getLocalClasses() {
       localStorage.setItem('le_online_classes', JSON.stringify(INITIAL_DEMO_CLASSES));
       return INITIAL_DEMO_CLASSES;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    // Depurar clases que hayan sido canceladas o que ya terminaron
+    const valid = parsed.filter(c => c.status !== 'cancelled' && !isClassFinished(c));
+    if (valid.length !== parsed.length) {
+      localStorage.setItem('le_online_classes', JSON.stringify(valid));
+    }
+    return valid;
   } catch (e) {
     return INITIAL_DEMO_CLASSES;
   }
@@ -132,7 +173,8 @@ function setLocalBookings(bookings) {
 }
 
 /**
- * Obtener todas las clases activas con el conteo de cupos ocupados
+ * Obtener todas las clases activas con el conteo de cupos ocupados.
+ * Automáticamente detecta y borra cualquier clase cuya hora haya finalizado.
  */
 async function fetchOnlineClasses(includeAllStatus = false) {
   const client = getOnlineSupabase();
@@ -165,7 +207,7 @@ async function fetchOnlineClasses(includeAllStatus = false) {
     }
   }
 
-  // Fallback si Supabase no tiene aún las tablas creadas
+  // Fallback si Supabase no tiene aún las tablas creadas o está en modo local
   if (!classes || classes.length === 0) {
     classes = getLocalClasses();
     if (!includeAllStatus) {
@@ -175,6 +217,34 @@ async function fetchOnlineClasses(includeAllStatus = false) {
 
   if (!bookings || bookings.length === 0) {
     bookings = getLocalBookings();
+  }
+
+  // REGLA: Si la clase ya se acabó (fecha y hora fin en el pasado), SE BORRA del sistema
+  const finishedClasses = classes.filter(c => isClassFinished(c));
+  if (finishedClasses.length > 0) {
+    const finishedIds = finishedClasses.map(c => c.id);
+    
+    // 1. Borrar de Supabase (reservas y clases)
+    if (client) {
+      client.from('class_bookings').delete().in('class_id', finishedIds)
+        .then(() => client.from('online_classes').delete().in('id', finishedIds))
+        .catch(err => console.warn("Error borrando clases finalizadas en Supabase:", err));
+    }
+
+    // 2. Borrar de LocalStorage
+    const local = getLocalClasses();
+    setLocalClasses(local.filter(c => !finishedIds.includes(c.id)));
+    const localBookings = getLocalBookings();
+    setLocalBookings(localBookings.filter(b => !finishedIds.includes(b.class_id)));
+
+    // 3. Excluir de la respuesta actual
+    classes = classes.filter(c => !finishedIds.includes(c.id));
+    bookings = bookings.filter(b => !finishedIds.includes(b.class_id));
+  }
+
+  // REGLA: Clases canceladas tampoco deben estar (se borran)
+  if (!includeAllStatus) {
+    classes = classes.filter(c => c.status !== 'cancelled');
   }
 
   // Calcular ocupación de cada clase (máximo 4)
@@ -243,23 +313,38 @@ async function createOnlineClass(classData) {
 }
 
 /**
- * Cancelar una clase online
+ * Eliminar / Borrar definitivamente una clase online (cuando el profesor la cancela)
+ * Elimina la clase y todas sus reservas asociadas tanto de Supabase como de LocalStorage
  */
-async function cancelOnlineClass(classId) {
+async function deleteOnlineClass(classId) {
   const client = getOnlineSupabase();
 
   if (client) {
     try {
-      await client.from('online_classes').update({ status: 'cancelled' }).eq('id', classId);
+      // 1. Eliminar reservas asociadas en Supabase
+      await client.from('class_bookings').delete().eq('class_id', classId);
+      // 2. Eliminar la clase en Supabase
+      await client.from('online_classes').delete().eq('id', classId);
     } catch (err) {
-      console.warn("Error al cancelar en Supabase:", err);
+      console.warn("Error al borrar clase en Supabase:", err);
     }
   }
 
+  // Eliminar de localStorage
   const current = getLocalClasses();
-  const updated = current.map(c => c.id === classId ? { ...c, status: 'cancelled' } : c);
+  const updated = current.filter(c => c.id !== classId);
   setLocalClasses(updated);
+
+  const currentBookings = getLocalBookings();
+  const updatedBookings = currentBookings.filter(b => b.class_id !== classId);
+  setLocalBookings(updatedBookings);
+
   return true;
+}
+
+// Alias para compatibilidad con código existente
+async function cancelOnlineClass(classId) {
+  return await deleteOnlineClass(classId);
 }
 
 /**
@@ -429,7 +514,9 @@ function formatClassTime(timeStr) {
 window.OnlineClassesService = {
   fetchOnlineClasses,
   createOnlineClass,
+  deleteOnlineClass,
   cancelOnlineClass,
+  isClassFinished,
   bookOnlineClass,
   confirmBookingToken,
   fetchBookingsForClass,

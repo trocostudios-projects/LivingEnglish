@@ -516,6 +516,11 @@
 
       // 2. Cargar clases
       await loadAndRenderClasses();
+
+      // 3. Revisión periódica cada 60s para borrar automáticamente clases finalizadas
+      setInterval(async () => {
+        await loadAndRenderClasses();
+      }, 60000);
     });
 
     async function loadAndRenderClasses() {

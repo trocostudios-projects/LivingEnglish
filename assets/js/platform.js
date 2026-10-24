@@ -2142,11 +2142,9 @@ async function loadTeacherOnlineClasses() {
           <button type="button" class="btn-primary" style="flex: 2; padding: 8px 12px; font-size: 12px;" onclick="openClassBookingsModal('${cls.id}')">
             👥 Ver Alumnos (${cls.bookings_count || 0})
           </button>
-          ${!isCancelled ? `
-            <button type="button" class="btn-secondary" style="flex: 1; padding: 8px 8px; font-size: 12px; color: #f87171; border-color: rgba(239,68,68,0.4);" onclick="handleCancelClass('${cls.id}')" title="Cancelar esta sesión">
-              🗑️ Cancelar
-            </button>
-          ` : ''}
+          <button type="button" class="btn-secondary" style="flex: 1; padding: 8px 8px; font-size: 12px; color: #f87171; border-color: rgba(239,68,68,0.4);" onclick="handleCancelClass('${cls.id}')" title="Cancelar y borrar esta clase del sistema">
+            🗑️ Cancelar y Borrar
+          </button>
         </div>
       `;
 
@@ -2230,15 +2228,20 @@ async function handlePublishClassSubmit(e) {
 }
 
 async function handleCancelClass(classId) {
-  if (!confirm("¿Estás seguro de que deseas cancelar esta clase online? Ya no se admitirán más reservas.")) {
+  if (!confirm("¿Estás seguro de que deseas cancelar y borrar esta clase online? Se eliminará definitivamente del sistema.")) {
     return;
   }
   try {
-    await window.OnlineClassesService.cancelOnlineClass(classId);
-    showToast("Clase cancelada.", "info");
+    if (window.OnlineClassesService && window.OnlineClassesService.deleteOnlineClass) {
+      await window.OnlineClassesService.deleteOnlineClass(classId);
+    } else if (window.OnlineClassesService) {
+      await window.OnlineClassesService.cancelOnlineClass(classId);
+    }
+    showToast("Clase cancelada y borrada del sistema.", "info");
     await loadTeacherOnlineClasses();
+    updateTeacherClassesBadge();
   } catch (err) {
-    showToast("Error al cancelar la clase.", "error");
+    showToast("Error al eliminar la clase.", "error");
   }
 }
 
