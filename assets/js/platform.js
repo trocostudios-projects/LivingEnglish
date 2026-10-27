@@ -755,7 +755,7 @@ function renderStudentEvaluations() {
   if (!container) return;
   container.innerHTML = '';
 
-  const courseLevel = currentUserProfile.course_level || 'Adultos 1';
+  const courseLevel = studentActiveViewingLevel || currentUserProfile.course_level || 'Adultos 1';
   const config = getCourseConfig(courseLevel);
 
   let totalScoreEarned = 0;
@@ -1139,6 +1139,10 @@ function renderTeacherCurriculumGrades(config) {
 
       const hasScore = currentPts !== '';
       const typeBadgeClass = item.type === 'Oral' ? 'badge-oral' : (item.type === 'Formativo' ? 'badge-formative' : (item.type === 'Sticker' || item.type === 'Lúdico' ? 'badge-kids' : 'badge-written'));
+      const safeAttrTitle = String(item.title || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 
       const box = document.createElement('div');
       box.className = `grade-input-box ${hasScore ? 'graded' : ''}`;
@@ -1148,14 +1152,14 @@ function renderTeacherCurriculumGrades(config) {
           <span style="font-size: 11px; font-weight: 700; color: var(--color-muted);">#${item.number} · ${item.lesson}</span>
           <span class="eval-badge-type ${typeBadgeClass}" style="font-size: 10px; padding: 2px 6px;">${item.type}</span>
         </div>
-        <div class="grade-input-box-title" title="${item.title}">${item.title}</div>
+        <div class="grade-input-box-title" title="${safeAttrTitle}">${item.title}</div>
         <div style="display: flex; gap: 6px; align-items: center;">
           <input type="number" step="0.5" min="0" max="${item.maxPoints}" 
                  id="grade_input_${item.number}" 
                  value="${currentPts}" 
                  placeholder="0 a ${item.maxPoints}"
                  data-item-number="${item.number}"
-                 data-item-title="${item.title.replace(/"/g, '&quot;')}"
+                 data-item-title="${safeAttrTitle}"
                  data-item-type="${item.type}"
                  data-max-points="${item.maxPoints}"
                  data-initial-val="${currentPts}"
@@ -1166,7 +1170,7 @@ function renderTeacherCurriculumGrades(config) {
           <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, 0)" title="Poner cero">0</button>
           <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, '')" title="Borrar calificación">Borrar</button>
         </div>
-        <button class="btn-save-grade" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${teacherActiveGradingLevel}', ${item.number}, '${item.title.replace(/'/g, "\\'")}', '${item.type}', ${item.maxPoints})">Guardar</button>
+        <button type="button" class="btn-save-grade" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${teacherActiveGradingLevel}', ${item.number})">Guardar</button>
       `;
       stageGrid.appendChild(box);
     });
@@ -1216,6 +1220,23 @@ function recalculateAllScreenPoints() {
     }
   });
 
+  config.stages.forEach((stage, stageIdx) => {
+    let stageEarned = 0;
+    let stageMax = 0;
+    stage.items.forEach(it => {
+      stageMax += Number(it.maxPoints || 0);
+      const inp = document.getElementById(`grade_input_${it.number}`);
+      const v = inp ? inp.value.trim() : '';
+      if (v !== '' && !isNaN(parseFloat(v))) {
+        stageEarned += parseFloat(v);
+      }
+    });
+    const stagePtsElem = document.getElementById(`stage_pts_${stageIdx}`);
+    if (stagePtsElem) {
+      stagePtsElem.innerText = `${stageEarned} / ${stageMax} pts`;
+    }
+  });
+
   updateTotalHeaderPoints(sum, config);
 }
 
@@ -1238,18 +1259,64 @@ function updateTotalHeaderPoints(totalPts, config) {
   }
 }
 
+async function upsertStudentGradesSafe(client, records) {
+  const list = Array.isArray(records) ? records : [records];
+  if (list.length === 0) return;
+
+  const { error: err1 } = await client
+    .from('student_grades')
+    .upsert(list, { onConflict: 'student_id,course_level,item_number' });
+
+  if (!err1) return;
+
+  // Fallback si la restricción única en Supabase es (student_id, item_number) o requiere actualización manual
+  const { error: err2 } = await client
+    .from('student_grades')
+    .upsert(list, { onConflict: 'student_id,item_number' });
+
+  if (!err2) return;
+
+  for (const rec of list) {
+    const { data: existing } = await client
+      .from('student_grades')
+      .select('id')
+      .eq('student_id', rec.student_id)
+      .eq('course_level', rec.course_level)
+      .eq('item_number', rec.item_number)
+      .maybeSingle();
+
+    if (existing && existing.id) {
+      const { error: updErr } = await client
+        .from('student_grades')
+        .update(rec)
+        .eq('id', existing.id);
+      if (updErr) throw updErr;
+    } else {
+      const { error: insErr } = await client
+        .from('student_grades')
+        .insert(rec);
+      if (insErr) throw insErr;
+    }
+  }
+}
+
 async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType, maxPoints) {
   const inputElem = document.getElementById(`grade_input_${itemNumber}`);
   const btn = document.getElementById(`btn_save_${itemNumber}`);
   const box = document.getElementById(`box_grade_${itemNumber}`);
   if (!inputElem) return;
 
+  const targetStudentId = studentId || (selectedStudent ? selectedStudent.id : null);
   const targetLevel = courseLevel || teacherActiveGradingLevel;
+  const resolvedTitle = itemTitle !== undefined ? itemTitle : (inputElem.getAttribute('data-item-title') || '');
+  const resolvedType = itemType !== undefined ? itemType : (inputElem.getAttribute('data-item-type') || 'Escrito');
+  const resolvedMaxPoints = maxPoints !== undefined ? Number(maxPoints) : parseFloat(inputElem.getAttribute('data-max-points') || '100');
+
   const rawVal = inputElem.value.trim();
   const numericVal = parseFloat(rawVal);
 
-  if (rawVal !== '' && (isNaN(numericVal) || numericVal < 0 || numericVal > maxPoints)) {
-    showToast(`⚠️ Ingrese un valor válido entre 0 y ${maxPoints} puntos`, "error");
+  if (rawVal !== '' && (isNaN(numericVal) || numericVal < 0 || numericVal > resolvedMaxPoints)) {
+    showToast(`⚠️ Ingrese un valor válido entre 0 y ${resolvedMaxPoints} puntos`, "error");
     return;
   }
 
@@ -1265,7 +1332,7 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
       const { error } = await client
         .from('student_grades')
         .delete()
-        .eq('student_id', studentId)
+        .eq('student_id', targetStudentId)
         .eq('course_level', targetLevel)
         .eq('item_number', itemNumber);
 
@@ -1277,23 +1344,18 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
       }
       showToast(`🗑️ Nota #${itemNumber} eliminada de ${targetLevel}`, "info");
     } else {
-      const { error } = await client
-        .from('student_grades')
-        .upsert({
-          student_id: studentId,
-          course_level: targetLevel,
-          item_number: itemNumber,
-          item_title: itemTitle,
-          item_type: itemType,
-          max_points: maxPoints,
-          points_awarded: numericVal,
-          graded_by: currentUserProfile?.id || null,
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'student_id,course_level,item_number'
-        });
+      await upsertStudentGradesSafe(client, {
+        student_id: targetStudentId,
+        course_level: targetLevel,
+        item_number: itemNumber,
+        item_title: resolvedTitle,
+        item_type: resolvedType,
+        max_points: resolvedMaxPoints,
+        points_awarded: numericVal,
+        graded_by: currentUserProfile?.id || null,
+        updated_at: new Date().toISOString()
+      });
 
-      if (error) throw error;
       selectedStudentGrades[itemNumber] = numericVal;
       inputElem.setAttribute('data-initial-val', String(numericVal));
       if (box) {
@@ -1371,11 +1433,7 @@ async function saveAllGrades() {
   try {
     // 1. Guardar notas cargadas
     if (recordsToUpsert.length > 0) {
-      const { error: upsertErr } = await client
-        .from('student_grades')
-        .upsert(recordsToUpsert, { onConflict: 'student_id,course_level,item_number' });
-
-      if (upsertErr) throw upsertErr;
+      await upsertStudentGradesSafe(client, recordsToUpsert);
 
       recordsToUpsert.forEach(r => {
         selectedStudentGrades[r.item_number] = r.points_awarded;
