@@ -137,7 +137,11 @@
   font-size: 14px;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.role-tab:active {
+  transform: scale(0.96);
 }
 
 .role-tab.active {
@@ -232,7 +236,8 @@
   height: 100%;
   background: linear-gradient(90deg, #3b82f6, #06b6d4, #4ade80);
   border-radius: var(--radius-pill);
-  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: width;
+  transition: width 350ms var(--ease-out);
   box-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
 }
 
@@ -316,7 +321,7 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .eval-filter-btn:hover {
@@ -488,7 +493,8 @@
   height: 100%;
   background: linear-gradient(90deg, #38bdf8, #4ade80);
   border-radius: 20px;
-  transition: width 0.4s ease;
+  will-change: width;
+  transition: width 300ms var(--ease-out);
 }
 
 .units-grid {
@@ -507,14 +513,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: var(--shadow-card);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--inner-highlight), var(--shadow-card);
+  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
   position: relative;
   overflow: hidden;
 }
 
 .unit-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: rgba(147, 197, 253, 0.55);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
 }
@@ -689,7 +695,7 @@
   margin-bottom: 10px;
   background: rgba(4, 14, 34, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: all var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
 
 .student-item:hover {
@@ -783,7 +789,8 @@
   height: 100%;
   background: linear-gradient(90deg, #3b82f6, #4ade80);
   border-radius: 10px;
-  transition: width 0.35s ease;
+  will-change: width;
+  transition: width 300ms var(--ease-out);
 }
 
 .teacher-eval-toolbar {
@@ -912,7 +919,7 @@
   font-weight: 800;
   font-size: 12px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), filter var(--duration-fast) var(--ease-out);
 }
 
 .btn-save-grade:hover {
@@ -1028,7 +1035,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
 
 .btn-sm-action:hover {
@@ -1070,8 +1077,8 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  transition: all var(--transition-fast);
+  box-shadow: var(--inner-highlight), 0 4px 12px rgba(16, 185, 129, 0.3);
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), filter var(--duration-fast) var(--ease-out);
 }
 
 .btn-save-all:hover {
@@ -1095,7 +1102,7 @@
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
 
 .btn-preset-date:hover {
@@ -1195,7 +1202,7 @@
   font-weight: 700;
   cursor: pointer;
   flex: 1;
-  transition: all var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
 
 .btn-quick-tag:hover {
@@ -1270,7 +1277,7 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   white-space: nowrap;
 }
 
@@ -1340,13 +1347,14 @@
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  transition: all 0.25s ease;
+  box-shadow: var(--inner-highlight), var(--shadow-card);
+  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
   cursor: pointer;
   backdrop-filter: blur(8px);
 }
 
 .game-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
   border-color: rgba(96, 165, 250, 0.6);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 18px rgba(59, 130, 246, 0.3);
   background: rgba(14, 56, 122, 0.65);
@@ -1486,11 +1494,60 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  box-shadow: var(--inner-highlight), 0 2px 8px rgba(37, 99, 235, 0.4);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
 }
 
 .btn-play-game:hover {
   background: #1d4ed8;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.5);
-  transform: scale(1.03);
+  transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   Microinteracciones & Feedback Táctil (Emil Kowalski Philosophy)
+   Respuesta instantánea en pointerdown/click (escala 0.96 - 0.985)
+   ========================================================================== */
+.eval-filter-btn:active {
+  transform: scale(0.96);
+}
+
+.unit-card:active {
+  transform: scale(0.985);
+}
+
+.student-item:active {
+  transform: scale(0.99);
+}
+
+.btn-save-grade:active {
+  transform: scale(0.97);
+}
+
+.btn-sm-action:active {
+  transform: scale(0.96);
+}
+
+.btn-save-all:active {
+  transform: scale(0.97);
+}
+
+.btn-quick-tag:active {
+  transform: scale(0.96);
+}
+
+.student-tab-pill:active {
+  transform: scale(0.97);
+}
+
+.game-card:active {
+  transform: scale(0.985);
+}
+
+.btn-play-game:active {
+  transform: scale(0.96);
+}
+
+.btn-link-action:active {
+  transform: scale(0.95);
 }

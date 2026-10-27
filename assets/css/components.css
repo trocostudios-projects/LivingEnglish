@@ -45,7 +45,8 @@
   border: 1px solid var(--color-border);
   cursor: pointer;
   box-shadow: var(--shadow-md);
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  box-shadow: var(--inner-highlight), var(--shadow-md);
 }
 
 .btn-primary:hover {
@@ -67,7 +68,8 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   cursor: pointer;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+  box-shadow: var(--inner-highlight), var(--shadow-md);
 }
 
 .btn-secondary:hover {
@@ -89,7 +91,8 @@
   border: 1px solid var(--color-border);
   cursor: pointer;
   box-shadow: var(--shadow-md);
-  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  box-shadow: var(--inner-highlight), var(--shadow-md);
 }
 
 .btn-talk:hover {
@@ -188,7 +191,7 @@
   -webkit-backdrop-filter: blur(8px);
   opacity: 0;
   transform: translateY(16px);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform var(--duration-normal) var(--ease-out), opacity var(--duration-fast) var(--ease-out);
   pointer-events: auto;
 }
 
@@ -209,3 +212,59 @@
   border-left: 4px solid var(--color-primary-light);
 }
 
+
+
+/* ==========================================================================
+   Microinteracciones y Feedback Táctil (Emil Kowalski Framework)
+   ========================================================================== */
+.btn-primary:active:not(:disabled),
+.btn-talk:active:not(:disabled),
+.btn-secondary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-talk:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Animación Física de Modales (Sin scale(0) ni teleport)
+   ========================================================================== */
+[id$="Modal"]:not(.hidden),
+[id$="modal"]:not(.hidden) {
+  animation: modalBackdropFadeIn var(--duration-fast) var(--ease-out) forwards;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+[id$="Modal"]:not(.hidden) > div,
+[id$="modal"]:not(.hidden) > div {
+  animation: modalDialogScaleIn var(--duration-normal) var(--ease-out) forwards;
+  transform-origin: center center;
+  box-shadow: var(--inner-highlight), 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+@keyframes modalBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalDialogScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
