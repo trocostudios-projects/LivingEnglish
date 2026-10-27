@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_bespoke">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261027_bespoke">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261027_bespoke">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_bespoke">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_layout">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261027_layout">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261027_layout">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_layout">
 </head>
 <body>
 
@@ -182,6 +182,14 @@
             </div>
             <div class="eval-search-box">
               <input type="text" id="studentEvalSearchInput" class="form-control eval-search-input" placeholder="🔍 Buscar evaluación o lección (ej. L3, Final)..." oninput="renderStudentEvaluations()">
+            </div>
+            <div class="eval-layout-toggle-group" id="studentLayoutToggleGroup" aria-label="Distribución de vista">
+              <button type="button" class="layout-toggle-btn active" data-layout="list" onclick="setStudentLayoutMode('list')" title="Vista Récord / Lista (Sin tarjetas anidadas)">
+                📄 Lista Récord
+              </button>
+              <button type="button" class="layout-toggle-btn" data-layout="grid" onclick="setStudentLayoutMode('grid')" title="Vista Cuadrícula">
+                🗂️ Tarjetas
+              </button>
             </div>
           </div>
 
@@ -961,8 +969,8 @@
   <!-- 2. Cliente de Supabase -->
   <script src="assets/js/supabaseClient.js?v=20261027"></script>
   <!-- 3. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261027_bespoke"></script>
+  <script src="assets/js/onlineClasses.js?v=20261027_layout"></script>
   <!-- 4. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261027_bespoke"></script>
+  <script src="assets/js/platform.js?v=20261027_layout"></script>
 </body>
 </html>

@@ -863,6 +863,15 @@ async function loadStudentGrades() {
 
 let studentEvalActiveFilter = 'all';
 let teacherEvalActiveFilter = 'all';
+let studentLayoutMode = localStorage.getItem('living_student_layout_mode') || 'list';
+
+function setStudentLayoutMode(mode) {
+  studentLayoutMode = mode;
+  try { localStorage.setItem('living_student_layout_mode', mode); } catch (e) {}
+  const btns = document.querySelectorAll('#studentLayoutToggleGroup .layout-toggle-btn');
+  btns.forEach(b => b.classList.toggle('active', b.getAttribute('data-layout') === mode));
+  renderStudentEvaluations();
+}
 
 function setStudentEvalFilter(filter) {
   studentEvalActiveFilter = filter || 'all';
@@ -916,6 +925,10 @@ function renderStudentEvaluations() {
   if (stCountAll) stCountAll.innerText = totalItemsCount;
   if (stCountGraded) stCountGraded.innerText = gradedItemsCount;
   if (stCountPending) stCountPending.innerText = pendingItemsCount;
+
+  // Sincronizar botones de modo de vista (Lista / Tarjetas)
+  const layoutBtns = document.querySelectorAll('#studentLayoutToggleGroup .layout-toggle-btn');
+  layoutBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-layout') === studentLayoutMode));
 
   let visibleCardsCount = 0;
 
@@ -977,8 +990,9 @@ function renderStudentEvaluations() {
       </div>
     `;
 
-    const grid = document.createElement('div');
-    grid.className = 'units-grid';
+    const isListMode = studentLayoutMode === 'list';
+    const contentContainer = document.createElement('div');
+    contentContainer.className = isListMode ? 'eval-items-list' : 'units-grid';
 
     filteredItems.forEach(item => {
       visibleCardsCount++;
@@ -991,41 +1005,72 @@ function renderStudentEvaluations() {
       const typeIcon = getEvalTypeIcon(item.type);
       const numFormatted = String(item.number).padStart(2, '0');
 
-      const card = document.createElement('div');
-      card.className = `unit-card ${hasScore ? 'unit-card-graded' : 'unit-card-pending'}`;
-      card.innerHTML = `
-        <div>
-          <div class="unit-card-top">
-            <div class="unit-meta-pills">
-              <span class="unit-num-pill">#${numFormatted}</span>
-              <span class="unit-lesson-pill">📘 ${item.lesson}</span>
-            </div>
+      const scoreHtml = hasScore
+        ? (config.isKids ? '⭐ ¡Logrado!' : `<span class="score-val score-passed">${numericAwarded}</span> <span class="score-denom">/ ${item.maxPoints} pts</span>`)
+        : (config.isKids ? '⏳ Por completar' : `<span class="score-val score-pending">--</span> <span class="score-denom">/ ${item.maxPoints} pts</span>`);
+
+      const statusChip = hasScore
+        ? '<span class="expiry-chip chip-active">● Calificada</span>'
+        : '<span class="expiry-chip chip-none">○ Pendiente</span>';
+
+      if (isListMode) {
+        // Fila limpia de récord académico (cero tarjetas anidadas)
+        const row = document.createElement('div');
+        row.className = `eval-row-item ${hasScore ? 'row-graded' : 'row-pending'}`;
+        row.innerHTML = `
+          <div class="eval-row-left">
+            <span class="eval-row-number">#${numFormatted}</span>
+            <span class="eval-row-lesson">📘 ${item.lesson}</span>
             <span class="eval-badge-type ${typeBadgeClass}">${typeIcon} ${item.type}</span>
+            <div class="eval-row-title" title="${item.title}">${item.title}</div>
           </div>
-          <div class="unit-title">${item.title}</div>
-        </div>
-        <div class="unit-card-bottom">
-          ${hasScore && !config.isKids ? `
-            <div class="unit-item-bar-track">
-              <div class="unit-item-bar-fill" style="width: ${itemPct}%;"></div>
+          <div class="eval-row-right">
+            ${hasScore && !config.isKids ? `
+              <div class="eval-row-mini-bar" title="${itemPct}%">
+                <div class="eval-row-mini-fill" style="width: ${itemPct}%;"></div>
+              </div>
+            ` : ''}
+            <div class="eval-row-score">
+              ${scoreHtml}
             </div>
-          ` : ''}
-          <div class="exam-badge ${hasScore ? 'exam-badge-graded' : 'exam-badge-pending'}">
-            <span class="exam-max-label">
-              ${hasScore ? '✅ Calificación obtenida' : (config.isKids ? '⏳ Por completar' : `⏳ Pendiente · Valor: ${item.maxPoints} pts`)}
-            </span>
-            <span class="score ${hasScore ? 'score-passed' : 'score-pending'}">
-              ${hasScore
-                ? (config.isKids ? '⭐ ¡Logrado!' : `${numericAwarded} <small style="font-weight: 500; opacity: 0.8;">/ ${item.maxPoints} pts</small>`)
-                : 'Sin nota'}
-            </span>
+            <div class="eval-row-status">
+              ${statusChip}
+            </div>
           </div>
-        </div>
-      `;
-      grid.appendChild(card);
+        `;
+        contentContainer.appendChild(row);
+      } else {
+        // Tarjeta plana individual (sin exam-badge interna)
+        const card = document.createElement('div');
+        card.className = `unit-card ${hasScore ? 'unit-card-graded' : 'unit-card-pending'}`;
+        card.innerHTML = `
+          <div>
+            <div class="unit-card-top">
+              <div class="unit-meta-pills">
+                <span class="unit-num-pill">#${numFormatted}</span>
+                <span class="unit-lesson-pill">📘 ${item.lesson}</span>
+              </div>
+              <span class="eval-badge-type ${typeBadgeClass}">${typeIcon} ${item.type}</span>
+            </div>
+            <div class="unit-title">${item.title}</div>
+          </div>
+          <div class="unit-card-bottom">
+            ${hasScore && !config.isKids ? `
+              <div class="unit-item-bar-track">
+                <div class="unit-item-bar-fill" style="width: ${itemPct}%;"></div>
+              </div>
+            ` : ''}
+            <div class="unit-card-footer-flat">
+              <div class="unit-score-text">${scoreHtml}</div>
+              <div class="unit-status-chip">${statusChip}</div>
+            </div>
+          </div>
+        `;
+        contentContainer.appendChild(card);
+      }
     });
 
-    section.appendChild(grid);
+    section.appendChild(contentContainer);
     container.appendChild(section);
   });
 

@@ -264,53 +264,55 @@
   transition: width 350ms var(--ease-out);
 }
 
-/* 3 Tarjetas KPI Digeribles */
+/* Barra de Estadísticas Plana (Sin tarjetas anidadas dentro de tarjetas) */
 .student-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 16px;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .student-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 .student-kpi-box {
-  background: rgba(6, 14, 30, 0.5);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 10px;
-  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--color-border-subtle);
+  border-radius: 0;
+  padding: 0 0 0 16px;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: border-color var(--duration-fast) var(--ease-out);
+  flex-direction: column;
+  gap: 3px;
 }
 
-.student-kpi-box:hover {
-  border-color: var(--color-border);
+.student-kpi-box:first-child {
+  border-left: none;
+  padding-left: 0;
 }
 
 .student-kpi-icon {
-  font-size: 18px;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: rgba(148, 163, 184, 0.08);
-  border: 1px solid var(--color-border-subtle);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  display: none; /* Elimina la caja interna de icono para aplanar la jerarquía */
 }
 
 .student-kpi-label {
   display: block;
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--color-muted);
   margin-bottom: 2px;
   font-weight: 600;
 }
 
 .student-kpi-value {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: #f8fafc;
 }
@@ -1536,4 +1538,217 @@
 
 .btn-link-action:active {
   transform: scale(0.95);
+}
+
+/* Selector de Modo de Vista (Lista Récord vs Tarjetas) */
+.eval-layout-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(6, 14, 30, 0.6);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.layout-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.layout-toggle-btn:hover {
+  color: #ffffff;
+}
+
+.layout-toggle-btn.active {
+  background: #1d4ed8;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.layout-toggle-btn:active {
+  transform: scale(0.96);
+}
+
+/* ==========================================================================
+   Lista Récord de Evaluaciones (Plana, sin anidación de cajas)
+   ========================================================================== */
+.eval-items-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.eval-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  transition: background-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+
+.eval-row-item:last-child {
+  border-bottom: none;
+}
+
+.eval-row-item:hover {
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.eval-row-item:active {
+  transform: scale(0.995);
+}
+
+.eval-row-item.row-graded {
+  background: rgba(16, 185, 129, 0.025);
+}
+
+.eval-row-item.row-graded:hover {
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.eval-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.eval-row-number {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.eval-row-lesson {
+  font-size: 11px;
+  font-weight: 600;
+  color: #cbd5e1;
+  background: rgba(6, 14, 30, 0.45);
+  border: 1px solid var(--color-border-subtle);
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.eval-row-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #f8fafc;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eval-row-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.eval-row-mini-bar {
+  width: 60px;
+  height: 4px;
+  background: rgba(6, 14, 30, 0.7);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+}
+
+.eval-row-mini-fill {
+  height: 100%;
+  background: #10b981;
+  border-radius: 6px;
+}
+
+.eval-row-score {
+  min-width: 100px;
+  text-align: right;
+  font-size: 13px;
+}
+
+.eval-row-score .score-val {
+  font-weight: 700;
+}
+
+.eval-row-score .score-denom {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+.eval-row-status {
+  min-width: 105px;
+  text-align: right;
+}
+
+/* Pie de tarjeta plana (cuando se usa vista cuadrícula) */
+.unit-card-footer-flat {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.unit-score-text {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.unit-score-text .score-val {
+  font-weight: 700;
+}
+
+.unit-score-text .score-denom {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+@media (max-width: 768px) {
+  .eval-row-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+  .eval-row-left {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .eval-row-title {
+    white-space: normal;
+    width: 100%;
+    margin-top: 2px;
+  }
+  .eval-row-right {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+    border-top: 1px dashed rgba(148, 163, 184, 0.1);
+    padding-top: 8px;
+  }
 }
