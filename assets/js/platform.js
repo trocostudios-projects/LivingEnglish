@@ -2554,10 +2554,10 @@ async function loadTeacherOnlineClasses() {
       }
 
       const statusBadge = isCancelled
-        ? '<span style="background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">Cancelada</span>'
+        ? '<span class="expiry-chip chip-expired">Cancelada</span>'
         : (isFull 
-            ? '<span style="background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid #ef4444; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">Completa (4/4)</span>'
-            : `<span style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">${cls.remaining_spots} cupos libres</span>`);
+            ? '<span class="expiry-chip chip-expired">Completa (4/4)</span>'
+            : `<span class="expiry-chip chip-active">${cls.remaining_spots} cupos libres</span>`);
 
       card.innerHTML = `
         <div>
