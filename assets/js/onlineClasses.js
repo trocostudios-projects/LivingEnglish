@@ -2,83 +2,28 @@
  * Academia Living English - Módulo Oficial de Clases Online en Vivo
  * Capacidad máxima: 4 personas por clase
  * Validación venezolana: Cédula de Identidad y Teléfono Venezolano
+ * Sincronización exclusiva con Supabase (con fallback local seguro sin datos fantasma)
  */
 
-// Semilla inicial de demostración para cuando las tablas estén vacías o pendientes de migración SQL
-const INITIAL_DEMO_CLASSES = [
-  {
-    id: 'demo-class-1',
-    teacher_id: null,
-    teacher_name: 'Prof. Carlos Méndez',
-    title: 'Speaking Club: Conversational Fluency & Small Talk',
-    course_level: 'Abierto a Todo Público',
-    class_date: '2026-10-27',
-    start_time: '18:00',
-    end_time: '19:00',
-    meeting_link: 'https://meet.google.com/liv-engl-spk',
-    max_capacity: 4,
-    description: 'Práctica intensiva 100% hablada para superar el bloqueo y dialogar con confianza en situaciones cotidianas.',
-    status: 'active',
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 'demo-class-2',
-    teacher_id: null,
-    teacher_name: 'Prof. Valeria Gómez',
-    title: 'Grammar Workshop: Present Perfect vs. Past Simple',
-    course_level: 'Abierto a Todo Público',
-    class_date: '2026-10-28',
-    start_time: '19:30',
-    end_time: '20:30',
-    meeting_link: 'https://meet.google.com/liv-engl-grm',
-    max_capacity: 4,
-    description: 'Taller práctico con ejercicios interactivos y dinámicas en parejas para dominar la diferencia de tiempos.',
-    status: 'active',
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 'demo-class-3',
-    teacher_id: null,
-    teacher_name: 'Prof. David Rivas',
-    title: 'Job Interview & Professional English Lab',
-    course_level: 'Abierto a Todo Público',
-    class_date: '2026-10-29',
-    start_time: '17:00',
-    end_time: '18:00',
-    meeting_link: 'https://meet.google.com/liv-engl-job',
-    max_capacity: 4,
-    description: 'Simulación de entrevistas de trabajo en inglés con retroalimentación inmediata sobre dicción y vocabulario corporativo.',
-    status: 'active',
-    created_at: new Date().toISOString()
+// Limpieza automática de datos demo antiguos que hayan quedado en caché del navegador
+try {
+  const rawC = localStorage.getItem('le_online_classes');
+  if (rawC) {
+    const listC = JSON.parse(rawC);
+    const cleanC = listC.filter(c => !String(c.id).startsWith('demo-'));
+    if (cleanC.length !== listC.length) {
+      localStorage.setItem('le_online_classes', JSON.stringify(cleanC));
+    }
   }
-];
-
-const INITIAL_DEMO_BOOKINGS = [
-  {
-    id: 'demo-book-1',
-    class_id: 'demo-class-1',
-    full_name: 'Alejandro Morales',
-    document_id: 'V-26.840.112',
-    phone: '0414-7891234',
-    email: 'alejandro.morales@gmail.com',
-    student_level: 'Intermedio',
-    status: 'confirmed',
-    confirmation_token: 'tok-demo-1',
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 'demo-book-2',
-    class_id: 'demo-class-1',
-    full_name: 'Mariana Castillo',
-    document_id: 'V-28.115.908',
-    phone: '0424-5551290',
-    email: 'mariana.c@hotmail.com',
-    student_level: 'Básico',
-    status: 'pending',
-    confirmation_token: 'tok-demo-2',
-    created_at: new Date().toISOString()
+  const rawB = localStorage.getItem('le_class_bookings');
+  if (rawB) {
+    const listB = JSON.parse(rawB);
+    const cleanB = listB.filter(b => !String(b.id).startsWith('demo-') && !String(b.class_id).startsWith('demo-'));
+    if (cleanB.length !== listB.length) {
+      localStorage.setItem('le_class_bookings', JSON.stringify(cleanB));
+    }
   }
-];
+} catch (e) {}
 
 // Helper para obtener cliente de Supabase
 function getOnlineSupabase() {
@@ -123,29 +68,23 @@ function isClassFinished(cls) {
   }
 }
 
-// Helpers de almacenamiento local (fallback resiliente)
+// Helpers de almacenamiento local (sin inyectar demos artificiales)
 function getLocalClasses() {
   try {
     const raw = localStorage.getItem('le_online_classes');
-    if (!raw) {
-      localStorage.setItem('le_online_classes', JSON.stringify(INITIAL_DEMO_CLASSES));
-      return INITIAL_DEMO_CLASSES;
-    }
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    // Depurar clases que hayan sido canceladas o que ya terminaron
-    const valid = parsed.filter(c => c.status !== 'cancelled' && !isClassFinished(c));
-    if (valid.length !== parsed.length) {
-      localStorage.setItem('le_online_classes', JSON.stringify(valid));
-    }
+    const valid = parsed.filter(c => !String(c.id).startsWith('demo-') && c.status !== 'cancelled' && !isClassFinished(c));
     return valid;
   } catch (e) {
-    return INITIAL_DEMO_CLASSES;
+    return [];
   }
 }
 
 function setLocalClasses(classes) {
   try {
-    localStorage.setItem('le_online_classes', JSON.stringify(classes));
+    const clean = Array.isArray(classes) ? classes.filter(c => !String(c.id).startsWith('demo-')) : [];
+    localStorage.setItem('le_online_classes', JSON.stringify(clean));
   } catch (e) {
     console.error("Error guardando le_online_classes:", e);
   }
@@ -154,19 +93,18 @@ function setLocalClasses(classes) {
 function getLocalBookings() {
   try {
     const raw = localStorage.getItem('le_class_bookings');
-    if (!raw) {
-      localStorage.setItem('le_class_bookings', JSON.stringify(INITIAL_DEMO_BOOKINGS));
-      return INITIAL_DEMO_BOOKINGS;
-    }
-    return JSON.parse(raw);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return parsed.filter(b => !String(b.id).startsWith('demo-') && !String(b.class_id).startsWith('demo-'));
   } catch (e) {
-    return INITIAL_DEMO_BOOKINGS;
+    return [];
   }
 }
 
 function setLocalBookings(bookings) {
   try {
-    localStorage.setItem('le_class_bookings', JSON.stringify(bookings));
+    const clean = Array.isArray(bookings) ? bookings.filter(b => !String(b.id).startsWith('demo-') && !String(b.class_id).startsWith('demo-')) : [];
+    localStorage.setItem('le_class_bookings', JSON.stringify(clean));
   } catch (e) {
     console.error("Error guardando le_class_bookings:", e);
   }
@@ -180,6 +118,7 @@ async function fetchOnlineClasses(includeAllStatus = false) {
   const client = getOnlineSupabase();
   let classes = [];
   let bookings = [];
+  let loadedFromSupabase = false;
 
   if (client) {
     try {
@@ -190,40 +129,44 @@ async function fetchOnlineClasses(includeAllStatus = false) {
       query = query.order('class_date', { ascending: true }).order('start_time', { ascending: true });
 
       const { data, error } = await query;
-      if (!error && data && data.length > 0) {
+      if (!error && Array.isArray(data)) {
         classes = data;
+        loadedFromSupabase = true;
+        setLocalClasses(data);
+      } else if (error) {
+        console.warn("Aviso consultando online_classes en Supabase:", error);
       }
     } catch (err) {
-      console.warn("Supabase online_classes fallo o tabla no existe aún. Usando fallback local.", err);
+      console.warn("Error de conexión con online_classes:", err);
     }
 
     try {
       const { data: bData, error: bError } = await client.from('class_bookings').select('*');
-      if (!bError && bData) {
+      if (!bError && Array.isArray(bData)) {
         bookings = bData;
+        setLocalBookings(bData);
       }
     } catch (err) {
-      console.warn("Supabase class_bookings fallo. Usando fallback local.", err);
+      console.warn("Aviso consultando class_bookings en Supabase:", err);
     }
   }
 
-  // Fallback si Supabase no tiene aún las tablas creadas o está en modo local
-  if (!classes || classes.length === 0) {
+  // Fallback a almacenamiento local SOLO si Supabase no estuvo disponible
+  if (!loadedFromSupabase) {
     classes = getLocalClasses();
     if (!includeAllStatus) {
       classes = classes.filter(c => c.status === 'active');
     }
-  }
-
-  if (!bookings || bookings.length === 0) {
-    bookings = getLocalBookings();
+    if (!bookings || bookings.length === 0) {
+      bookings = getLocalBookings();
+    }
   }
 
   // REGLA: Si la clase ya se acabó (fecha y hora fin en el pasado), SE BORRA del sistema
   const finishedClasses = classes.filter(c => isClassFinished(c));
   if (finishedClasses.length > 0) {
     const finishedIds = finishedClasses.map(c => c.id);
-    
+
     // 1. Borrar de Supabase (reservas y clases)
     if (client) {
       client.from('class_bookings').delete().in('class_id', finishedIds)
@@ -271,13 +214,13 @@ async function fetchOnlineClasses(includeAllStatus = false) {
 
 /**
  * Publicar una nueva clase online (desde el panel del docente)
+ * Se inserta de manera nativa en Supabase (generando UUID auténtico)
  */
 async function createOnlineClass(classData) {
   const client = getOnlineSupabase();
-  const maxCapacity = 4; // Regla de negocio: exactamente máx 4 personas por clase
+  const maxCapacity = 4; // Exactamente máx 4 personas por clase
 
-  const newClass = {
-    id: 'class-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
+  const dbPayload = {
     teacher_id: classData.teacher_id || null,
     teacher_name: classData.teacher_name || 'Profesor Living English',
     title: classData.title.trim(),
@@ -288,45 +231,63 @@ async function createOnlineClass(classData) {
     meeting_link: classData.meeting_link || '',
     max_capacity: maxCapacity,
     description: classData.description || '',
-    status: 'active',
-    created_at: new Date().toISOString()
+    status: 'active'
   };
 
-  // Intentar guardar en Supabase
+  let savedClass = null;
+
   if (client) {
     try {
-      const { data, error } = await client.from('online_classes').insert([newClass]).select();
-      if (!error && data && data.length > 0) {
-        newClass.id = data[0].id;
+      const { data, error } = await client.from('online_classes').insert([dbPayload]).select();
+      if (error) {
+        console.error("Error al crear clase en Supabase:", error);
+        throw new Error(error.message);
+      }
+      if (data && data.length > 0) {
+        savedClass = data[0];
       }
     } catch (err) {
-      console.warn("Fallo insert en Supabase online_classes. Respaldando localmente.", err);
+      console.error("Fallo insert en Supabase online_classes:", err);
+      throw err;
     }
+  }
+
+  if (!savedClass) {
+    savedClass = {
+      ...dbPayload,
+      id: 'class-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
+      created_at: new Date().toISOString()
+    };
   }
 
   // Guardar en almacenamiento local
   const current = getLocalClasses();
-  current.unshift(newClass);
+  current.unshift(savedClass);
   setLocalClasses(current);
 
-  return newClass;
+  return savedClass;
 }
 
 /**
- * Eliminar / Borrar definitivamente una clase online (cuando el profesor la cancela)
- * Elimina la clase y todas sus reservas asociadas tanto de Supabase como de LocalStorage
+ * Eliminar definitivamente una clase online
+ * Borra la clase y sus reservas tanto en Supabase como en LocalStorage
  */
 async function deleteOnlineClass(classId) {
   const client = getOnlineSupabase();
 
   if (client) {
     try {
-      // 1. Eliminar reservas asociadas en Supabase
+      // 1. Eliminar reservas asociadas
       await client.from('class_bookings').delete().eq('class_id', classId);
-      // 2. Eliminar la clase en Supabase
-      await client.from('online_classes').delete().eq('id', classId);
+      // 2. Eliminar la clase
+      const { error } = await client.from('online_classes').delete().eq('id', classId);
+      if (error) {
+        console.error("Error al borrar clase en Supabase:", error);
+        throw new Error(error.message);
+      }
     } catch (err) {
-      console.warn("Error al borrar clase en Supabase:", err);
+      console.error("Fallo al eliminar clase en Supabase:", err);
+      throw err;
     }
   }
 
@@ -342,7 +303,7 @@ async function deleteOnlineClass(classId) {
   return true;
 }
 
-// Alias para compatibilidad con código existente
+// Alias para compatibilidad
 async function cancelOnlineClass(classId) {
   return await deleteOnlineClass(classId);
 }
@@ -385,38 +346,50 @@ async function bookOnlineClass(classId, studentData) {
   // 5. Generar token de confirmación para el correo
   const token = 'tok-' + Date.now() + '-' + Math.random().toString(36).substr(2, 8);
 
-  const newBooking = {
-    id: 'book-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
+  const dbBooking = {
     class_id: classId,
     full_name: studentData.full_name.trim(),
     document_id: doc,
     phone: phone,
     email: email,
     student_level: studentData.student_level || 'Básico',
-    status: 'pending', // Requiere confirmación por correo
-    confirmation_token: token,
-    created_at: new Date().toISOString()
+    status: 'pending',
+    confirmation_token: token
   };
 
+  let savedBooking = null;
   const client = getOnlineSupabase();
   if (client) {
     try {
-      const { data, error } = await client.from('class_bookings').insert([newBooking]).select();
-      if (!error && data && data.length > 0) {
-        newBooking.id = data[0].id;
+      const { data, error } = await client.from('class_bookings').insert([dbBooking]).select();
+      if (error) {
+        console.error("Error al registrar reserva en Supabase:", error);
+        throw new Error(error.message);
+      }
+      if (data && data.length > 0) {
+        savedBooking = data[0];
       }
     } catch (err) {
-      console.warn("Fallo insert en Supabase class_bookings. Guardando localmente.", err);
+      console.error("Fallo insert en Supabase class_bookings:", err);
+      throw err;
     }
+  }
+
+  if (!savedBooking) {
+    savedBooking = {
+      ...dbBooking,
+      id: 'book-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
+      created_at: new Date().toISOString()
+    };
   }
 
   // Guardar en almacenamiento local
   const currentBookings = getLocalBookings();
-  currentBookings.unshift(newBooking);
+  currentBookings.unshift(savedBooking);
   setLocalBookings(currentBookings);
 
   return {
-    booking: newBooking,
+    booking: savedBooking,
     targetClass: targetClass,
     confirmationToken: token
   };
