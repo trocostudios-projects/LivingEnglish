@@ -150,49 +150,209 @@
    Panel de Resumen de Progreso y Puntos (Barra y Estadísticas)
    ========================================================================== */
 .progress-summary-card {
-  background: var(--color-primary-glass-strong);
-  border: 1px solid var(--color-border-card);
-  border-radius: var(--radius-xl);
-  padding: 24px;
-  margin-bottom: 28px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: var(--shadow-card);
+  background: linear-gradient(145deg, rgba(14, 56, 122, 0.88), rgba(10, 37, 88, 0.82));
+  border: 1px solid rgba(147, 197, 253, 0.35);
+  border-radius: 18px;
+  padding: 26px 28px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .progress-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.progress-eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #93c5fd;
+  margin-bottom: 6px;
+}
+
+.progress-main-score-row {
+  display: flex;
+  align-items: baseline;
   gap: 12px;
-  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.progress-score-number {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1.1;
+  color: #ffffff;
+}
+
+.progress-pct-pill {
+  background: rgba(59, 130, 246, 0.25);
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  color: #bfdbfe;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.status-hero-pill {
+  font-size: 14px;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.progress-bar-wrapper {
+  margin-bottom: 20px;
 }
 
 .progress-bar-bg {
   width: 100%;
-  height: 14px;
-  background: rgba(0, 0, 0, 0.4);
+  height: 16px;
+  background: rgba(4, 14, 34, 0.65);
   border-radius: var(--radius-pill);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 2px;
 }
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #4ade80);
+  background: linear-gradient(90deg, #3b82f6, #06b6d4, #4ade80);
   border-radius: var(--radius-pill);
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
 }
 
-.progress-stats-row {
+.student-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.student-kpi-box {
+  background: rgba(4, 14, 34, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.student-kpi-icon {
+  font-size: 22px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.student-kpi-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  margin-bottom: 2px;
+}
+
+.student-kpi-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Barra de Filtros Rápidos (Estudiante y Profesor)
+   ========================================================================== */
+.eval-filter-toolbar {
   display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
-  font-size: 13px;
-  color: var(--color-muted);
+  flex-wrap: wrap;
+  background: rgba(6, 20, 48, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 22px;
+  backdrop-filter: blur(10px);
+}
+
+.eval-filter-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.eval-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  border-radius: 50px;
+  padding: 7px 14px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.eval-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.eval-filter-btn.active {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  border-color: rgba(147, 197, 253, 0.6);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4);
+}
+
+.filter-count-badge {
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  font-weight: 800;
+}
+
+.eval-search-box {
+  flex: 1;
+  min-width: 220px;
+  max-width: 340px;
+}
+
+.eval-search-input {
+  padding: 8px 14px !important;
+  font-size: 13px !important;
+  border-radius: 50px !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
 }
 
 /* ==========================================================================
@@ -201,110 +361,272 @@
 .eval-badge-type {
   display: inline-flex;
   align-items: center;
+  gap: 4px;
   padding: 4px 10px;
-  border-radius: var(--radius-md);
+  border-radius: 50px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
 }
 
 .badge-written {
-  background: rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.25);
   color: #93c5fd;
   border: 1px solid rgba(147, 197, 253, 0.4);
 }
 
 .badge-oral {
-  background: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.25);
   color: #fde68a;
   border: 1px solid rgba(253, 230, 138, 0.4);
 }
 
 .badge-formative {
-  background: rgba(168, 85, 247, 0.3);
+  background: rgba(168, 85, 247, 0.25);
   color: #d8b4fe;
   border: 1px solid rgba(216, 180, 254, 0.4);
 }
 
 .badge-kids {
-  background: rgba(236, 72, 153, 0.3);
+  background: rgba(236, 72, 153, 0.25);
   color: #fbcfe8;
   border: 1px solid rgba(251, 207, 232, 0.4);
 }
 
 /* ==========================================================================
-   Cuadrícula de Evaluaciones
+   Módulos por Etapa y Tarjetas de Evaluaciones (Estudiante)
    ========================================================================== */
-.eval-section-title {
-  font-family: var(--font-display);
-  font-size: 20px;
-  color: #ffffff;
-  margin: 28px 0 16px 0;
+.student-stage-module {
+  background: rgba(8, 28, 66, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.student-stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.student-stage-title-group {
   display: flex;
   align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 8px;
+  gap: 12px;
+}
+
+.stage-step-badge {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(147, 197, 253, 0.45);
+  white-space: nowrap;
+}
+
+.eval-section-title {
+  font-family: var(--font-display);
+  font-size: 19px;
+  color: #ffffff;
+  margin: 0;
+}
+
+.student-stage-subtitle {
+  display: block;
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 2px;
+}
+
+.student-stage-stats {
+  min-width: 170px;
+  text-align: right;
+}
+
+.student-stage-pts {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+.student-stage-pct {
+  color: #93c5fd;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.stage-mini-bar-track {
+  width: 100%;
+  height: 7px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.stage-mini-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #4ade80);
+  border-radius: 20px;
+  transition: width 0.4s ease;
 }
 
 .units-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
 }
 
 .unit-card {
-  background: var(--color-primary-glass);
-  border: 1px solid var(--color-border-card);
-  border-radius: var(--radius-xl);
-  padding: 20px;
+  background: rgba(14, 56, 122, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 18px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   box-shadow: var(--shadow-card);
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .unit-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-3px);
+  border-color: rgba(147, 197, 253, 0.55);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
 }
 
-.unit-number {
-  font-family: var(--font-display);
-  font-size: 18px;
-  color: var(--color-primary-light);
-  margin-bottom: 6px;
+.unit-card-graded {
+  background: linear-gradient(155deg, rgba(14, 56, 122, 0.65), rgba(6, 78, 59, 0.38));
+  border-color: rgba(74, 222, 128, 0.42);
+}
+
+.unit-card-graded::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background: #4ade80;
+}
+
+.unit-card-pending::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background: rgba(148, 163, 184, 0.35);
+}
+
+.unit-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.unit-meta-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.unit-num-pill {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(37, 99, 235, 0.45);
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.unit-lesson-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #cbd5e1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
 .unit-title {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.42;
   margin-bottom: 16px;
-  text-shadow: var(--text-shadow-subtle);
+}
+
+.unit-card-bottom {
+  margin-top: auto;
+}
+
+.unit-item-bar-track {
+  width: 100%;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.unit-item-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #4ade80);
+  border-radius: 10px;
 }
 
 .exam-badge {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
-  background: var(--color-dark-bg);
-  border-radius: var(--radius-md);
-  font-size: 13px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(4, 14, 34, 0.55);
+  border-radius: 10px;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.exam-badge-graded {
+  background: rgba(6, 78, 59, 0.45);
+  border-color: rgba(74, 222, 128, 0.35);
+}
+
+.exam-max-label {
+  color: #cbd5e1;
+  font-weight: 600;
 }
 
 .score {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 15px;
+  white-space: nowrap;
 }
 
 .score-passed {
@@ -315,49 +637,99 @@
   color: var(--color-warning);
 }
 
+.empty-filter-box {
+  background: rgba(8, 28, 66, 0.5);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
 /* ==========================================================================
-   Vista de Profesor
+   Vista de Profesor (Lista de Alumnos y Editor de Notas Moderno)
    ========================================================================== */
 .teacher-section {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
+  align-items: start;
 }
 
-@media (min-width: 860px) {
+@media (min-width: 920px) {
   .teacher-section {
     grid-template-columns: 340px 1fr;
   }
 }
 
 .student-list {
-  background: var(--color-primary-glass);
-  border: 1px solid var(--color-border-card);
-  border-radius: var(--radius-xl);
-  padding: 20px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(8, 28, 66, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
+  padding: 18px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#studentsContainer {
+  max-height: 680px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .student-item {
   padding: 12px 14px;
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   cursor: pointer;
-  margin-bottom: 8px;
-  background: var(--color-dark-subtle);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
+  background: rgba(4, 14, 34, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   transition: all var(--transition-fast);
 }
 
-.student-item:hover,
+.student-item:hover {
+  border-color: rgba(147, 197, 253, 0.5);
+  background: rgba(14, 56, 122, 0.7);
+  transform: translateX(2px);
+}
+
 .student-item.active {
-  border-color: var(--color-white);
-  background: rgba(14, 56, 122, 0.9);
+  border-color: #60a5fa;
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.75), rgba(14, 56, 122, 0.9));
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+.student-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.student-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.student-item-body {
+  flex: 1;
+  min-width: 0;
 }
 
 .student-name {
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #ffffff;
 }
 
 .student-level {
@@ -367,75 +739,179 @@
 }
 
 .grade-editor {
-  background: var(--color-primary-glass);
-  border: 1px solid var(--color-border-card);
-  border-radius: var(--radius-xl);
+  background: rgba(8, 28, 66, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 18px;
   padding: 24px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.teacher-grade-summary-box {
+  background: rgba(4, 14, 34, 0.55);
+  border: 1px solid rgba(147, 197, 253, 0.3);
+  border-radius: 14px;
+  padding: 14px 18px;
+  text-align: right;
+  min-width: 250px;
+}
+
+.teacher-total-points-display {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+.teacher-mini-progress-track {
+  width: 100%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.teacher-mini-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #4ade80);
+  border-radius: 10px;
+  transition: width 0.35s ease;
+}
+
+.teacher-eval-toolbar {
+  margin-top: 16px;
+  margin-bottom: 18px;
+}
+
+.teacher-empty-selection {
+  padding: 56px 24px;
+  text-align: center;
+  background: rgba(4, 14, 34, 0.35);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
 }
 
 .teacher-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 16px;
   margin-top: 20px;
 }
 
 .grade-input-box {
-  background: var(--color-dark-bg);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-lg);
-  padding: 14px;
+  background: rgba(4, 14, 34, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.grade-input-box label {
-  display: block;
-  font-size: 12px;
-  color: var(--color-muted);
-  margin-bottom: 4px;
-  font-weight: 600;
+.grade-box-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .grade-input-box-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: #ffffff;
-  margin-bottom: 8px;
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+.grade-box-controls {
+  margin-top: auto;
+  background: rgba(14, 56, 122, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.grade-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.grade-state-indicator {
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.grade-input-box.graded .grade-state-indicator {
+  color: #4ade80;
+}
+
+.grade-input-box.modified .grade-state-indicator {
+  color: #fde047;
+}
+
+.grade-max-hint {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.grade-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .grade-input-box input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(4, 14, 34, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   color: var(--color-white);
-  padding: 8px 10px;
-  font-weight: 700;
-  font-size: 14px;
+  padding: 9px 58px 9px 12px;
+  font-weight: 800;
+  font-size: 15px;
   outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .grade-input-box input:focus {
-  border-color: var(--color-white);
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+}
+
+.grade-input-suffix {
+  position: absolute;
+  right: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #93c5fd;
+  pointer-events: none;
 }
 
 .btn-save-grade {
   margin-top: 10px;
   width: 100%;
-  padding: 8px;
-  background: var(--color-success);
-  color: var(--color-primary);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-weight: 700;
+  padding: 9px 12px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #052e16;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  font-weight: 800;
   font-size: 12px;
   cursor: pointer;
-  transition: opacity var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .btn-save-grade:hover {
-  opacity: 0.9;
+  filter: brightness(1.08);
+  transform: translateY(-1px);
 }
 
 /* ==========================================================================
@@ -638,68 +1114,98 @@
 /* Agrupación de etapas en el panel del profesor */
 .teacher-stage-block {
   margin-bottom: 22px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
-  padding: 16px;
+  background: rgba(4, 14, 34, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 20px;
 }
 
 .teacher-stage-header {
-  font-family: var(--font-display);
-  font-size: 16px;
-  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.teacher-stage-title-text {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: #ffffff;
 }
 
 /* Cuadrícula de notas por etapa */
 .teacher-stage-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
 }
 
 /* Acciones en la tarjeta de nota */
 .grade-input-box {
   position: relative;
-  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.grade-input-box:hover {
+  border-color: rgba(147, 197, 253, 0.45);
 }
 
 .grade-input-box.graded {
-  border-color: rgba(34, 197, 94, 0.4);
-  background: rgba(34, 197, 94, 0.05);
+  border-color: rgba(74, 222, 128, 0.45);
+  background: linear-gradient(160deg, rgba(4, 14, 34, 0.65), rgba(6, 78, 59, 0.32));
 }
 
 .grade-input-box.modified {
-  border-color: rgba(245, 158, 11, 0.6);
-  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.3);
+  border-color: rgba(250, 204, 21, 0.75);
+  box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.35);
+}
+
+.grade-input-box.modified .btn-save-grade {
+  background: linear-gradient(135deg, #facc15, #eab308);
+  color: #0f172a;
+}
+
+.hidden-by-filter {
+  display: none !important;
 }
 
 .grade-shortcuts {
   display: flex;
   gap: 6px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .btn-quick-tag {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--color-muted);
-  border-radius: var(--radius-sm);
-  padding: 3px 6px;
-  font-size: 10px;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #e2e8f0;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
   flex: 1;
+  transition: all var(--transition-fast);
 }
 
 .btn-quick-tag:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(59, 130, 246, 0.35);
+  border-color: #93c5fd;
   color: #ffffff;
+}
+
+.btn-quick-clear {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+}
+
+.btn-quick-clear:hover {
+  background: rgba(239, 68, 68, 0.35);
+  border-color: #fca5a5;
 }
 
 /* Badge de alumno en la lista */

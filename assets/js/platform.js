@@ -750,6 +750,25 @@ async function loadStudentGrades() {
   renderStudentEvaluations();
 }
 
+let studentEvalActiveFilter = 'all';
+let teacherEvalActiveFilter = 'all';
+
+function setStudentEvalFilter(filter) {
+  studentEvalActiveFilter = filter || 'all';
+  const pills = document.querySelectorAll('#studentEvalFilterPills .eval-filter-btn');
+  pills.forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-filter') === studentEvalActiveFilter);
+  });
+  renderStudentEvaluations();
+}
+
+function getEvalTypeIcon(type) {
+  if (type === 'Oral') return '🗣️';
+  if (type === 'Formativo') return '🎯';
+  if (type === 'Sticker' || type === 'Lúdico') return '⭐';
+  return '📝';
+}
+
 function renderStudentEvaluations() {
   const container = document.getElementById('evaluationsContainer');
   if (!container) return;
@@ -757,38 +776,138 @@ function renderStudentEvaluations() {
 
   const courseLevel = studentActiveViewingLevel || currentUserProfile.course_level || 'Adultos 1';
   const config = getCourseConfig(courseLevel);
+  const searchQuery = (document.getElementById('studentEvalSearchInput')?.value || '').toLowerCase().trim();
 
   let totalScoreEarned = 0;
+  let totalItemsCount = 0;
+  let gradedItemsCount = 0;
 
+  // Primer pase: calcular métricas globales reales sin importar el filtro visual
   config.stages.forEach(stage => {
+    stage.items.forEach(item => {
+      totalItemsCount++;
+      const awarded = studentGradesCache[item.number];
+      const hasScore = awarded !== undefined && awarded !== null && awarded !== '';
+      if (hasScore) {
+        gradedItemsCount++;
+        totalScoreEarned += Number(awarded);
+      }
+    });
+  });
+
+  const pendingItemsCount = Math.max(0, totalItemsCount - gradedItemsCount);
+
+  // Actualizar contadores de los botones de filtro
+  const stCountAll = document.getElementById('stCountAll');
+  const stCountGraded = document.getElementById('stCountGraded');
+  const stCountPending = document.getElementById('stCountPending');
+  if (stCountAll) stCountAll.innerText = totalItemsCount;
+  if (stCountGraded) stCountGraded.innerText = gradedItemsCount;
+  if (stCountPending) stCountPending.innerText = pendingItemsCount;
+
+  let visibleCardsCount = 0;
+
+  // Segundo pase: construir módulos por etapa con diseño moderno y digerible
+  config.stages.forEach((stage, stageIdx) => {
+    let stageEarned = 0;
+    let stageMax = 0;
+    let stageGradedCount = 0;
+
+    stage.items.forEach(it => {
+      stageMax += Number(it.maxPoints || 0);
+      const val = studentGradesCache[it.number];
+      if (val !== undefined && val !== null && val !== '') {
+        stageEarned += Number(val);
+        stageGradedCount++;
+      }
+    });
+
+    const filteredItems = stage.items.filter(item => {
+      const awarded = studentGradesCache[item.number];
+      const hasScore = awarded !== undefined && awarded !== null && awarded !== '';
+
+      if (studentEvalActiveFilter === 'graded' && !hasScore) return false;
+      if (studentEvalActiveFilter === 'pending' && hasScore) return false;
+      if (studentEvalActiveFilter === 'Oral' && item.type !== 'Oral') return false;
+      if (studentEvalActiveFilter === 'Escrito' && item.type !== 'Escrito') return false;
+
+      if (searchQuery) {
+        const haystack = `#${item.number} ${item.lesson} ${item.title} ${item.type}`.toLowerCase();
+        if (!haystack.includes(searchQuery)) return false;
+      }
+      return true;
+    });
+
+    if (filteredItems.length === 0) return;
+
+    const stagePct = stageMax > 0 ? Math.min(100, Math.round((stageEarned / stageMax) * 100)) : 0;
     const section = document.createElement('div');
-    section.innerHTML = `<h3 class="eval-section-title">📖 ${stage.name}</h3>`;
+    section.className = 'student-stage-module';
+
+    section.innerHTML = `
+      <div class="student-stage-header">
+        <div class="student-stage-title-group">
+          <span class="stage-step-badge">Etapa ${stageIdx + 1}</span>
+          <div>
+            <h3 class="eval-section-title">${stage.name}</h3>
+            <span class="student-stage-subtitle">${stageGradedCount} de ${stage.items.length} evaluaciones completadas</span>
+          </div>
+        </div>
+        <div class="student-stage-stats">
+          <div class="student-stage-pts">
+            ${config.isKids ? `${stageGradedCount} / ${stage.items.length} ⭐` : `${stageEarned} / ${stageMax} pts`}
+            <span class="student-stage-pct">(${stagePct}%)</span>
+          </div>
+          <div class="stage-mini-bar-track">
+            <div class="stage-mini-bar-fill" style="width: ${stagePct}%;"></div>
+          </div>
+        </div>
+      </div>
+    `;
 
     const grid = document.createElement('div');
     grid.className = 'units-grid';
 
-    stage.items.forEach(item => {
+    filteredItems.forEach(item => {
+      visibleCardsCount++;
       const awarded = studentGradesCache[item.number];
-      const hasScore = awarded !== undefined && awarded !== null;
-      if (hasScore) totalScoreEarned += Number(awarded);
+      const hasScore = awarded !== undefined && awarded !== null && awarded !== '';
+      const numericAwarded = hasScore ? Number(awarded) : 0;
+      const itemPct = item.maxPoints > 0 ? Math.min(100, Math.round((numericAwarded / item.maxPoints) * 100)) : 0;
 
       const typeBadgeClass = item.type === 'Oral' ? 'badge-oral' : (item.type === 'Formativo' ? 'badge-formative' : (item.type === 'Sticker' || item.type === 'Lúdico' ? 'badge-kids' : 'badge-written'));
+      const typeIcon = getEvalTypeIcon(item.type);
+      const numFormatted = String(item.number).padStart(2, '0');
 
       const card = document.createElement('div');
-      card.className = 'unit-card';
+      card.className = `unit-card ${hasScore ? 'unit-card-graded' : 'unit-card-pending'}`;
       card.innerHTML = `
         <div>
-          <div class="unit-number">
-            <span>#${item.number} · ${item.lesson}</span>
-            <span class="eval-badge-type ${typeBadgeClass}">${item.type}</span>
+          <div class="unit-card-top">
+            <div class="unit-meta-pills">
+              <span class="unit-num-pill">#${numFormatted}</span>
+              <span class="unit-lesson-pill">📘 ${item.lesson}</span>
+            </div>
+            <span class="eval-badge-type ${typeBadgeClass}">${typeIcon} ${item.type}</span>
           </div>
           <div class="unit-title">${item.title}</div>
         </div>
-        <div class="exam-badge">
-          <span>${config.isKids ? 'Estado:' : `Máx: ${item.maxPoints} pts`}</span>
-          <span class="score ${hasScore ? 'score-passed' : 'score-pending'}">
-            ${hasScore ? (config.isKids ? '⭐ Logrado' : `${awarded} pts`) : 'Pendiente'}
-          </span>
+        <div class="unit-card-bottom">
+          ${hasScore && !config.isKids ? `
+            <div class="unit-item-bar-track">
+              <div class="unit-item-bar-fill" style="width: ${itemPct}%;"></div>
+            </div>
+          ` : ''}
+          <div class="exam-badge ${hasScore ? 'exam-badge-graded' : 'exam-badge-pending'}">
+            <span class="exam-max-label">
+              ${hasScore ? '✅ Calificación obtenida' : (config.isKids ? '⏳ Por completar' : `⏳ Pendiente · Valor: ${item.maxPoints} pts`)}
+            </span>
+            <span class="score ${hasScore ? 'score-passed' : 'score-pending'}">
+              ${hasScore
+                ? (config.isKids ? '⭐ ¡Logrado!' : `${numericAwarded} <small style="font-weight: 500; opacity: 0.8;">/ ${item.maxPoints} pts</small>`)
+                : 'Sin nota'}
+            </span>
+          </div>
         </div>
       `;
       grid.appendChild(card);
@@ -798,19 +917,45 @@ function renderStudentEvaluations() {
     container.appendChild(section);
   });
 
-  // Barra de progreso y estadísticas
+  if (visibleCardsCount === 0) {
+    container.innerHTML = `
+      <div class="empty-filter-box">
+        <div style="font-size: 36px; margin-bottom: 8px;">🔍</div>
+        <h4 style="font-family: var(--font-display); font-size: 18px; margin: 0 0 6px 0;">No hay evaluaciones con este filtro</h4>
+        <p style="font-size: 13px; color: var(--color-muted); margin: 0 0 14px 0;">Prueba seleccionando «Todas» o borrando el texto de búsqueda.</p>
+        <button type="button" class="btn-sm-action" onclick="document.getElementById('studentEvalSearchInput').value=''; setStudentEvalFilter('all');">
+          Ver todas las evaluaciones
+        </button>
+      </div>
+    `;
+  }
+
+  // Barra de progreso y estadísticas KPI del estudiante
   const scoreDisplay = document.getElementById('studentScoreDisplay');
   const progressBar = document.getElementById('studentProgressBar');
   const statusBadge = document.getElementById('studentStatusBadge');
   const percentText = document.getElementById('studentPercentText');
+  const completedCountText = document.getElementById('studentCompletedCountText');
+  const pointsRemainingText = document.getElementById('studentPointsRemainingText');
+  const approvalTarget = document.getElementById('studentApprovalTarget');
+
+  if (completedCountText) {
+    completedCountText.innerText = `${gradedItemsCount} de ${totalItemsCount} (${totalItemsCount > 0 ? Math.round((gradedItemsCount / totalItemsCount) * 100) : 0}%)`;
+  }
 
   if (config.isKids) {
-    scoreDisplay.innerText = `${totalScoreEarned} / ${config.maxPoints} actividades`;
+    scoreDisplay.innerText = `${totalScoreEarned} / ${config.maxPoints} ⭐`;
     const pct = Math.min(100, Math.round((totalScoreEarned / config.maxPoints) * 100));
     progressBar.style.width = `${pct}%`;
     percentText.innerText = `${pct}% completado`;
-    statusBadge.innerText = totalScoreEarned >= config.passingScore ? '⭐ ¡Nivel Aprobado!' : 'En aprendizaje';
-    statusBadge.className = totalScoreEarned >= config.passingScore ? 'score score-passed' : 'score score-pending';
+    const isApproved = totalScoreEarned >= config.passingScore;
+    statusBadge.innerText = isApproved ? '⭐ ¡Nivel Aprobado!' : '🎈 En aprendizaje';
+    statusBadge.className = isApproved ? 'score score-passed status-hero-pill' : 'score score-pending status-hero-pill';
+    if (approvalTarget) approvalTarget.innerText = `${config.passingScore} stickers`;
+    if (pointsRemainingText) {
+      const rem = Math.max(0, config.passingScore - totalScoreEarned);
+      pointsRemainingText.innerText = rem === 0 ? '🎉 ¡Meta lograda!' : `Faltan ${rem} stickers`;
+    }
   } else {
     scoreDisplay.innerText = `${totalScoreEarned} / ${config.maxPoints} pts`;
     const pct = Math.min(100, Math.round((totalScoreEarned / config.maxPoints) * 100));
@@ -818,8 +963,13 @@ function renderStudentEvaluations() {
     percentText.innerText = `${pct}% acumulado`;
 
     const isApproved = totalScoreEarned >= config.passingScore;
-    statusBadge.innerText = isApproved ? '🎉 ¡Nivel Aprobado!' : 'En progreso';
-    statusBadge.className = isApproved ? 'score score-passed' : 'score score-pending';
+    statusBadge.innerText = isApproved ? '🎉 ¡Nivel Aprobado!' : '⏳ En progreso';
+    statusBadge.className = isApproved ? 'score score-passed status-hero-pill' : 'score score-pending status-hero-pill';
+    if (approvalTarget) approvalTarget.innerText = `${config.passingScore} / ${config.maxPoints} pts`;
+    if (pointsRemainingText) {
+      const rem = Math.max(0, config.passingScore - totalScoreEarned);
+      pointsRemainingText.innerText = rem === 0 ? '🏆 ¡Meta de aprobación superada!' : `Faltan ${rem} pts para aprobar`;
+    }
   }
 }
 
@@ -920,6 +1070,12 @@ function renderStudentList() {
     const isSelected = selectedStudent && selectedStudent.id === student.id;
     const expInfo = getExpirationInfo(student.expires_at);
     const docDisplay = student.document_id ? `🪪 ${student.document_id}` : '🪪 Sin doc';
+    const initials = (student.full_name || 'AL')
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(n => n[0].toUpperCase())
+      .join('');
 
     item.className = `student-item ${isSelected ? 'active' : ''}`;
     item.onclick = (e) => {
@@ -929,15 +1085,20 @@ function renderStudentList() {
     };
 
     item.innerHTML = `
-      <div class="student-item-header">
-        <span class="student-name">${student.full_name}</span>
-        <button type="button" class="student-quick-edit-btn" onclick="openEditStudentModal('${student.id}')" title="Editar estudiante o vigencia">
-          ✏️
-        </button>
-      </div>
-      <div class="student-level">${docDisplay} · 📚 ${student.course_level}</div>
-      <div style="margin-top: 6px;">
-        <span class="expiry-chip ${expInfo.chipClass}">${expInfo.label}</span>
+      <div class="student-item-row">
+        <div class="student-avatar-circle">${initials}</div>
+        <div class="student-item-body">
+          <div class="student-item-header">
+            <span class="student-name">${student.full_name}</span>
+            <button type="button" class="student-quick-edit-btn" onclick="openEditStudentModal('${student.id}')" title="Editar estudiante o vigencia">
+              ✏️
+            </button>
+          </div>
+          <div class="student-level">${docDisplay} · 📚 ${student.course_level}</div>
+          <div style="margin-top: 6px;">
+            <span class="expiry-chip ${expInfo.chipClass}">${expInfo.label}</span>
+          </div>
+        </div>
       </div>
     `;
     container.appendChild(item);
@@ -1004,6 +1165,8 @@ async function selectStudent(studentId) {
 
   if (actionsBar) actionsBar.classList.remove('hidden');
   if (gradeActionsArea) gradeActionsArea.classList.remove('hidden');
+  const gradingToolbar = document.getElementById('teacherGradingToolbar');
+  if (gradingToolbar) gradingToolbar.classList.remove('hidden');
 
   // Por defecto calificar el nivel actual oficial del estudiante
   teacherActiveGradingLevel = selectedStudent.course_level;
@@ -1102,6 +1265,41 @@ async function loadAndRenderTeacherGradesForActiveLevel() {
   renderTeacherCurriculumGrades(config);
 }
 
+function setTeacherEvalFilter(filter) {
+  teacherEvalActiveFilter = filter || 'all';
+  const pills = document.querySelectorAll('#teacherEvalFilterPills .eval-filter-btn');
+  pills.forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tfilter') === teacherEvalActiveFilter);
+  });
+  applyTeacherEvalFilter();
+}
+
+function applyTeacherEvalFilter() {
+  const searchQuery = (document.getElementById('teacherEvalSearchInput')?.value || '').toLowerCase().trim();
+  const stageBlocks = document.querySelectorAll('#teacherUnitsGrid .teacher-stage-block');
+
+  stageBlocks.forEach(stageBlock => {
+    const boxes = stageBlock.querySelectorAll('.grade-input-box');
+    let visibleInStage = 0;
+
+    boxes.forEach(box => {
+      const inp = box.querySelector('input[type="number"]');
+      const hasVal = inp && inp.value.trim() !== '';
+      const haystack = (box.getAttribute('data-search-text') || '').toLowerCase();
+
+      let matchesFilter = true;
+      if (teacherEvalActiveFilter === 'graded' && !hasVal) matchesFilter = false;
+      if (teacherEvalActiveFilter === 'pending' && hasVal) matchesFilter = false;
+      if (searchQuery && !haystack.includes(searchQuery)) matchesFilter = false;
+
+      box.classList.toggle('hidden-by-filter', !matchesFilter);
+      if (matchesFilter) visibleInStage++;
+    });
+
+    stageBlock.classList.toggle('hidden-by-filter', visibleInStage === 0);
+  });
+}
+
 function renderTeacherCurriculumGrades(config) {
   const grid = document.getElementById('teacherUnitsGrid');
   if (!grid) return;
@@ -1115,17 +1313,34 @@ function renderTeacherCurriculumGrades(config) {
 
     let stageEarned = 0;
     let stageMax = 0;
+    let stageGradedCount = 0;
     stage.items.forEach(it => {
       stageMax += Number(it.maxPoints || 0);
       const val = selectedStudentGrades[it.number];
-      if (val !== undefined && val !== null && val !== '') stageEarned += Number(val);
+      if (val !== undefined && val !== null && val !== '') {
+        stageEarned += Number(val);
+        stageGradedCount++;
+      }
     });
+
+    const stagePct = stageMax > 0 ? Math.min(100, Math.round((stageEarned / stageMax) * 100)) : 0;
 
     stageBlock.innerHTML = `
       <div class="teacher-stage-header">
-        <div>📖 ${stage.name}</div>
-        <div style="font-size: 13px; color: var(--color-primary-light); font-weight: 700;">
-          Puntaje: <span id="stage_pts_${stageIdx}">${stageEarned} / ${stageMax} pts</span>
+        <div class="student-stage-title-group">
+          <span class="stage-step-badge">Etapa ${stageIdx + 1}</span>
+          <div>
+            <div class="teacher-stage-title-text">${stage.name}</div>
+            <span class="student-stage-subtitle" id="stage_count_${stageIdx}">${stageGradedCount} de ${stage.items.length} evaluadas</span>
+          </div>
+        </div>
+        <div class="student-stage-stats">
+          <div style="font-size: 13px; color: var(--color-primary-light); font-weight: 700;">
+            Puntaje: <span id="stage_pts_${stageIdx}">${stageEarned} / ${stageMax} pts</span>
+          </div>
+          <div class="stage-mini-bar-track">
+            <div class="stage-mini-bar-fill" id="stage_bar_${stageIdx}" style="width: ${stagePct}%;"></div>
+          </div>
         </div>
       </div>
       <div class="teacher-stage-grid" id="stage_grid_${stageIdx}"></div>
@@ -1139,38 +1354,63 @@ function renderTeacherCurriculumGrades(config) {
 
       const hasScore = currentPts !== '';
       const typeBadgeClass = item.type === 'Oral' ? 'badge-oral' : (item.type === 'Formativo' ? 'badge-formative' : (item.type === 'Sticker' || item.type === 'Lúdico' ? 'badge-kids' : 'badge-written'));
+      const typeIcon = getEvalTypeIcon(item.type);
+      const numFormatted = String(item.number).padStart(2, '0');
       const safeAttrTitle = String(item.title || '')
         .replace(/&/g, '&amp;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+      const halfPts = Math.round((item.maxPoints / 2) * 10) / 10;
 
       const box = document.createElement('div');
       box.className = `grade-input-box ${hasScore ? 'graded' : ''}`;
       box.id = `box_grade_${item.number}`;
+      box.setAttribute('data-search-text', `#${item.number} ${item.lesson} ${safeAttrTitle} ${item.type}`);
       box.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <span style="font-size: 11px; font-weight: 700; color: var(--color-muted);">#${item.number} · ${item.lesson}</span>
-          <span class="eval-badge-type ${typeBadgeClass}" style="font-size: 10px; padding: 2px 6px;">${item.type}</span>
+        <div>
+          <div class="grade-box-top-row">
+            <div class="unit-meta-pills">
+              <span class="unit-num-pill">#${numFormatted}</span>
+              <span class="unit-lesson-pill">${item.lesson}</span>
+            </div>
+            <span class="eval-badge-type ${typeBadgeClass}">${typeIcon} ${item.type}</span>
+          </div>
+          <div class="grade-input-box-title" title="${safeAttrTitle}">${item.title}</div>
         </div>
-        <div class="grade-input-box-title" title="${safeAttrTitle}">${item.title}</div>
-        <div style="display: flex; gap: 6px; align-items: center;">
-          <input type="number" step="0.5" min="0" max="${item.maxPoints}" 
-                 id="grade_input_${item.number}" 
-                 value="${currentPts}" 
-                 placeholder="0 a ${item.maxPoints}"
-                 data-item-number="${item.number}"
-                 data-item-title="${safeAttrTitle}"
-                 data-item-type="${item.type}"
-                 data-max-points="${item.maxPoints}"
-                 data-initial-val="${currentPts}"
-                 oninput="handleGradeInputChange(${item.number}, ${item.maxPoints})">
+
+        <div class="grade-box-controls">
+          <div class="grade-status-row">
+            <span class="grade-state-indicator" id="grade_state_${item.number}">
+              ${hasScore ? '✅ Calificada' : '⏳ Sin calificar'}
+            </span>
+            <span class="grade-max-hint">Máx: ${item.maxPoints} pts</span>
+          </div>
+
+          <div class="grade-input-wrapper">
+            <input type="number" step="0.5" min="0" max="${item.maxPoints}" 
+                   id="grade_input_${item.number}" 
+                   value="${currentPts}" 
+                   placeholder="Ingresa nota (0 - ${item.maxPoints})"
+                   data-item-number="${item.number}"
+                   data-item-title="${safeAttrTitle}"
+                   data-item-type="${item.type}"
+                   data-max-points="${item.maxPoints}"
+                   data-initial-val="${currentPts}"
+                   oninput="handleGradeInputChange(${item.number}, ${item.maxPoints})">
+            <span class="grade-input-suffix">/ ${item.maxPoints}</span>
+          </div>
+
+          <div class="grade-shortcuts">
+            <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, ${item.maxPoints})" title="Asignar puntaje máximo (${item.maxPoints} pts)">💯 Máx (${item.maxPoints})</button>
+            ${item.maxPoints > 1 ? `<button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, ${halfPts})" title="Asignar 50% (${halfPts} pts)">50% (${halfPts})</button>` : ''}
+            <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, 0)" title="Asignar 0 puntos">0</button>
+            <button type="button" class="btn-quick-tag btn-quick-clear" onclick="quickSetGrade(${item.number}, '')" title="Limpiar calificación">🗑️</button>
+          </div>
+
+          <button type="button" class="btn-save-grade" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${teacherActiveGradingLevel}', ${item.number})">
+            💾 Guardar nota
+          </button>
         </div>
-        <div class="grade-shortcuts">
-          <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, ${item.maxPoints})" title="Poner puntaje máximo">Máx (${item.maxPoints})</button>
-          <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, 0)" title="Poner cero">0</button>
-          <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, '')" title="Borrar calificación">Borrar</button>
-        </div>
-        <button type="button" class="btn-save-grade" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${teacherActiveGradingLevel}', ${item.number})">Guardar</button>
       `;
       stageGrid.appendChild(box);
     });
@@ -1178,12 +1418,14 @@ function renderTeacherCurriculumGrades(config) {
     grid.appendChild(stageBlock);
   });
 
-  updateTotalHeaderPoints(totalPts, config);
+  recalculateAllScreenPoints();
+  applyTeacherEvalFilter();
 }
 
 function handleGradeInputChange(itemNumber, maxPoints) {
   const input = document.getElementById(`grade_input_${itemNumber}`);
   const box = document.getElementById(`box_grade_${itemNumber}`);
+  const stateLbl = document.getElementById(`grade_state_${itemNumber}`);
   if (!input || !box) return;
 
   const currentVal = input.value.trim();
@@ -1191,8 +1433,10 @@ function handleGradeInputChange(itemNumber, maxPoints) {
 
   if (currentVal !== initVal) {
     box.classList.add('modified');
+    if (stateLbl) stateLbl.innerText = '✏️ Sin guardar';
   } else {
     box.classList.remove('modified');
+    if (stateLbl) stateLbl.innerText = currentVal !== '' ? '✅ Calificada' : '⏳ Sin calificar';
   }
 
   // Recalcular total en tiempo real
@@ -1213,48 +1457,75 @@ function recalculateAllScreenPoints() {
   const inputs = document.querySelectorAll('#teacherUnitsGrid input[type="number"]');
 
   let sum = 0;
+  let totalCount = 0;
+  let gradedCount = 0;
   inputs.forEach(inp => {
+    totalCount++;
     const v = inp.value.trim();
     if (v !== '' && !isNaN(parseFloat(v))) {
       sum += parseFloat(v);
+      gradedCount++;
     }
   });
+
+  const tchCountAll = document.getElementById('tchCountAll');
+  const tchCountGraded = document.getElementById('tchCountGraded');
+  const tchCountPending = document.getElementById('tchCountPending');
+  if (tchCountAll) tchCountAll.innerText = totalCount;
+  if (tchCountGraded) tchCountGraded.innerText = gradedCount;
+  if (tchCountPending) tchCountPending.innerText = Math.max(0, totalCount - gradedCount);
 
   config.stages.forEach((stage, stageIdx) => {
     let stageEarned = 0;
     let stageMax = 0;
+    let stageGraded = 0;
     stage.items.forEach(it => {
       stageMax += Number(it.maxPoints || 0);
       const inp = document.getElementById(`grade_input_${it.number}`);
       const v = inp ? inp.value.trim() : '';
       if (v !== '' && !isNaN(parseFloat(v))) {
         stageEarned += parseFloat(v);
+        stageGraded++;
       }
     });
     const stagePtsElem = document.getElementById(`stage_pts_${stageIdx}`);
     if (stagePtsElem) {
       stagePtsElem.innerText = `${stageEarned} / ${stageMax} pts`;
     }
+    const stageCountElem = document.getElementById(`stage_count_${stageIdx}`);
+    if (stageCountElem) {
+      stageCountElem.innerText = `${stageGraded} de ${stage.items.length} evaluadas`;
+    }
+    const stageBarElem = document.getElementById(`stage_bar_${stageIdx}`);
+    if (stageBarElem) {
+      const sPct = stageMax > 0 ? Math.min(100, Math.round((stageEarned / stageMax) * 100)) : 0;
+      stageBarElem.style.width = `${sPct}%`;
+    }
   });
 
-  updateTotalHeaderPoints(sum, config);
+  updateTotalHeaderPoints(sum, config, gradedCount, totalCount);
 }
 
-function updateTotalHeaderPoints(totalPts, config) {
+function updateTotalHeaderPoints(totalPts, config, gradedCount = 0, totalCount = 0) {
   const pointsBadge = document.getElementById('teacherStudentTotalPoints');
   const statusChip = document.getElementById('teacherStudentStatusChip');
+  const progressBar = document.getElementById('teacherStudentProgressBar');
   if (!pointsBadge) return;
 
   const pct = Math.min(100, Math.round((totalPts / config.maxPoints) * 100));
   const isApproved = totalPts >= config.passingScore;
 
   pointsBadge.innerText = `Total: ${totalPts} / ${config.maxPoints} pts (${pct}%)`;
+  if (progressBar) {
+    progressBar.style.width = `${pct}%`;
+  }
 
   if (statusChip) {
+    const evalSummary = totalCount > 0 ? ` · ${gradedCount}/${totalCount} evaluadas` : '';
     if (isApproved) {
-      statusChip.innerHTML = `<span class="score score-passed">🎉 Nivel Aprobado (Meta: ${config.passingScore} pts)</span>`;
+      statusChip.innerHTML = `<span class="score score-passed">🎉 Nivel Aprobado (Meta: ${config.passingScore} pts${evalSummary})</span>`;
     } else {
-      statusChip.innerHTML = `<span class="score score-pending">⏳ En progreso (Meta: ${config.passingScore} pts)</span>`;
+      statusChip.innerHTML = `<span class="score score-pending">⏳ En progreso (Meta: ${config.passingScore} pts${evalSummary})</span>`;
     }
   }
 }
@@ -1342,6 +1613,8 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
       if (box) {
         box.classList.remove('graded', 'modified');
       }
+      const stateLbl = document.getElementById(`grade_state_${itemNumber}`);
+      if (stateLbl) stateLbl.innerText = '⏳ Sin calificar';
       showToast(`🗑️ Nota #${itemNumber} eliminada de ${targetLevel}`, "info");
     } else {
       await upsertStudentGradesSafe(client, {
@@ -1362,10 +1635,13 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
         box.classList.add('graded');
         box.classList.remove('modified');
       }
+      const stateLbl = document.getElementById(`grade_state_${itemNumber}`);
+      if (stateLbl) stateLbl.innerText = '✅ Calificada';
       showToast(`✅ Nota #${itemNumber} guardada en ${targetLevel}: ${numericVal} pts`, "success");
     }
 
     recalculateAllScreenPoints();
+    applyTeacherEvalFilter();
 
   } catch (err) {
     console.error("Error al guardar nota en Supabase:", err);
@@ -1373,7 +1649,7 @@ async function saveGrade(studentId, courseLevel, itemNumber, itemTitle, itemType
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.innerText = 'Guardar';
+      btn.innerText = '💾 Guardar nota';
     }
   }
 }
@@ -1439,11 +1715,13 @@ async function saveAllGrades() {
         selectedStudentGrades[r.item_number] = r.points_awarded;
         const inp = document.getElementById(`grade_input_${r.item_number}`);
         const bx = document.getElementById(`box_grade_${r.item_number}`);
+        const st = document.getElementById(`grade_state_${r.item_number}`);
         if (inp) inp.setAttribute('data-initial-val', String(r.points_awarded));
         if (bx) {
           bx.classList.add('graded');
           bx.classList.remove('modified');
         }
+        if (st) st.innerText = '✅ Calificada';
       });
     }
 
@@ -1459,11 +1737,14 @@ async function saveAllGrades() {
       delete selectedStudentGrades[num];
       const inp = document.getElementById(`grade_input_${num}`);
       const bx = document.getElementById(`box_grade_${num}`);
+      const st = document.getElementById(`grade_state_${num}`);
       if (inp) inp.setAttribute('data-initial-val', '');
       if (bx) bx.classList.remove('graded', 'modified');
+      if (st) st.innerText = '⏳ Sin calificar';
     }
 
     recalculateAllScreenPoints();
+    applyTeacherEvalFilter();
     showToast(`🎉 ¡Todas las calificaciones de ${selectedStudent.full_name} (${teacherActiveGradingLevel}) han sido guardadas con éxito!`, "success", 4000);
 
   } catch (err) {
@@ -2031,6 +2312,10 @@ window.filterStudents = filterStudents;
 window.selectStudent = selectStudent;
 window.changeTeacherGradingLevel = changeTeacherGradingLevel;
 window.changeStudentViewLevel = changeStudentViewLevel;
+window.setStudentEvalFilter = setStudentEvalFilter;
+window.setTeacherEvalFilter = setTeacherEvalFilter;
+window.applyTeacherEvalFilter = applyTeacherEvalFilter;
+window.renderStudentEvaluations = renderStudentEvaluations;
 window.saveGrade = saveGrade;
 window.saveAllGrades = saveAllGrades;
 window.quickSetGrade = quickSetGrade;

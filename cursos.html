@@ -112,31 +112,80 @@
 
         <!-- SUBSECCIÓN 1: EVALUACIONES Y NOTAS -->
         <div id="studentTabGrades">
-          <!-- Tarjeta de Progreso y Puntos Acumulados -->
+          <!-- Tarjeta Hero de Progreso y Resumen Digerible -->
           <div id="studentProgressCard" class="progress-summary-card">
             <div class="progress-header">
               <div>
-                <span style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted);">Progreso de Calificaciones</span>
-                <div style="font-family: var(--font-display); font-size: 26px; color: #ffffff;" id="studentScoreDisplay">
-                  0 / 2200 pts
+                <span class="progress-eyebrow">📊 Resumen de Rendimiento Académico</span>
+                <div class="progress-main-score-row">
+                  <div class="progress-score-number" id="studentScoreDisplay">
+                    0 / 2200 pts
+                  </div>
+                  <span id="studentPercentText" class="progress-pct-pill">0% completado</span>
                 </div>
               </div>
-              <div id="studentStatusBadge" class="score score-pending" style="font-size: 14px; padding: 6px 14px; background: rgba(0,0,0,0.3); border-radius: 50px;">
-                En progreso
+              <div id="studentStatusBadge" class="score score-pending status-hero-pill">
+                ⏳ En progreso
               </div>
             </div>
 
-            <div class="progress-bar-bg">
-              <div id="studentProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+            <div class="progress-bar-wrapper">
+              <div class="progress-bar-bg">
+                <div id="studentProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+              </div>
             </div>
 
-            <div class="progress-stats-row">
-              <span id="studentApprovalTarget">Meta para aprobar: 1500 pts</span>
-              <span id="studentPercentText">0% completado</span>
+            <!-- 3 Tarjetas KPI Digeribles para el Estudiante -->
+            <div class="student-kpi-grid">
+              <div class="student-kpi-box">
+                <span class="student-kpi-icon">🎯</span>
+                <div>
+                  <span class="student-kpi-label">Meta de Aprobación</span>
+                  <strong class="student-kpi-value" id="studentApprovalTarget">1500 pts</strong>
+                </div>
+              </div>
+              <div class="student-kpi-box">
+                <span class="student-kpi-icon">✅</span>
+                <div>
+                  <span class="student-kpi-label">Evaluaciones Presentadas</span>
+                  <strong class="student-kpi-value" id="studentCompletedCountText">0 de 19 completadas</strong>
+                </div>
+              </div>
+              <div class="student-kpi-box">
+                <span class="student-kpi-icon">🚀</span>
+                <div>
+                  <span class="student-kpi-label">Estado hacia la Meta</span>
+                  <strong class="student-kpi-value" id="studentPointsRemainingText">Faltan 1500 pts para aprobar</strong>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Cuadrícula de Evaluaciones Reales -->
+          <!-- Barra de Filtros Accesibles para el Estudiante -->
+          <div class="eval-filter-toolbar" aria-label="Filtrar evaluaciones">
+            <div class="eval-filter-pills" id="studentEvalFilterPills">
+              <button type="button" class="eval-filter-btn active" data-filter="all" onclick="setStudentEvalFilter('all')">
+                📚 Todas <span class="filter-count-badge" id="stCountAll">0</span>
+              </button>
+              <button type="button" class="eval-filter-btn" data-filter="graded" onclick="setStudentEvalFilter('graded')">
+                ✅ Calificadas <span class="filter-count-badge" id="stCountGraded">0</span>
+              </button>
+              <button type="button" class="eval-filter-btn" data-filter="pending" onclick="setStudentEvalFilter('pending')">
+                ⏳ Pendientes <span class="filter-count-badge" id="stCountPending">0</span>
+              </button>
+              <button type="button" class="eval-filter-btn" data-filter="Oral" onclick="setStudentEvalFilter('Oral')">
+                🗣️ Orales
+              </button>
+              <button type="button" class="eval-filter-btn" data-filter="Escrito" onclick="setStudentEvalFilter('Escrito')">
+                📝 Escritas
+              </button>
+            </div>
+            <div class="eval-search-box">
+              <input type="text" id="studentEvalSearchInput" class="form-control eval-search-input" placeholder="🔍 Buscar evaluación o lección (ej. L3, Final)..." oninput="renderStudentEvaluations()">
+            </div>
+          </div>
+
+          <!-- Cuadrícula de Evaluaciones Reales por Etapas -->
           <div id="evaluationsContainer">
             <!-- Renderizado dinámicamente según el curso (Adultos, Teens, Junior, Kids) -->
           </div>
@@ -390,8 +439,11 @@
               </div>
 
               <!-- RESUMEN DE PUNTOS Y BOTÓN DE GUARDAR TODO -->
-              <div id="teacherGradeActionsArea" class="hidden" style="text-align: right; min-width: 220px;">
-                <div id="teacherStudentTotalPoints" style="font-size: 18px; font-weight: 700; color: #ffffff; margin-bottom: 4px;"></div>
+              <div id="teacherGradeActionsArea" class="hidden teacher-grade-summary-box">
+                <div id="teacherStudentTotalPoints" class="teacher-total-points-display"></div>
+                <div class="teacher-mini-progress-track">
+                  <div id="teacherStudentProgressBar" class="teacher-mini-progress-fill" style="width: 0%;"></div>
+                </div>
                 <div id="teacherStudentStatusChip" style="font-size: 12px; margin-bottom: 10px;"></div>
                 <button id="btnSaveAllGrades" class="btn-save-all" onclick="saveAllGrades()">
                   💾 Guardar todas las notas
@@ -399,10 +451,32 @@
               </div>
             </div>
 
+            <!-- BARRA DE FILTROS RÁPIDOS DE EVALUACIONES PARA EL PROFESOR -->
+            <div id="teacherGradingToolbar" class="hidden eval-filter-toolbar teacher-eval-toolbar">
+              <div class="eval-filter-pills" id="teacherEvalFilterPills">
+                <button type="button" class="eval-filter-btn active" data-tfilter="all" onclick="setTeacherEvalFilter('all')">
+                  📋 Todas <span class="filter-count-badge" id="tchCountAll">0</span>
+                </button>
+                <button type="button" class="eval-filter-btn" data-tfilter="pending" onclick="setTeacherEvalFilter('pending')">
+                  ⏳ Sin calificar <span class="filter-count-badge" id="tchCountPending">0</span>
+                </button>
+                <button type="button" class="eval-filter-btn" data-tfilter="graded" onclick="setTeacherEvalFilter('graded')">
+                  ✅ Calificadas <span class="filter-count-badge" id="tchCountGraded">0</span>
+                </button>
+              </div>
+              <div class="eval-search-box">
+                <input type="text" id="teacherEvalSearchInput" class="form-control eval-search-input" placeholder="🔍 Filtrar actividad o lección..." oninput="applyTeacherEvalFilter()">
+              </div>
+            </div>
+
             <!-- CUADRÍCULA DE ETAPAS Y EVALUACIONES -->
             <div id="teacherUnitsGrid" style="margin-top: 18px;">
-              <div style="color: var(--color-muted); padding: 40px 20px; text-align: center;">
-                👈 Selecciona un estudiante de la columna izquierda para cargar sus notas oficiales y gestionar su acceso.
+              <div class="teacher-empty-selection">
+                <div style="font-size: 42px; margin-bottom: 10px;">👨‍🎓</div>
+                <h4 style="font-family: var(--font-display); font-size: 18px; color: #ffffff; margin: 0 0 6px 0;">Ningún estudiante seleccionado</h4>
+                <p style="color: var(--color-muted); font-size: 13px; max-width: 420px; margin: 0 auto;">
+                  Selecciona un alumno de la lista izquierda para ver su progreso por etapas, calificar sus evaluaciones o gestionar su matrícula.
+                </p>
               </div>
             </div>
           </div>
