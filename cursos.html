@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_layout">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261027_layout">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261027_layout">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_layout">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_tchlayout">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261027_tchlayout">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261027_tchlayout">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_tchlayout">
 </head>
 <body>
 
@@ -474,6 +474,14 @@
               </div>
               <div class="eval-search-box">
                 <input type="text" id="teacherEvalSearchInput" class="form-control eval-search-input" placeholder="🔍 Filtrar actividad o lección..." oninput="applyTeacherEvalFilter()">
+              </div>
+              <div class="eval-layout-toggle-group" id="teacherLayoutToggleGroup" aria-label="Distribución de vista docente">
+                <button type="button" class="layout-toggle-btn active" data-tlayout="list" onclick="setTeacherLayoutMode('list')" title="Planilla Rápida / Récord continuo (Sin tarjetas anidadas)">
+                  📄 Planilla Rápida
+                </button>
+                <button type="button" class="layout-toggle-btn" data-tlayout="grid" onclick="setTeacherLayoutMode('grid')" title="Vista Tarjetas">
+                  🗂️ Tarjetas
+                </button>
               </div>
             </div>
 
@@ -969,8 +977,8 @@
   <!-- 2. Cliente de Supabase -->
   <script src="assets/js/supabaseClient.js?v=20261027"></script>
   <!-- 3. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261027_layout"></script>
+  <script src="assets/js/onlineClasses.js?v=20261027_tchlayout"></script>
   <!-- 4. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261027_layout"></script>
+  <script src="assets/js/platform.js?v=20261027_tchlayout"></script>
 </body>
 </html>

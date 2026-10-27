@@ -960,21 +960,40 @@
   filter: brightness(1.08);
 }
 
-/* Barra de métricas del profesor */
+/* Barra Resumen de Métricas del Profesor (Plana y Unificada) */
 .teacher-metrics-bar {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  background: rgba(11, 23, 48, 0.75);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px 20px;
   margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 768px) {
+  .teacher-metrics-bar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
 }
 
 .metric-pill {
-  background: rgba(11, 23, 48, 0.75);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--color-border-subtle);
+  border-radius: 0;
+  padding: 0 0 0 16px;
   display: flex;
   flex-direction: column;
+  gap: 2px;
+}
+
+.metric-pill:first-child {
+  border-left: none;
+  padding-left: 0;
 }
 
 .metric-number {
@@ -1750,5 +1769,153 @@
     gap: 10px;
     border-top: 1px dashed rgba(148, 163, 184, 0.1);
     padding-top: 8px;
+  }
+}
+
+/* ==========================================================================
+   Planilla Rápida de Calificaciones Docente (Fila Continua / Cero Tarjetas Anidadas)
+   ========================================================================== */
+.teacher-stage-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.grade-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: 0;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.grade-row-item:last-child {
+  border-bottom: none;
+}
+
+.grade-row-item:hover {
+  background: rgba(148, 163, 184, 0.05);
+}
+
+.grade-row-item.graded {
+  background: rgba(16, 185, 129, 0.02);
+}
+
+.grade-row-item.graded:hover {
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.grade-row-item.modified {
+  background: rgba(245, 158, 11, 0.06) !important;
+  box-shadow: inset 3px 0 0 #f59e0b;
+}
+
+.grade-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.grade-row-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #f8fafc;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grade-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.grade-row-input-wrap {
+  width: 110px;
+  position: relative;
+}
+
+.grade-row-input-wrap input {
+  padding: 6px 42px 6px 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  height: 34px !important;
+  background: rgba(6, 14, 30, 0.85) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+}
+
+.grade-row-shortcuts {
+  display: flex;
+  gap: 3px;
+  margin-top: 0 !important;
+}
+
+.grade-row-shortcuts .btn-quick-tag {
+  padding: 4px 7px;
+  font-size: 11px;
+  min-width: 28px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-row-save {
+  margin-top: 0 !important;
+  width: 34px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 13px !important;
+  border-radius: 6px !important;
+  flex-shrink: 0;
+}
+
+.grade-row-status {
+  min-width: 95px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .grade-row-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+  .grade-row-meta {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .grade-row-title {
+    white-space: normal;
+    width: 100%;
+  }
+  .grade-row-controls {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-top: 1px dashed rgba(148, 163, 184, 0.1);
+    padding-top: 6px !important;
   }
 }
