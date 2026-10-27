@@ -394,6 +394,12 @@
   border: 1px solid rgba(251, 207, 232, 0.4);
 }
 
+.badge-project {
+  background: rgba(16, 185, 129, 0.25);
+  color: #a7f3d0;
+  border: 1px solid rgba(167, 243, 208, 0.4);
+}
+
 /* ==========================================================================
    Módulos por Etapa y Tarjetas de Evaluaciones (Estudiante)
    ========================================================================== */
