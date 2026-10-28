@@ -49,22 +49,50 @@ body.landing-page {
   }
 }
 
+/* Sombra atmosférica superior sobre el hero (Degradado cinematográfico) */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 280px;
+  background: linear-gradient(180deg, rgba(2, 11, 30, 0.92) 0%, rgba(2, 11, 30, 0.55) 55%, rgba(2, 11, 30, 0) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* ==========================================================================
-   Cabecera y Navegación
+   Cabecera y Navegación Flotante con Sombra y Profundidad (Bespoke Glass Header)
    ========================================================================== */
 .header-nav {
   position: relative;
-  z-index: 10;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  padding: 10px 16px;
+  background: rgba(3, 16, 44, 0.76);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.65), 0 4px 14px rgba(0, 43, 118, 0.3), var(--inner-highlight);
+  transition: box-shadow var(--transition-normal), border-color var(--transition-fast);
+}
+
+@media (min-width: 768px) {
+  .header-nav {
+    padding: 12px 28px;
+    border-radius: var(--radius-2xl);
+  }
 }
 
 .desktop-nav {
   display: none;
   align-items: center;
-  gap: 32px;
+  gap: 20px;
 }
 
 @media (min-width: 768px) {
@@ -73,33 +101,82 @@ body.landing-page {
   }
 }
 
+@media (min-width: 1024px) {
+  .desktop-nav {
+    gap: 28px;
+  }
+}
+
 .nav-link {
+  font-family: var(--font-body);
   font-weight: 600;
-  font-size: 15px;
-  color: var(--color-white);
+  font-size: 14px;
+  color: #f8fafc;
   text-decoration: none;
-  text-shadow: var(--shadow-sm);
-  transition: opacity var(--transition-fast);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
 }
 
 .nav-link:hover,
 .nav-link:focus-visible {
-  opacity: 0.8;
+  color: #ffffff;
+  background-color: rgba(112, 166, 255, 0.14);
+}
+
+.nav-link:active {
+  transform: scale(0.96);
+}
+
+/* Botón de Acción Principal en la Cabecera (Rayo Mandarina de Living English) */
+.header-nav .btn-talk {
+  background-color: var(--accent-orange);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--inner-highlight), 0 3px 12px rgba(248, 120, 0, 0.38);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.header-nav .btn-talk:hover:not(:disabled) {
+  background-color: var(--accent-orange-hover);
+  box-shadow: var(--inner-highlight), 0 4px 18px rgba(248, 120, 0, 0.5);
+  transform: translateY(-1px);
+}
+
+.header-nav .btn-talk:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 /* ==========================================================================
    Menú Móvil
    ========================================================================== */
 .mobile-menu-btn {
-  display: flex;
-  background: none;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(112, 166, 255, 0.14);
+  border: 1px solid var(--color-border);
   color: var(--color-white);
+  font-family: var(--font-body);
   font-weight: 600;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
-  padding: 8px 0;
-  text-shadow: var(--text-shadow-subtle);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(112, 166, 255, 0.25);
+}
+
+.mobile-menu-btn:active {
+  transform: scale(0.96);
 }
 
 @media (min-width: 768px) {
