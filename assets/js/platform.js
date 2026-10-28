@@ -926,9 +926,6 @@ function renderStudentEvaluations() {
   if (stCountGraded) stCountGraded.innerText = gradedItemsCount;
   if (stCountPending) stCountPending.innerText = pendingItemsCount;
 
-  // Sincronizar botones de modo de vista (Lista / Tarjetas)
-  const layoutBtns = document.querySelectorAll('#studentLayoutToggleGroup .layout-toggle-btn');
-  layoutBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-layout') === studentLayoutMode));
 
   let visibleCardsCount = 0;
 
@@ -990,9 +987,8 @@ function renderStudentEvaluations() {
       </div>
     `;
 
-    const isListMode = studentLayoutMode === 'list';
-    const contentContainer = document.createElement('div');
-    contentContainer.className = isListMode ? 'eval-items-list' : 'units-grid';
+    const grid = document.createElement('div');
+    grid.className = 'units-grid';
 
     filteredItems.forEach(item => {
       visibleCardsCount++;
@@ -1013,64 +1009,36 @@ function renderStudentEvaluations() {
         ? '<span class="expiry-chip chip-active">● Calificada</span>'
         : '<span class="expiry-chip chip-none">○ Pendiente</span>';
 
-      if (isListMode) {
-        // Fila limpia de récord académico (cero tarjetas anidadas)
-        const row = document.createElement('div');
-        row.className = `eval-row-item ${hasScore ? 'row-graded' : 'row-pending'}`;
-        row.innerHTML = `
-          <div class="eval-row-left">
-            <span class="eval-row-number">#${numFormatted}</span>
-            <span class="eval-row-lesson">📘 ${item.lesson}</span>
+      // Tarjeta plana del estudiante (sin exam-badge interna)
+      const card = document.createElement('div');
+      card.className = `unit-card ${hasScore ? 'unit-card-graded' : 'unit-card-pending'}`;
+      card.innerHTML = `
+        <div>
+          <div class="unit-card-top">
+            <div class="unit-meta-pills">
+              <span class="unit-num-pill">#${numFormatted}</span>
+              <span class="unit-lesson-pill">📘 ${item.lesson}</span>
+            </div>
             <span class="eval-badge-type ${typeBadgeClass}">${typeIcon} ${item.type}</span>
-            <div class="eval-row-title" title="${item.title}">${item.title}</div>
           </div>
-          <div class="eval-row-right">
-            ${hasScore && !config.isKids ? `
-              <div class="eval-row-mini-bar" title="${itemPct}%">
-                <div class="eval-row-mini-fill" style="width: ${itemPct}%;"></div>
-              </div>
-            ` : ''}
-            <div class="eval-row-score">
-              ${scoreHtml}
+          <div class="unit-title">${item.title}</div>
+        </div>
+        <div class="unit-card-footer">
+          ${hasScore && !config.isKids ? `
+            <div class="unit-item-bar-track">
+              <div class="unit-item-bar-fill" style="width: ${itemPct}%;"></div>
             </div>
-            <div class="eval-row-status">
-              ${statusChip}
-            </div>
+          ` : ''}
+          <div class="unit-card-footer-row">
+            <div class="unit-card-score">${scoreHtml}</div>
+            <div class="unit-card-status">${statusChip}</div>
           </div>
-        `;
-        contentContainer.appendChild(row);
-      } else {
-        // Tarjeta plana individual (sin exam-badge interna)
-        const card = document.createElement('div');
-        card.className = `unit-card ${hasScore ? 'unit-card-graded' : 'unit-card-pending'}`;
-        card.innerHTML = `
-          <div>
-            <div class="unit-card-top">
-              <div class="unit-meta-pills">
-                <span class="unit-num-pill">#${numFormatted}</span>
-                <span class="unit-lesson-pill">📘 ${item.lesson}</span>
-              </div>
-              <span class="eval-badge-type ${typeBadgeClass}">${typeIcon} ${item.type}</span>
-            </div>
-            <div class="unit-title">${item.title}</div>
-          </div>
-          <div class="unit-card-bottom">
-            ${hasScore && !config.isKids ? `
-              <div class="unit-item-bar-track">
-                <div class="unit-item-bar-fill" style="width: ${itemPct}%;"></div>
-              </div>
-            ` : ''}
-            <div class="unit-card-footer-flat">
-              <div class="unit-score-text">${scoreHtml}</div>
-              <div class="unit-status-chip">${statusChip}</div>
-            </div>
-          </div>
-        `;
-        contentContainer.appendChild(card);
-      }
+        </div>
+      `;
+      grid.appendChild(card);
     });
 
-    section.appendChild(contentContainer);
+    section.appendChild(grid);
     container.appendChild(section);
   });
 
@@ -1473,11 +1441,6 @@ function renderTeacherCurriculumGrades(config) {
   if (!grid) return;
   grid.innerHTML = '';
 
-  // Sincronizar botones de modo de vista del docente
-  const layoutBtns = document.querySelectorAll('#teacherLayoutToggleGroup .layout-toggle-btn');
-  layoutBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-tlayout') === teacherLayoutMode));
-
-  const isListMode = teacherLayoutMode === 'list';
   let totalPts = 0;
 
   config.stages.forEach((stage, stageIdx) => {
@@ -1516,10 +1479,10 @@ function renderTeacherCurriculumGrades(config) {
           </div>
         </div>
       </div>
-      <div class="${isListMode ? 'teacher-stage-rows' : 'teacher-stage-grid'}" id="stage_grid_${stageIdx}"></div>
+      <div class="teacher-stage-grid" id="stage_grid_${stageIdx}"></div>
     `;
 
-    const stageContainer = stageBlock.querySelector(`#stage_grid_${stageIdx}`);
+    const stageGrid = stageBlock.querySelector(`#stage_grid_${stageIdx}`);
 
     stage.items.forEach(item => {
       const currentPts = selectedStudentGrades[item.number] !== undefined ? selectedStudentGrades[item.number] : '';
@@ -1533,83 +1496,38 @@ function renderTeacherCurriculumGrades(config) {
         .replace(/&/g, '&amp;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
-      const halfPts = Math.round((item.maxPoints / 2) * 10) / 10;
 
+      // Tarjeta plana del docente (el docente escribe directamente la nota; sin botones 100, 50, 0, X ni cajitas anidadas)
       const box = document.createElement('div');
-      box.className = `grade-input-box ${isListMode ? 'grade-row-item' : ''} ${hasScore ? 'graded' : ''}`;
+      box.className = `grade-input-box ${hasScore ? 'graded' : ''}`;
       box.id = `box_grade_${item.number}`;
       box.setAttribute('data-search-text', `#${item.number} ${item.lesson} ${safeAttrTitle} ${item.type}`);
-
-      if (isListMode) {
-        // MODO PLANILLA RÁPIDA (Fila continua, cero tarjetas anidadas)
-        box.innerHTML = `
-          <div class="grade-row-meta">
-            <span class="unit-num-pill">#${numFormatted}</span>
-            <span class="unit-lesson-pill">${item.lesson}</span>
+      box.innerHTML = `
+        <div>
+          <div class="grade-box-top-row">
+            <div class="unit-meta-pills">
+              <span class="unit-num-pill">#${numFormatted}</span>
+              <span class="unit-lesson-pill">${item.lesson}</span>
+            </div>
             <span class="eval-badge-type ${typeBadgeClass}">${typeIcon} ${item.type}</span>
-            <div class="grade-row-title" title="${safeAttrTitle}">${item.title}</div>
+          </div>
+          <div class="grade-input-box-title" title="${safeAttrTitle}">${item.title}</div>
+        </div>
+
+        <div class="grade-card-footer">
+          <div class="grade-status-row">
+            <span class="grade-state-indicator" id="grade_state_${item.number}">
+              ${hasScore ? '✅ Calificada' : '⏳ Sin calificar'}
+            </span>
+            <span class="grade-max-hint">Máx: ${item.maxPoints} pts</span>
           </div>
 
-          <div class="grade-row-controls">
-            <div class="grade-input-wrapper grade-row-input-wrap">
-              <input type="number" step="0.5" min="0" max="${item.maxPoints}" 
-                     id="grade_input_${item.number}" 
-                     value="${currentPts}" 
-                     placeholder="0"
-                     data-item-number="${item.number}"
-                     data-item-title="${safeAttrTitle}"
-                     data-item-type="${item.type}"
-                     data-max-points="${item.maxPoints}"
-                     data-initial-val="${currentPts}"
-                     oninput="handleGradeInputChange(${item.number}, ${item.maxPoints})">
-              <span class="grade-input-suffix">/ ${item.maxPoints}</span>
-            </div>
-
-            <div class="grade-shortcuts grade-row-shortcuts">
-              <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, ${item.maxPoints})" title="Puntaje Máximo (${item.maxPoints} pts)">💯</button>
-              ${item.maxPoints > 1 ? `<button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, ${halfPts})" title="50% (${halfPts} pts)">½</button>` : ''}
-              <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, 0)" title="0 puntos">0</button>
-              <button type="button" class="btn-quick-tag btn-quick-clear" onclick="quickSetGrade(${item.number}, '')" title="Borrar nota">✕</button>
-            </div>
-
-            <button type="button" class="btn-save-grade btn-row-save" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${teacherActiveGradingLevel}', ${item.number})" title="Guardar nota de esta evaluación">
-              💾
-            </button>
-
-            <div class="grade-row-status">
-              <span class="grade-state-indicator" id="grade_state_${item.number}">
-                ${hasScore ? '✅ Calificada' : '⏳ Pendiente'}
-              </span>
-            </div>
-          </div>
-        `;
-      } else {
-        // MODO TARJETAS PLANAS (Sin cajitas anidadas internas)
-        box.innerHTML = `
-          <div>
-            <div class="grade-box-top-row">
-              <div class="unit-meta-pills">
-                <span class="unit-num-pill">#${numFormatted}</span>
-                <span class="unit-lesson-pill">${item.lesson}</span>
-              </div>
-              <span class="eval-badge-type ${typeBadgeClass}">${typeIcon} ${item.type}</span>
-            </div>
-            <div class="grade-input-box-title" title="${safeAttrTitle}">${item.title}</div>
-          </div>
-
-          <div class="grade-box-controls">
-            <div class="grade-status-row">
-              <span class="grade-state-indicator" id="grade_state_${item.number}">
-                ${hasScore ? '✅ Calificada' : '⏳ Sin calificar'}
-              </span>
-              <span class="grade-max-hint">Máx: ${item.maxPoints} pts</span>
-            </div>
-
+          <div class="grade-input-action-row">
             <div class="grade-input-wrapper">
               <input type="number" step="0.5" min="0" max="${item.maxPoints}" 
                      id="grade_input_${item.number}" 
                      value="${currentPts}" 
-                     placeholder="Ingresa nota (0 - ${item.maxPoints})"
+                     placeholder="Escribir nota..."
                      data-item-number="${item.number}"
                      data-item-title="${safeAttrTitle}"
                      data-item-type="${item.type}"
@@ -1619,21 +1537,14 @@ function renderTeacherCurriculumGrades(config) {
               <span class="grade-input-suffix">/ ${item.maxPoints}</span>
             </div>
 
-            <div class="grade-shortcuts">
-              <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, ${item.maxPoints})" title="Asignar puntaje máximo (${item.maxPoints} pts)">💯 Máx (${item.maxPoints})</button>
-              ${item.maxPoints > 1 ? `<button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, ${halfPts})" title="Asignar 50% (${halfPts} pts)">50% (${halfPts})</button>` : ''}
-              <button type="button" class="btn-quick-tag" onclick="quickSetGrade(${item.number}, 0)" title="Asignar 0 puntos">0</button>
-              <button type="button" class="btn-quick-tag btn-quick-clear" onclick="quickSetGrade(${item.number}, '')" title="Limpiar calificación">🗑️</button>
-            </div>
-
-            <button type="button" class="btn-save-grade" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${teacherActiveGradingLevel}', ${item.number})">
-              💾 Guardar nota
+            <button type="button" class="btn-save-grade-compact" id="btn_save_${item.number}" onclick="saveGrade('${selectedStudent.id}', '${teacherActiveGradingLevel}', ${item.number})" title="Guardar nota">
+              💾 Guardar
             </button>
           </div>
-        `;
-      }
+        </div>
+      `;
 
-      stageContainer.appendChild(box);
+      stageGrid.appendChild(box);
     });
 
     grid.appendChild(stageBlock);

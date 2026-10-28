@@ -1919,3 +1919,86 @@
     padding-top: 6px !important;
   }
 }
+
+/* ==========================================================================
+   Tarjetas Planas Sin Anidación (Estudiante y Docente)
+   ========================================================================== */
+.unit-card-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.unit-card-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.unit-card-score {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.unit-card-score .score-val {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.unit-card-score .score-denom {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+.grade-card-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.grade-input-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.grade-input-action-row .grade-input-wrapper {
+  flex: 1;
+}
+
+.grade-input-action-row .grade-input-wrapper input {
+  padding: 8px 48px 8px 12px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.btn-save-grade-compact {
+  padding: 8px 14px;
+  background: #10b981;
+  color: #042f2e;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: transform var(--duration-fast) var(--ease-out), filter var(--duration-fast) var(--ease-out);
+}
+
+.btn-save-grade-compact:hover {
+  filter: brightness(1.08);
+}
+
+.btn-save-grade-compact:active {
+  transform: scale(0.96);
+}
+
+.grade-input-box.modified .btn-save-grade-compact {
+  background: #f59e0b;
+  color: #0f172a;
+}
