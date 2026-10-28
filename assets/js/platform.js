@@ -357,16 +357,6 @@ function showToast(message, type = 'info', duration = 3500) {
 // ==============================================================================
 function switchRole(role) {
   currentRole = role;
-  const tabStudent = document.getElementById('tabStudent');
-  const tabTeacher = document.getElementById('tabTeacher');
-  const btnAuth = document.getElementById('btnAuthAction');
-
-  if (tabStudent) tabStudent.classList.toggle('active', role === 'estudiante');
-  if (tabTeacher) tabTeacher.classList.toggle('active', role === 'profesor');
-
-  if (btnAuth) {
-    btnAuth.innerText = role === 'estudiante' ? 'Ingresar como Estudiante' : 'Ingresar como Profesor';
-  }
 }
 
 // Helper para obtener el cliente oficial de Supabase
@@ -621,21 +611,26 @@ async function initAuthenticatedUser(user) {
 
   currentUserProfile = profile;
 
-  // Interfaz de Usuario
+  // Interfaz de Usuario con Detección Automática de Rol (Estudiante o Profesor)
   document.getElementById('authSection').classList.add('hidden');
   const userBadge = document.getElementById('userBadge');
   const userNameElem = document.getElementById('userName');
 
-  userBadge.classList.remove('hidden');
-  userNameElem.innerText = `${profile.role === 'profesor' ? 'Prof.' : 'Est.'} ${profile.full_name}`;
+  const isTeacher = profile.role === 'profesor' || profile.role === 'teacher' || profile.role === 'admin';
+  currentRole = isTeacher ? 'profesor' : 'estudiante';
 
-  if (profile.role === 'profesor') {
+  userBadge.classList.remove('hidden');
+  userNameElem.innerText = `${isTeacher ? 'Prof.' : 'Est.'} ${profile.full_name}`;
+
+  if (isTeacher) {
+    // Ingreso directo como Profesor: accede al panel docente exclusivo
     document.getElementById('teacherDashboard').classList.remove('hidden');
     document.getElementById('studentDashboard').classList.add('hidden');
     switchTeacherTab('students');
     await loadTeacherStudents();
     updateTeacherClassesBadge();
   } else {
+    // Ingreso directo como Estudiante: accede únicamente a su portal de estudio y notas
     document.getElementById('studentDashboard').classList.remove('hidden');
     document.getElementById('teacherDashboard').classList.add('hidden');
     setupStudentView();

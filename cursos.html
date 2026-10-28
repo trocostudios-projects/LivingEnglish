@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_brand">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261027_brand">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261027_brand">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_brand">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_autorole">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261027_autorole">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261027_autorole">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_autorole">
 </head>
 <body>
 
@@ -36,17 +36,12 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-container">
 
-      <!-- 1. FORMULARIO DE ACCESO EXCLUSIVO (LOGIN INSTITUCIONAL) -->
+      <!-- 1. FORMULARIO DE ACCESO EXCLUSIVO (LOGIN INSTITUCIONAL AUTOMÁTICO) -->
       <section id="authSection" class="auth-card">
-        <h2 class="page-title text-center" style="font-size: 28px;">Portal Estudiantil</h2>
-        <p class="page-description text-center" style="font-size: 14px; margin-bottom: 20px;">
-          Ingresa con tu correo institucional y contraseña
+        <h2 class="page-title text-center" style="font-size: 28px;">Portal Institucional</h2>
+        <p class="page-description text-center" style="font-size: 14px; margin-bottom: 22px;">
+          Ingresa con tus credenciales de estudiante o profesor
         </p>
-
-        <div class="role-tabs">
-          <button class="role-tab active" id="tabStudent" onclick="switchRole('estudiante')">Estudiante</button>
-          <button class="role-tab" id="tabTeacher" onclick="switchRole('profesor')">Profesor</button>
-        </div>
 
         <form id="authForm" onsubmit="handleAuthSubmit(event)">
           <div class="form-group">
@@ -59,7 +54,7 @@
             <input type="password" id="loginPass" class="form-control" placeholder="••••••••" required autocomplete="current-password">
           </div>
 
-          <button type="submit" class="btn-primary" id="btnAuthAction">Ingresar como Estudiante</button>
+          <button type="submit" class="btn-primary" id="btnAuthAction" style="width: 100%; padding: 12px 24px; font-size: 14px; font-weight: 700;">Iniciar Sesión</button>
 
           <div style="margin-top: 18px; text-align: center; font-size: 13px;">
             <a href="recuperar.html" style="color: var(--color-primary-light); text-decoration: underline;">
@@ -963,8 +958,8 @@
   <!-- 2. Cliente de Supabase -->
   <script src="assets/js/supabaseClient.js?v=20261027"></script>
   <!-- 3. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261027_brand"></script>
+  <script src="assets/js/onlineClasses.js?v=20261027_autorole"></script>
   <!-- 4. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261027_brand"></script>
+  <script src="assets/js/platform.js?v=20261027_autorole"></script>
 </body>
 </html>
