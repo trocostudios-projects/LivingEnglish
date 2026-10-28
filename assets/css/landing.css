@@ -24,11 +24,11 @@ body.landing-page {
 .hero-section {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: calc(100vh - 84px);
+  min-height: calc(100dvh - 84px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 24px;
   padding-bottom: clamp(40px, 8vh, 64px);
   overflow: hidden;
@@ -50,58 +50,49 @@ body.landing-page {
 }
 
 /* ==========================================================================
-   Cabecera de Cristal Transparente Definido (Pure Glass Header)
+   Cabecera Institucional Fija (Siempre visible al desplazar con bisel inferior)
    ========================================================================== */
-.header-nav {
-  position: relative;
-  z-index: 20;
+.site-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background: rgba(3, 16, 44, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 12px 24px;
+  
+  /* Pequeño bisel inferior para diferenciar claramente del body */
+  border-bottom: 1px solid rgba(112, 166, 255, 0.22);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+@media (min-width: 768px) {
+  .site-header {
+    padding: 14px 48px;
+  }
+}
+
+.site-header-inner {
+  max-width: 1240px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 10px 18px;
-  
-  /* Cristal puro transparente: sin sombras oscuras ni fondos pesados */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.04) 100%
-  );
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  
-  /* Borde de cristal nítido que delimita claramente el header */
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-top: 1px solid rgba(255, 255, 255, 0.50);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: var(--radius-pill);
-  
-  /* Resplandor interior especular sin sombras oscuras proyectadas */
-  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.40);
-  transition: border-color var(--transition-fast), background var(--transition-normal);
-}
-
-@media (min-width: 768px) {
-  .header-nav {
-    padding: 12px 30px;
-  }
 }
 
 .desktop-nav {
   display: none;
   align-items: center;
-  gap: 16px;
+  gap: 28px;
 }
 
 @media (min-width: 768px) {
   .desktop-nav {
     display: flex;
-  }
-}
-
-@media (min-width: 1024px) {
-  .desktop-nav {
-    gap: 24px;
   }
 }
 
@@ -111,85 +102,73 @@ body.landing-page {
   font-size: 14px;
   color: #f8fafc;
   text-decoration: none;
-  padding: 8px 14px;
-  border-radius: var(--radius-pill);
-  border: 1px solid transparent;
-  transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
   display: inline-flex;
   align-items: center;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .nav-link:hover,
 .nav-link:focus-visible {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  background-color: rgba(112, 166, 255, 0.12);
 }
 
 .nav-link:active {
   transform: scale(0.96);
 }
 
-/* Botón de Acción Cristalino Living English (Joya Mandarina Energética) */
-.header-nav .btn-talk {
-  background: linear-gradient(135deg, #ff8c1a 0%, #f87800 100%);
+/* Botón de Acción en Cabecera (Rayo Mandarina de Living English) */
+.site-header .btn-talk {
+  background-color: var(--accent-orange);
   color: #ffffff;
+  font-family: var(--font-body);
   font-weight: 700;
-  padding: 10px 22px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-top: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 
-    inset 0 1px 1px rgba(255, 255, 255, 0.55),
-    0 2px 8px rgba(248, 120, 0, 0.3);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-  transition: transform var(--duration-fast) var(--ease-out), filter var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  font-size: 13px;
+  padding: 9px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  box-shadow: var(--inner-highlight);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
 }
 
-.header-nav .btn-talk:hover:not(:disabled) {
-  filter: brightness(1.08);
-  box-shadow: 
-    inset 0 1px 1px rgba(255, 255, 255, 0.65),
-    0 4px 12px rgba(248, 120, 0, 0.4);
+.site-header .btn-talk:hover:not(:disabled) {
+  background-color: var(--accent-orange-hover);
   transform: translateY(-1px);
 }
 
-.header-nav .btn-talk:active:not(:disabled) {
+.site-header .btn-talk:active:not(:disabled) {
   transform: scale(0.96);
 }
 
-/* ==========================================================================
-   Menú Móvil Cristalino
-   ========================================================================== */
+/* Menú Móvil */
 .mobile-menu-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-top: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  background: rgba(112, 166, 255, 0.12);
+  border: 1px solid var(--color-border);
   color: var(--color-white);
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  padding: 8px 18px;
-  border-radius: var(--radius-pill);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  padding: 7px 16px;
+  border-radius: var(--radius-md);
   transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
 }
 
 .mobile-menu-btn:hover {
-  background: rgba(112, 166, 255, 0.25);
+  background: rgba(112, 166, 255, 0.22);
 }
 
 .mobile-menu-btn:active {
   transform: scale(0.96);
 }
+
+
 
 @media (min-width: 768px) {
   .mobile-menu-btn {

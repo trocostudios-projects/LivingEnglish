@@ -11,17 +11,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_glass_clean">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261027_glass_clean">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261027_glass_clean">
-  <link rel="stylesheet" href="assets/css/landing.css?v=20261027_glass_clean">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_sticky_bevel">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261027_sticky_bevel">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261027_sticky_bevel">
+  <link rel="stylesheet" href="assets/css/landing.css?v=20261027_sticky_bevel">
 </head>
 <body class="landing-page">
 
-  <!-- HERO SECTION PRINCIPAL -->
-  <section class="hero-section">
-    <!-- CABECERA CON EL LOGO REAL DE LA ACADEMIA -->
-    <header class="header-nav">
+  <!-- CABECERA INSTITUCIONAL FIJA (SIEMPRE VISIBLE AL DESPLAZAR CON BISEL INFERIOR) -->
+  <header class="site-header" id="siteHeader">
+    <div class="site-header-inner">
       <a href="index.html" class="brand-logo-link" aria-label="Academia Living English">
         <img src="assets/img/logo.png" alt="Academia Living English Logo" class="brand-logo-img">
       </a>
@@ -39,7 +38,11 @@
       <button class="mobile-menu-btn" id="openMenuBtn" aria-label="Abrir menú de navegación">
         Menú
       </button>
-    </header>
+    </div>
+  </header>
+
+  <!-- HERO SECTION PRINCIPAL -->
+  <section class="hero-section">
 
     <!-- CONTENIDO HERO -->
     <div class="hero-content">
