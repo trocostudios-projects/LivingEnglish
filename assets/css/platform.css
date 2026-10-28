@@ -15,7 +15,7 @@
   flex-direction: column;
 
   /* Fondo sobrio, profundo y refinado (Oxford Navy a Midnight Slate) */
-  background: linear-gradient(rgba(7, 14, 30, 0.88), rgba(4, 10, 24, 0.94)), var(--bg-hero-desktop);
+  background: linear-gradient(rgba(2, 11, 30, 0.90), rgba(1, 7, 22, 0.96)), var(--bg-hero-desktop);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -25,7 +25,7 @@
 
 @media (max-width: 767px) {
   .app-viewport {
-    background: linear-gradient(rgba(7, 14, 30, 0.90), rgba(4, 10, 24, 0.96)), var(--bg-hero-mobile);
+    background: linear-gradient(rgba(2, 11, 30, 0.92), rgba(1, 7, 22, 0.97)), var(--bg-hero-mobile);
     background-size: cover;
     background-position: center top;
     background-attachment: fixed;
@@ -37,7 +37,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(9, 20, 44, 0.85);
+  background: rgba(3, 16, 44, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border);
@@ -76,7 +76,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(13, 27, 56, 0.85);
+  background: rgba(5, 24, 66, 0.85);
   padding: 6px 14px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
@@ -127,7 +127,7 @@
 .auth-card {
   max-width: 440px;
   margin: 40px auto;
-  background: rgba(11, 23, 48, 0.9);
+  background: rgba(4, 20, 52, 0.9);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-2xl);
   padding: 36px 32px;
@@ -138,7 +138,7 @@
 
 .role-tabs {
   display: flex;
-  background: rgba(6, 14, 30, 0.6);
+  background: rgba(2, 14, 38, 0.65);
   border-radius: var(--radius-lg);
   padding: 4px;
   margin-bottom: 24px;
@@ -165,7 +165,7 @@
 }
 
 .role-tab.active {
-  background: #1d4ed8;
+  background: var(--accent-cobalt);
   color: #ffffff;
   border: 1px solid rgba(147, 197, 253, 0.35);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
@@ -175,7 +175,7 @@
    Panel de Resumen de Progreso y Puntos (Student Progress Scorecard)
    ========================================================================== */
 .progress-summary-card {
-  background: rgba(13, 27, 56, 0.78);
+  background: rgba(5, 24, 66, 0.78);
   border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 24px 28px;
@@ -221,7 +221,7 @@
 }
 
 .progress-pct-pill {
-  background: rgba(37, 99, 235, 0.16);
+  background: rgba(0, 96, 248, 0.18);
   border: 1px solid rgba(96, 165, 250, 0.3);
   color: #bfdbfe;
   font-size: 12px;
@@ -249,7 +249,7 @@
 .progress-bar-bg {
   width: 100%;
   height: 8px;
-  background: rgba(6, 14, 30, 0.7);
+  background: rgba(2, 14, 38, 0.75);
   border-radius: var(--radius-pill);
   overflow: hidden;
   border: 1px solid var(--color-border-subtle);
@@ -258,7 +258,7 @@
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #2563eb, #10b981);
+  background: linear-gradient(90deg, var(--accent-cobalt), var(--accent-orange) 65%, var(--color-success) 100%);
   border-radius: var(--radius-pill);
   will-change: width;
   transition: width 350ms var(--ease-out);
@@ -326,7 +326,7 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  background: rgba(11, 23, 48, 0.75);
+  background: rgba(4, 20, 52, 0.76);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 10px 14px;
@@ -364,14 +364,14 @@
 }
 
 .eval-filter-btn.active {
-  background: #1d4ed8;
+  background: var(--accent-cobalt);
   color: #ffffff;
   border-color: rgba(147, 197, 253, 0.4);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .filter-count-badge {
-  background: rgba(6, 14, 30, 0.6);
+  background: rgba(2, 14, 38, 0.65);
   color: #cbd5e1;
   font-size: 11px;
   padding: 1px 6px;
@@ -409,15 +409,15 @@
 }
 
 .badge-written {
-  background: rgba(37, 99, 235, 0.15);
+  background: rgba(0, 96, 248, 0.15);
   color: #93c5fd;
-  border: 1px solid rgba(96, 165, 250, 0.3);
+  border: 1px solid rgba(112, 166, 255, 0.3);
 }
 
 .badge-oral {
-  background: rgba(217, 119, 6, 0.16);
-  color: #fcd34d;
-  border: 1px solid rgba(251, 191, 36, 0.3);
+  background: rgba(248, 120, 0, 0.16);
+  color: #fdba74;
+  border: 1px solid rgba(248, 120, 0, 0.35);
 }
 
 .badge-formative {
@@ -427,9 +427,9 @@
 }
 
 .badge-kids {
-  background: rgba(219, 39, 119, 0.16);
-  color: #f472b6;
-  border: 1px solid rgba(244, 114, 182, 0.3);
+  background: rgba(104, 200, 96, 0.16);
+  color: #86efac;
+  border: 1px solid rgba(104, 200, 96, 0.3);
 }
 
 .badge-project {
@@ -442,7 +442,7 @@
    Módulos por Etapa y Tarjetas de Evaluaciones (Estudiante)
    ========================================================================== */
 .student-stage-module {
-  background: rgba(11, 23, 48, 0.68);
+  background: rgba(4, 20, 52, 0.70);
   border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 20px;
@@ -469,7 +469,7 @@
 }
 
 .stage-step-badge {
-  background: rgba(37, 99, 235, 0.18);
+  background: rgba(0, 43, 118, 0.38);
   color: #93c5fd;
   font-size: 11px;
   font-weight: 700;
@@ -516,7 +516,7 @@
 .stage-mini-bar-track {
   width: 100%;
   height: 6px;
-  background: rgba(6, 14, 30, 0.7);
+  background: rgba(2, 14, 38, 0.75);
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--color-border-subtle);
@@ -537,7 +537,7 @@
 }
 
 .unit-card {
-  background: rgba(13, 27, 56, 0.7);
+  background: rgba(5, 24, 66, 0.72);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 16px;
@@ -554,7 +554,7 @@
 
 .unit-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(147, 197, 253, 0.45);
+  border-color: rgba(112, 166, 255, 0.48);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
 }
 
@@ -603,7 +603,7 @@
   font-size: 12px;
   font-weight: 700;
   color: #f8fafc;
-  background: rgba(37, 99, 235, 0.25);
+  background: rgba(0, 96, 248, 0.25);
   border: 1px solid rgba(96, 165, 250, 0.3);
   padding: 2px 7px;
   border-radius: 6px;
@@ -634,7 +634,7 @@
 .unit-item-bar-track {
   width: 100%;
   height: 4px;
-  background: rgba(6, 14, 30, 0.6);
+  background: rgba(2, 14, 38, 0.65);
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 8px;
@@ -708,7 +708,7 @@
 }
 
 .student-list {
-  background: rgba(11, 23, 48, 0.8);
+  background: rgba(4, 20, 52, 0.82);
   border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 16px;
@@ -727,7 +727,7 @@
   border-radius: 10px;
   cursor: pointer;
   margin-bottom: 8px;
-  background: rgba(6, 14, 30, 0.5);
+  background: rgba(2, 14, 38, 0.55);
   border: 1px solid var(--color-border-subtle);
   transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
@@ -739,8 +739,8 @@
 
 .student-item.active {
   border-color: rgba(96, 165, 250, 0.55);
-  background: rgba(29, 78, 216, 0.18);
-  box-shadow: inset 3px 0 0 #3b82f6;
+  background: rgba(0, 43, 118, 0.32);
+  box-shadow: inset 3px 0 0 var(--accent-orange);
 }
 
 .student-item-row {
@@ -785,7 +785,7 @@
 }
 
 .grade-editor {
-  background: rgba(11, 23, 48, 0.8);
+  background: rgba(4, 20, 52, 0.82);
   border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 22px;
@@ -794,7 +794,7 @@
 }
 
 .teacher-grade-summary-box {
-  background: rgba(6, 14, 30, 0.6);
+  background: rgba(2, 14, 38, 0.65);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 12px 16px;
@@ -848,7 +848,7 @@
 }
 
 .grade-input-box {
-  background: rgba(6, 14, 30, 0.6);
+  background: rgba(2, 14, 38, 0.65);
   border: 1px solid var(--color-border);
   border-radius: 10px;
   padding: 14px;
@@ -917,7 +917,7 @@
 
 .grade-input-box input {
   width: 100%;
-  background: rgba(6, 14, 30, 0.85);
+  background: rgba(2, 14, 38, 0.88);
   border: 1px solid var(--color-border);
   border-radius: 6px;
   color: var(--color-white);
@@ -929,8 +929,8 @@
 }
 
 .grade-input-box input:focus {
-  border-color: #60a5fa;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+  border-color: var(--accent-cobalt);
+  box-shadow: 0 0 0 2px rgba(0, 96, 248, 0.3);
 }
 
 .grade-input-suffix {
@@ -965,7 +965,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  background: rgba(11, 23, 48, 0.75);
+  background: rgba(4, 20, 52, 0.76);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 14px 20px;
@@ -1096,7 +1096,7 @@
 }
 
 .btn-sm-upgrade {
-  background: rgba(37, 99, 235, 0.18);
+  background: rgba(0, 43, 118, 0.38);
   border-color: rgba(96, 165, 250, 0.35);
   color: #bfdbfe;
   font-weight: 600;
@@ -1237,7 +1237,7 @@
 }
 
 .btn-quick-tag:hover {
-  background: rgba(37, 99, 235, 0.25);
+  background: rgba(0, 96, 248, 0.25);
   color: #ffffff;
 }
 
@@ -1297,7 +1297,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(6, 14, 30, 0.5);
+  background: rgba(2, 14, 38, 0.55);
   color: var(--color-muted);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-pill);
@@ -1317,15 +1317,15 @@
 }
 
 .student-tab-pill.active {
-  background: #1d4ed8;
+  background: var(--color-primary);
   color: #ffffff;
   border-color: rgba(147, 197, 253, 0.4);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .badge-pill-accent {
-  background: #f59e0b;
-  color: #042f2e;
+  background: var(--accent-orange);
+  color: #ffffff;
   font-size: 10px;
   font-weight: 800;
   padding: 2px 6px;
@@ -1338,7 +1338,7 @@
    Sección de Juegos Interactivos (Games Grid & Cards)
    ========================================================================== */
 .games-header-banner {
-  background: rgba(11, 23, 48, 0.75);
+  background: rgba(4, 20, 52, 0.76);
   border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 20px 24px;
@@ -1360,7 +1360,7 @@
 }
 
 .game-card {
-  background: rgba(13, 27, 56, 0.72);
+  background: rgba(5, 24, 66, 0.74);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 20px;
@@ -1400,9 +1400,9 @@
 }
 
 .tag-vocab {
-  background: rgba(37, 99, 235, 0.15);
+  background: rgba(0, 96, 248, 0.15);
   color: #93c5fd;
-  border: 1px solid rgba(96, 165, 250, 0.3);
+  border: 1px solid rgba(112, 166, 255, 0.3);
 }
 
 .tag-grammar {
@@ -1439,7 +1439,7 @@
   font-size: 11px;
   font-weight: 700;
   color: #fbbf24;
-  background: rgba(6, 14, 30, 0.5);
+  background: rgba(2, 14, 38, 0.55);
   padding: 2px 8px;
   border-radius: var(--radius-pill);
   border: 1px solid rgba(251, 191, 36, 0.25);
@@ -1563,7 +1563,7 @@
 .eval-layout-toggle-group {
   display: inline-flex;
   align-items: center;
-  background: rgba(6, 14, 30, 0.6);
+  background: rgba(2, 14, 38, 0.65);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-pill);
   padding: 3px;
@@ -1689,7 +1689,7 @@
 .eval-row-mini-bar {
   width: 60px;
   height: 4px;
-  background: rgba(6, 14, 30, 0.7);
+  background: rgba(2, 14, 38, 0.75);
   border-radius: 6px;
   overflow: hidden;
   border: 1px solid var(--color-border-subtle);

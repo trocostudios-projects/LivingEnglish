@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_cards">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261027_cards">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261027_cards">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_cards">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_brand">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261027_brand">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261027_brand">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_brand">
 </head>
 <body>
 
@@ -346,7 +346,7 @@
               <h1 class="page-title" style="margin-bottom: 4px;">Panel de Profesores & Calificaciones</h1>
               <p class="page-description" style="margin-bottom: 0;">Gestiona evaluaciones oficiales, progreso y caducidad de matrículas.</p>
             </div>
-            <button class="btn-primary" onclick="toggleNewStudentModal(true)" style="width: auto; padding: 12px 22px; font-size: 14px; background: #2563eb;">
+            <button class="btn-primary" onclick="toggleNewStudentModal(true)" style="width: auto; padding: 12px 22px; font-size: 14px; background: var(--accent-cobalt);">
               ➕ Registrar Nuevo Estudiante
             </button>
           </div>
@@ -499,7 +499,7 @@
               <span>🌐 Ver Portal Público de Clases</span>
               <span>↗</span>
             </a>
-            <button class="btn-primary" onclick="openPublishClassModal()" style="width: auto; padding: 12px 22px; font-size: 14px; background: #2563eb;">
+            <button class="btn-primary" onclick="openPublishClassModal()" style="width: auto; padding: 12px 22px; font-size: 14px; background: var(--accent-cobalt);">
               ➕ Publicar Nueva Clase Online
             </button>
           </div>
@@ -537,7 +537,7 @@
 
   <!-- MODAL PARA QUE EL DOCENTE REGISTRE NUEVOS ESTUDIANTES (COMPACTO) -->
   <div id="newStudentModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
-    <div class="auth-card" style="max-width: 520px; width: 100%; margin: auto; background: #0e387a; border: 1px solid rgba(255,255,255,0.4); padding: 22px;">
+    <div class="auth-card" style="max-width: 520px; width: 100%; margin: auto; background: var(--color-primary-glass-strong); border: 1px solid rgba(255,255,255,0.4); padding: 22px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h3 class="page-title" style="font-size: 20px; margin: 0;">➕ Registrar Nuevo Estudiante</h3>
         <button type="button" onclick="toggleNewStudentModal(false)" style="background: none; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">&times;</button>
@@ -606,7 +606,7 @@
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <button type="submit" id="btnSaveNewStudent" class="btn-primary" style="flex: 1; padding: 10px; background: #22c55e; color: #0e387a; font-weight: 700; font-size: 14px;">Guardar Alumno</button>
+          <button type="submit" id="btnSaveNewStudent" class="btn-primary" style="flex: 1; padding: 10px; background: #22c55e; color: #022c22; font-weight: 700; font-size: 14px;">Guardar Alumno</button>
           <button type="button" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 14px;" onclick="toggleNewStudentModal(false)">Cancelar</button>
         </div>
       </form>
@@ -615,7 +615,7 @@
 
   <!-- MODAL DE RENOVACIÓN DE MATRÍCULA Y PROMOCIÓN AL SIGUIENTE NIVEL -->
   <div id="renewLevelModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
-    <div class="auth-card" style="max-width: 500px; width: 100%; margin: auto; background: #0e387a; border: 2px solid #3b82f6; padding: 22px;">
+    <div class="auth-card" style="max-width: 500px; width: 100%; margin: auto; background: var(--color-primary-glass-strong); border: 1px solid var(--accent-cobalt); padding: 22px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <h3 class="page-title" style="font-size: 20px; margin: 0;">🎓 Renovar al Siguiente Nivel (+1 Año)</h3>
         <button type="button" onclick="toggleRenewLevelModal(false)" style="background: none; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">&times;</button>
@@ -662,7 +662,7 @@
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <button type="submit" id="btnConfirmRenew" class="btn-primary" style="flex: 1; padding: 10px; background: #22c55e; color: #0e387a; font-weight: 700; font-size: 14px;">
+          <button type="submit" id="btnConfirmRenew" class="btn-primary" style="flex: 1; padding: 10px; background: #22c55e; color: #022c22; font-weight: 700; font-size: 14px;">
             Confirmar Renovación
           </button>
           <button type="button" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 14px;" onclick="toggleRenewLevelModal(false)">
@@ -675,7 +675,7 @@
 
   <!-- MODAL PARA EDITAR ESTUDIANTE / VIGENCIA DE MATRÍCULA -->
   <div id="editStudentModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
-    <div class="auth-card" style="max-width: 520px; width: 100%; margin: 20px auto; background: #0e387a; border: 1px solid rgba(255,255,255,0.4);">
+    <div class="auth-card" style="max-width: 520px; width: 100%; margin: 20px auto; background: var(--color-primary-glass-strong); border: 1px solid rgba(255,255,255,0.4);">
       <h3 class="page-title" style="font-size: 22px; margin-bottom: 6px;">✏️ Editar Información del Estudiante</h3>
       <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 20px;">
         Actualiza los datos académicos o renueva el acceso a la plataforma.
@@ -738,7 +738,7 @@
         </div>
 
         <div style="display: flex; gap: 12px; margin-top: 16px;">
-          <button type="submit" id="btnSaveEditStudent" class="btn-primary" style="flex: 1; background: #3b82f6;">Guardar Cambios</button>
+          <button type="submit" id="btnSaveEditStudent" class="btn-primary" style="flex: 1; background: var(--accent-cobalt);">Guardar Cambios</button>
           <button type="button" class="btn-secondary" style="flex: 1;" onclick="toggleEditStudentModal(false)">Cancelar</button>
         </div>
       </form>
@@ -747,7 +747,7 @@
 
   <!-- MODAL DE ACCESO CADUCADO PARA ESTUDIANTE -->
   <div id="expiredAccountModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1001; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div class="auth-card" style="max-width: 480px; width: 100%; margin: 0; background: #0e387a; border: 2px solid #ef4444; text-align: center;">
+    <div class="auth-card" style="max-width: 480px; width: 100%; margin: 0; background: var(--color-primary-glass-strong); border: 2px solid #ef4444; text-align: center;">
       <div style="font-size: 48px; margin-bottom: 12px;">⏳</div>
       <h3 class="page-title" style="font-size: 24px; color: #fca5a5; margin-bottom: 8px;">Tu Matrícula ha Caducado</h3>
       <p id="expiredAccountMessage" style="font-size: 14px; color: var(--color-muted); margin-bottom: 22px; line-height: 1.6;">
@@ -755,7 +755,7 @@
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <a href="https://wa.me/573000000000?text=Hola,%20mi%20acceso%20a%20la%20plataforma%20de%20Living%20English%20ha%20caducado%20y%20deseo%20renovarlo" target="_blank" rel="noopener noreferrer" class="btn-primary" style="background: #22c55e; color: #0e387a; text-decoration: none;">
+        <a href="https://wa.me/573000000000?text=Hola,%20mi%20acceso%20a%20la%20plataforma%20de%20Living%20English%20ha%20caducado%20y%20deseo%20renovarlo" target="_blank" rel="noopener noreferrer" class="btn-primary" style="background: #22c55e; color: #022c22; text-decoration: none;">
           💬 Contactar por WhatsApp para Renovar
         </a>
         <button type="button" class="btn-secondary" onclick="logoutFromExpired()">
@@ -770,7 +770,7 @@
 
   <!-- MODAL DE RECUPERACIÓN DE CONTRASEÑA -->
   <div id="recoveryModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div class="auth-card" style="max-width: 440px; width: 100%; margin: 0; background: #0e387a; border: 1px solid rgba(255,255,255,0.4);">
+    <div class="auth-card" style="max-width: 440px; width: 100%; margin: 0; background: var(--color-primary-glass-strong); border: 1px solid rgba(255,255,255,0.4);">
       <h3 class="page-title" style="font-size: 22px; margin-bottom: 8px;">🔑 Recuperar Contraseña</h3>
       <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 18px; line-height: 1.5;">
         Ingresa tu correo institucional registrado y te enviaremos un enlace oficial para restablecer tu contraseña.
@@ -792,7 +792,7 @@
 
   <!-- MODAL DE ESTABLECER NUEVA CONTRASEÑA (RECOVERY CALLBACK) -->
   <div id="resetPasswordModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div class="auth-card" style="max-width: 440px; width: 100%; margin: 0; background: #0e387a; border: 2px solid var(--color-success);">
+    <div class="auth-card" style="max-width: 440px; width: 100%; margin: 0; background: var(--color-primary-glass-strong); border: 2px solid var(--color-success);">
       <h3 class="page-title" style="font-size: 22px; margin-bottom: 8px;">🔐 Nueva Contraseña</h3>
       <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 18px;">
         Ingresa tu nueva contraseña para actualizar tu cuenta.
@@ -804,14 +804,14 @@
           <input type="password" id="updateNewPass" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
         </div>
 
-        <button type="submit" id="btnUpdatePassword" class="btn-primary" style="background: #22c55e; color: #0e387a;">Guardar y Continuar</button>
+        <button type="submit" id="btnUpdatePassword" class="btn-primary" style="background: #22c55e; color: #022c22;">Guardar y Continuar</button>
       </form>
     </div>
   </div>
 
   <!-- MODAL DE LANZADOR DE JUEGOS INTERACTIVOS -->
   <div id="gameLauncherModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1002; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
-    <div class="auth-card" style="max-width: 480px; width: 100%; margin: auto; background: #0e387a; border: 2px solid var(--color-primary-light); text-align: center; position: relative;">
+    <div class="auth-card" style="max-width: 480px; width: 100%; margin: auto; background: var(--color-primary-glass-strong); border: 2px solid var(--color-primary-light); text-align: center; position: relative;">
       <button type="button" onclick="closeGameLauncher()" style="position: absolute; top: 14px; right: 16px; background: none; border: none; color: #ffffff; font-size: 26px; cursor: pointer; line-height: 1;">&times;</button>
       
       <div id="gameModalIcon" style="font-size: 52px; margin-bottom: 10px;">🎮</div>
@@ -842,7 +842,7 @@
 
   <!-- MODAL PARA PUBLICAR NUEVA CLASE ONLINE (DOCENTE) -->
   <div id="publishClassModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1003; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
-    <div class="auth-card" style="max-width: 540px; width: 100%; margin: auto; background: #0e387a; border: 2px solid var(--color-primary-light); padding: 24px;">
+    <div class="auth-card" style="max-width: 540px; width: 100%; margin: auto; background: var(--color-primary-glass-strong); border: 2px solid var(--color-primary-light); padding: 24px;">
       
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
         <div>
@@ -902,7 +902,7 @@
         </div>
 
         <div style="display: flex; gap: 12px;">
-          <button type="submit" id="btnPublishClass" class="btn-primary" style="flex: 2; background: #2563eb;">
+          <button type="submit" id="btnPublishClass" class="btn-primary" style="flex: 2; background: var(--accent-cobalt);">
             Publicar Clase en el Portal
           </button>
           <button type="button" class="btn-secondary" style="flex: 1;" onclick="closePublishClassModal()">
@@ -915,7 +915,7 @@
 
   <!-- MODAL PARA VER ESTUDIANTES AGENDADOS EN UNA CLASE (DOCENTE) -->
   <div id="viewClassBookingsModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1004; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
-    <div class="auth-card" style="max-width: 680px; width: 100%; margin: auto; background: #0e387a; border: 2px solid var(--color-primary-light); padding: 24px;">
+    <div class="auth-card" style="max-width: 680px; width: 100%; margin: auto; background: var(--color-primary-glass-strong); border: 2px solid var(--color-primary-light); padding: 24px;">
       
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
         <div>
@@ -963,8 +963,8 @@
   <!-- 2. Cliente de Supabase -->
   <script src="assets/js/supabaseClient.js?v=20261027"></script>
   <!-- 3. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261027_cards"></script>
+  <script src="assets/js/onlineClasses.js?v=20261027_brand"></script>
   <!-- 4. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261027_cards"></script>
+  <script src="assets/js/platform.js?v=20261027_brand"></script>
 </body>
 </html>

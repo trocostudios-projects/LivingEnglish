@@ -11,16 +11,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_cards">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261027_cards">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261027_cards">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_cards">
-  <link rel="stylesheet" href="assets/css/landing.css?v=20261027_cards">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261027_brand">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261027_brand">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261027_brand">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261027_brand">
+  <link rel="stylesheet" href="assets/css/landing.css?v=20261027_brand">
 
   <style>
     /* Estilos dedicados del portal de clases online (Bespoke Academic UI) */
     .portal-body {
-      background: linear-gradient(rgba(7, 14, 30, 0.88), rgba(4, 10, 24, 0.94)), var(--bg-hero-desktop);
+      background: linear-gradient(rgba(2, 11, 30, 0.90), rgba(1, 7, 22, 0.96)), var(--bg-hero-desktop);
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -31,7 +31,7 @@
 
     @media (max-width: 767px) {
       .portal-body {
-        background: linear-gradient(rgba(7, 14, 30, 0.90), rgba(4, 10, 24, 0.96)), var(--bg-hero-mobile);
+        background: linear-gradient(rgba(2, 11, 30, 0.92), rgba(1, 7, 22, 0.97)), var(--bg-hero-mobile);
         background-size: cover;
         background-position: center top;
         background-attachment: fixed;
@@ -59,7 +59,7 @@
     }
 
     .feature-strip-pill {
-      background: rgba(11, 23, 48, 0.7);
+      background: rgba(4, 20, 52, 0.75);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-pill);
       padding: 6px 14px;
@@ -77,7 +77,7 @@
     }
 
     .classes-filter-bar {
-      background: rgba(11, 23, 48, 0.75);
+      background: rgba(4, 20, 52, 0.78);
       border: 1px solid var(--color-border);
       border-radius: 12px;
       padding: 12px 16px;
@@ -90,7 +90,7 @@
     }
 
     .class-card {
-      background: rgba(13, 27, 56, 0.72);
+      background: rgba(5, 24, 66, 0.74);
       border: 1px solid var(--color-border);
       border-radius: 14px;
       padding: 20px 22px;
@@ -106,7 +106,7 @@
 
     .class-card:hover {
       transform: translateY(-2px);
-      border-color: rgba(96, 165, 250, 0.5);
+      border-color: rgba(112, 166, 255, 0.5);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
@@ -142,7 +142,7 @@
     }
 
     .spot-block.occupied {
-      background: #2563eb;
+      background: var(--accent-cobalt);
     }
 
     .spot-block.occupied-full {
@@ -154,9 +154,9 @@
     }
 
     .btn-reserve-class {
-      background: #1d4ed8;
+      background: var(--accent-cobalt);
       color: #ffffff;
-      border: 1px solid rgba(147, 197, 253, 0.3);
+      border: 1px solid rgba(112, 166, 255, 0.35);
       padding: 9px 16px;
       border-radius: var(--radius-md);
       font-weight: 600;
@@ -172,7 +172,7 @@
     }
 
     .btn-reserve-class:hover:not(:disabled) {
-      background: #2563eb;
+      background: var(--accent-cobalt-hover);
     }
 
     .btn-reserve-class:active:not(:disabled) {
@@ -469,7 +469,7 @@
     }
   </script>
   <script src="assets/js/supabaseClient.js"></script>
-  <script src="assets/js/onlineClasses.js?v=20261027_cards"></script>
+  <script src="assets/js/onlineClasses.js?v=20261027_brand"></script>
 
   <script>
     let currentClassesList = [];

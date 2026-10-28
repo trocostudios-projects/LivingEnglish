@@ -37,24 +37,24 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: #1d4ed8;
+  background-color: var(--accent-cobalt);
   color: #ffffff;
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 14px;
   padding: 12px 24px;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(147, 197, 253, 0.25);
+  border: 1px solid rgba(112, 166, 255, 0.35);
   cursor: pointer;
-  box-shadow: var(--inner-highlight), 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--inner-highlight), 0 2px 8px rgba(0, 43, 118, 0.4);
   transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #2563eb;
-  border-color: rgba(147, 197, 253, 0.45);
+  background-color: var(--accent-cobalt-hover);
+  border-color: rgba(112, 166, 255, 0.55);
   transform: translateY(-1px);
-  box-shadow: var(--inner-highlight), 0 4px 14px rgba(37, 99, 235, 0.35);
+  box-shadow: var(--inner-highlight), 0 4px 14px rgba(0, 96, 248, 0.38);
 }
 
 .btn-secondary {
@@ -62,22 +62,22 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: rgba(15, 23, 42, 0.65);
+  background-color: rgba(4, 20, 52, 0.7);
   color: #e2e8f0;
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 14px;
   padding: 12px 24px;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--color-border);
   cursor: pointer;
   transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   box-shadow: var(--inner-highlight), 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: rgba(30, 41, 59, 0.85);
-  border-color: rgba(148, 163, 184, 0.35);
+  background-color: rgba(9, 36, 92, 0.85);
+  border-color: rgba(112, 166, 255, 0.4);
   color: #ffffff;
   transform: translateY(-1px);
 }
@@ -87,22 +87,49 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background-color: #1e3a8a;
+  background-color: var(--color-primary);
   color: #ffffff;
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 13px;
   padding: 8px 18px;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(147, 197, 253, 0.3);
+  border: 1px solid rgba(112, 166, 255, 0.3);
   cursor: pointer;
   box-shadow: var(--inner-highlight), 0 2px 6px rgba(0, 0, 0, 0.25);
   transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
 }
 
 .btn-talk:hover:not(:disabled) {
-  background-color: #2563eb;
+  background-color: var(--color-primary-hover);
   transform: translateY(-1px);
+}
+
+/* Botón de Energía Acento (Inspirado en el rayo ⚡ de Living English) */
+.btn-orange,
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--accent-orange);
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 11px 22px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  box-shadow: var(--inner-highlight), 0 2px 10px rgba(248, 120, 0, 0.35);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.btn-orange:hover:not(:disabled),
+.btn-accent:hover:not(:disabled) {
+  background-color: var(--accent-orange-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--inner-highlight), 0 4px 16px rgba(248, 120, 0, 0.45);
 }
 
 /* ==========================================================================
