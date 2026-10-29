@@ -281,6 +281,58 @@
     { min: 100, max: 250, icon: '💎', title: 'Master Legend' }
   ];
 
+  const GAME_INTRO_META = {
+    'kids:listen': {
+      pill: '🧸 MODO NIÑOS · LISTENING',
+      icon: '🎧',
+      title: '¡Escucha y Toca!',
+      desc: 'Escucha la pronunciación en inglés y toca la tarjeta ilustrada correcta para ganar estrellas.',
+      chips: ['🔊 Audio en Inglés', '💡 Pista en Español', '⭐ +1 Estrella por acierto']
+    },
+    'kids:letters': {
+      pill: '🧸 MODO NIÑOS · SPELLING',
+      icon: '🧩',
+      title: 'Arma la Palabra',
+      desc: 'Observa el dibujo y toca las letras en el orden correcto para escribir la palabra en inglés.',
+      chips: ['🔤 Deletreo Guiado', '💡 Botón de Pista', '🔊 Pronunciación por Letra']
+    },
+    'kids:bubbles': {
+      pill: '🧸 MODO NIÑOS · CATEGORIES',
+      icon: '🎈',
+      title: '¡Explota las Burbujas!',
+      desc: 'Mira la categoría objetivo y revienta únicamente las burbujas que pertenezcan a ese grupo.',
+      chips: ['🎈 12 Categorías', '⚡ Reflejos y Vocabulario', '🔊 Voz Interactiva']
+    },
+    'kids:memory': {
+      pill: '🧸 MODO NIÑOS · MEMORY 3D',
+      icon: '✨',
+      title: 'Memoria en Inglés',
+      desc: 'Voltea las cartas 3D, escucha cómo se pronuncia cada palabra y encuentra las 3 parejas.',
+      chips: ['🃏 Cartas 3D', '🔊 Pronunciación al Voltear', '🧠 Memoria Visual']
+    },
+    'gen:fillrush': {
+      pill: '🎓 NIVELES A1–C1 · SPEED GRAMMAR',
+      icon: '⚡',
+      title: 'Fill-in Rush (60s)',
+      desc: 'Completa la oración o elige el término correcto antes de que se agote el reloj. ¡Cada acierto suma +3 segundos!',
+      chips: ['⏱️ Reto de 60 Segundos', '📚 Gramática y Vocabulario', '🔥 Bonus de Tiempo']
+    },
+    'gen:swipe': {
+      pill: '🎓 NIVELES A1–C1 · TRUE OR FALSE',
+      icon: '🃏',
+      title: 'Swipe & Match',
+      desc: 'Decide si la palabra en la tarjeta coincide con la definición o frase. Desliza a la derecha (Verdadero) o izquierda (Falso).',
+      chips: ['👆 Desliza o Usa Botones', '🎯 Comprensión Rápida', '🔊 Audio Integrado']
+    },
+    'gen:bubbles': {
+      pill: '🎓 NIVELES A1–C1 · WORD BUILDER',
+      icon: '🧩',
+      title: 'Word Bubbles',
+      desc: 'Ordena las letras o palabras para construir la respuesta exacta a la pista gramatical o definición.',
+      chips: ['🔤 Construcción Exacta', '💡 Pista Inteligente', '🎓 Niveles A1 a C1']
+    }
+  };
+
   // Estado general
   const supabaseLevelCache = {};
   let hasLoadedAllFromSupabase = false;
@@ -672,25 +724,74 @@
   let currentListenTarget = null;
   let isListenLocked = false;
 
-  function switchKidsGame(gameKey) {
-    currentKidsGame = gameKey;
-    if (gameKey !== 'bubbles') {
-      stopBubbleSpawner();
+  function showPlayOverlayFor(metaKey) {
+    stopRushTimer();
+    stopBubbleSpawner();
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
     }
 
     document.querySelectorAll('.kids-view').forEach(v => v.classList.add('hidden'));
-    document.querySelectorAll('.kids-nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.general-view').forEach(v => v.classList.add('hidden'));
 
-    const activeView = document.getElementById(`game-kids-${gameKey}`);
+    const overlay = document.getElementById('lqStartOverlay');
+    if (!overlay) return;
+    overlay.classList.remove('hidden');
+
+    const meta = GAME_INTRO_META[metaKey] || GAME_INTRO_META['kids:listen'];
+    const pillEl = document.getElementById('lqStartModePill');
+    const iconEl = document.getElementById('lqStartIcon');
+    const titleEl = document.getElementById('lqStartTitle');
+    const descEl = document.getElementById('lqStartDesc');
+    const chipsEl = document.getElementById('lqStartChips');
+
+    if (pillEl) {
+      pillEl.innerText = isKidsMode
+        ? meta.pill
+        : `${meta.pill} (${currentGeneralLevel})`;
+    }
+    if (iconEl) iconEl.innerText = meta.icon;
+    if (titleEl) titleEl.innerText = meta.title;
+    if (descEl) descEl.innerText = meta.desc;
+    if (chipsEl && Array.isArray(meta.chips)) {
+      chipsEl.innerHTML = meta.chips
+        .map(c => `<span class="lq-start-chip">${c}</span>`)
+        .join('');
+    }
+  }
+
+  function startCurrentGame() {
+    playSynth('tap');
+    const overlay = document.getElementById('lqStartOverlay');
+    if (overlay) overlay.classList.add('hidden');
+
+    if (isKidsMode) {
+      document.querySelectorAll('.kids-view').forEach(v => v.classList.add('hidden'));
+      const activeView = document.getElementById(`game-kids-${currentKidsGame}`);
+      if (activeView) activeView.classList.remove('hidden');
+
+      if (currentKidsGame === 'listen') initKidsListenGame();
+      if (currentKidsGame === 'letters') initKidsSpellerGame();
+      if (currentKidsGame === 'bubbles') initKidsBubbleGame();
+      if (currentKidsGame === 'memory') initKidsMemoryGame();
+    } else {
+      document.querySelectorAll('.general-view').forEach(v => v.classList.add('hidden'));
+      const activeView = document.getElementById(`game-${currentGeneralGame}`);
+      if (activeView) activeView.classList.remove('hidden');
+
+      initActiveGeneralGame(true);
+    }
+  }
+
+  function switchKidsGame(gameKey) {
+    currentKidsGame = gameKey;
+    stopBubbleSpawner();
+
+    document.querySelectorAll('.kids-nav-tab').forEach(b => b.classList.remove('active'));
     const activeNav = document.getElementById(`knav-${gameKey}`);
-    if (activeView) activeView.classList.remove('hidden');
     if (activeNav) activeNav.classList.add('active');
 
-    if (!isGamesTabActive) return;
-    if (gameKey === 'listen') initKidsListenGame();
-    if (gameKey === 'letters') initKidsSpellerGame();
-    if (gameKey === 'bubbles') initKidsBubbleGame();
-    if (gameKey === 'memory') initKidsMemoryGame();
+    showPlayOverlayFor(`kids:${gameKey}`);
   }
 
   function initKidsListenGame() {
@@ -1189,24 +1290,23 @@
     if (menu) menu.classList.add('hidden');
 
     await fetchLevelFromSupabase(target);
-    initActiveGeneralGame(true);
+    const overlay = document.getElementById('lqStartOverlay');
+    if (overlay && !overlay.classList.contains('hidden')) {
+      showPlayOverlayFor(`gen:${currentGeneralGame}`);
+    } else {
+      initActiveGeneralGame(true);
+    }
   }
 
   function switchGeneralGame(gameKey) {
     currentGeneralGame = gameKey;
-    if (gameKey !== 'fillrush') {
-      stopRushTimer();
-    }
+    stopRushTimer();
 
-    document.querySelectorAll('.general-view').forEach(v => v.classList.add('hidden'));
     document.querySelectorAll('.gen-nav-tab').forEach(b => b.classList.remove('active'));
-
-    const activeView = document.getElementById(`game-${gameKey}`);
     const activeNav = document.getElementById(`gnav-${gameKey}`);
-    if (activeView) activeView.classList.remove('hidden');
     if (activeNav) activeNav.classList.add('active');
 
-    initActiveGeneralGame(false);
+    showPlayOverlayFor(`gen:${gameKey}`);
   }
 
   function initActiveGeneralGame(resetRush) {
@@ -1763,7 +1863,8 @@
     toggleLevelMenu,
     setLevel,
     toggleSound,
-    restartFillRush
+    restartFillRush,
+    startCurrentGame
   };
 
   window.toggleAudienceMode = toggleAudienceMode;

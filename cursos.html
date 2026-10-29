@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_pro_games">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261029_pro_games">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261029_pro_games">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_pro_games">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_play_fullscreen">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261029_play_fullscreen">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261029_play_fullscreen">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_play_fullscreen">
 </head>
 <body>
 
@@ -304,6 +304,29 @@
                 <span class="lq-dock-emoji">🧩</span>
                 <span class="lq-dock-label">Word Bubbles</span>
               </button>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- PANTALLA DE INICIO CON BOTÓN PLAY ANTES DE EMPEZAR CADA JUEGO  -->
+            <!-- ============================================================== -->
+            <div id="lqStartOverlay" class="lq-start-overlay">
+              <div class="lq-start-card">
+                <span id="lqStartModePill" class="lq-start-mode-pill">🧸 MODO NIÑOS</span>
+                <div id="lqStartIcon" class="lq-start-hero-icon bounce-gentle">🎧</div>
+                <h2 id="lqStartTitle" class="lq-start-title">¡Escucha y Toca!</h2>
+                <p id="lqStartDesc" class="lq-start-desc">
+                  Escucha la pronunciación en inglés y toca la ilustración correcta para ganar estrellas.
+                </p>
+                <div id="lqStartChips" class="lq-start-chips">
+                  <span class="lq-start-chip">🔊 Audio Nativo</span>
+                  <span class="lq-start-chip">⭐ +1 Estrella por acierto</span>
+                  <span class="lq-start-chip">🎯 Vocabulario Ilustrado</span>
+                </div>
+                <button type="button" id="lqPlayBtn" onclick="window.LivingGames.startCurrentGame()" class="lq-btn-3d lq-btn-green lq-play-main-btn">
+                  <span class="lq-play-triangle">▶</span>
+                  <span>PLAY</span>
+                </button>
+              </div>
             </div>
 
             <!-- ============================================================== -->
@@ -1193,10 +1216,10 @@
   <!-- 3. Confetti para celebraciones de racha en Juegos -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <!-- 4. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261029_pro_games"></script>
+  <script src="assets/js/onlineClasses.js?v=20261029_play_fullscreen"></script>
   <!-- 5. Módulo Oficial de Juegos Interactivos (Tabla `games` en Supabase) -->
-  <script src="assets/js/studentGames.js?v=20261029_pro_games"></script>
+  <script src="assets/js/studentGames.js?v=20261029_play_fullscreen"></script>
   <!-- 6. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261029_pro_games"></script>
+  <script src="assets/js/platform.js?v=20261029_play_fullscreen"></script>
 </body>
 </html>
