@@ -8,28 +8,205 @@
   // ============================================================================
   // 1. DICCIONARIO INFANTIL (KIDS MODE) Y RESPALDO MULTINIVEL (A1–C1)
   // ============================================================================
-  const KIDS_ITEMS = [
-    { word: 'Cat', emoji: '🐱', category: 'animals', letters: ['C', 'A', 'T'] },
-    { word: 'Dog', emoji: '🐶', category: 'animals', letters: ['D', 'O', 'G'] },
-    { word: 'Lion', emoji: '🦁', category: 'animals', letters: ['L', 'I', 'O', 'N'] },
-    { word: 'Frog', emoji: '🐸', category: 'animals', letters: ['F', 'R', 'O', 'G'] },
-    { word: 'Duck', emoji: '🦆', category: 'animals', letters: ['D', 'U', 'C', 'K'] },
-    { word: 'Elephant', emoji: '🐘', category: 'animals', letters: ['E', 'L', 'E', 'P', 'H', 'A', 'N', 'T'] },
-    { word: 'Apple', emoji: '🍎', category: 'fruits', letters: ['A', 'P', 'P', 'L', 'E'] },
-    { word: 'Banana', emoji: '🍌', category: 'fruits', letters: ['B', 'A', 'N', 'A', 'N', 'A'] },
-    { word: 'Orange', emoji: '🍊', category: 'fruits', letters: ['O', 'R', 'A', 'N', 'G', 'E'] },
-    { word: 'Grape', emoji: '🍇', category: 'fruits', letters: ['G', 'R', 'A', 'P', 'E'] },
-    { word: 'Car', emoji: '🚗', category: 'vehicles', letters: ['C', 'A', 'R'] },
-    { word: 'Bus', emoji: '🚌', category: 'vehicles', letters: ['B', 'U', 'S'] },
-    { word: 'Train', emoji: '🚂', category: 'vehicles', letters: ['T', 'R', 'A', 'I', 'N'] },
-    { word: 'Plane', emoji: '✈️', category: 'vehicles', letters: ['P', 'L', 'A', 'N', 'E'] },
-    { word: 'Sun', emoji: '🌞', category: 'nature', letters: ['S', 'U', 'N'] },
-    { word: 'Moon', emoji: '🌙', category: 'nature', letters: ['M', 'O', 'O', 'N'] },
-    { word: 'Star', emoji: '⭐', category: 'nature', letters: ['S', 'T', 'A', 'R'] },
-    { word: 'Pizza', emoji: '🍕', category: 'food', letters: ['P', 'I', 'Z', 'Z', 'A'] },
-    { word: 'Milk', emoji: '🥛', category: 'food', letters: ['M', 'I', 'L', 'K'] },
-    { word: 'Ice cream', emoji: '🍦', category: 'food', letters: ['I', 'C', 'E'] }
+  const DEFAULT_KIDS_ITEMS = [
+    // 1. ANIMALS (30)
+    { word: 'Cat', emoji: '🐱', category: 'animals', spanish_hint: 'Gato' },
+    { word: 'Dog', emoji: '🐶', category: 'animals', spanish_hint: 'Perro' },
+    { word: 'Lion', emoji: '🦁', category: 'animals', spanish_hint: 'León' },
+    { word: 'Tiger', emoji: '🐯', category: 'animals', spanish_hint: 'Tigre' },
+    { word: 'Frog', emoji: '🐸', category: 'animals', spanish_hint: 'Rana' },
+    { word: 'Duck', emoji: '🦆', category: 'animals', spanish_hint: 'Pato' },
+    { word: 'Bird', emoji: '🐦', category: 'animals', spanish_hint: 'Pájaro' },
+    { word: 'Fish', emoji: '🐟', category: 'animals', spanish_hint: 'Pez' },
+    { word: 'Bear', emoji: '🐻', category: 'animals', spanish_hint: 'Oso' },
+    { word: 'Panda', emoji: '🐼', category: 'animals', spanish_hint: 'Panda' },
+    { word: 'Koala', emoji: '🐨', category: 'animals', spanish_hint: 'Koala' },
+    { word: 'Pig', emoji: '🐷', category: 'animals', spanish_hint: 'Cerdo' },
+    { word: 'Cow', emoji: '🐮', category: 'animals', spanish_hint: 'Vaca' },
+    { word: 'Horse', emoji: '🐴', category: 'animals', spanish_hint: 'Caballo' },
+    { word: 'Sheep', emoji: '🐑', category: 'animals', spanish_hint: 'Oveja' },
+    { word: 'Goat', emoji: '🐐', category: 'animals', spanish_hint: 'Cabra' },
+    { word: 'Monkey', emoji: '🐵', category: 'animals', spanish_hint: 'Mono' },
+    { word: 'Rabbit', emoji: '🐰', category: 'animals', spanish_hint: 'Conejo' },
+    { word: 'Mouse', emoji: '🐭', category: 'animals', spanish_hint: 'Ratón' },
+    { word: 'Fox', emoji: '🦊', category: 'animals', spanish_hint: 'Zorro' },
+    { word: 'Wolf', emoji: '🐺', category: 'animals', spanish_hint: 'Lobo' },
+    { word: 'Zebra', emoji: '🦓', category: 'animals', spanish_hint: 'Cebra' },
+    { word: 'Giraffe', emoji: '🦒', category: 'animals', spanish_hint: 'Jirafa' },
+    { word: 'Elephant', emoji: '🐘', category: 'animals', spanish_hint: 'Elefante' },
+    { word: 'Turtle', emoji: '🐢', category: 'animals', spanish_hint: 'Tortuga' },
+    { word: 'Snake', emoji: '🐍', category: 'animals', spanish_hint: 'Serpiente' },
+    { word: 'Whale', emoji: '🐳', category: 'animals', spanish_hint: 'Ballena' },
+    { word: 'Dolphin', emoji: '🐬', category: 'animals', spanish_hint: 'Delfín' },
+    { word: 'Shark', emoji: '🦈', category: 'animals', spanish_hint: 'Tiburón' },
+    { word: 'Bee', emoji: '🐝', category: 'animals', spanish_hint: 'Abeja' },
+    // 2. FRUITS & VEGGIES (20)
+    { word: 'Apple', emoji: '🍎', category: 'fruits', spanish_hint: 'Manzana' },
+    { word: 'Banana', emoji: '🍌', category: 'fruits', spanish_hint: 'Banano' },
+    { word: 'Orange', emoji: '🍊', category: 'fruits', spanish_hint: 'Naranja' },
+    { word: 'Grape', emoji: '🍇', category: 'fruits', spanish_hint: 'Uva' },
+    { word: 'Lemon', emoji: '🍋', category: 'fruits', spanish_hint: 'Limón' },
+    { word: 'Peach', emoji: '🍑', category: 'fruits', spanish_hint: 'Durazno' },
+    { word: 'Pear', emoji: '🍐', category: 'fruits', spanish_hint: 'Pera' },
+    { word: 'Mango', emoji: '🥭', category: 'fruits', spanish_hint: 'Mango' },
+    { word: 'Melon', emoji: '🍈', category: 'fruits', spanish_hint: 'Melón' },
+    { word: 'Watermelon', emoji: '🍉', category: 'fruits', spanish_hint: 'Sandía' },
+    { word: 'Cherry', emoji: '🍒', category: 'fruits', spanish_hint: 'Cereza' },
+    { word: 'Strawberry', emoji: '🍓', category: 'fruits', spanish_hint: 'Fresa' },
+    { word: 'Kiwi', emoji: '🥝', category: 'fruits', spanish_hint: 'Kiwi' },
+    { word: 'Coconut', emoji: '🥥', category: 'fruits', spanish_hint: 'Coco' },
+    { word: 'Pineapple', emoji: '🍍', category: 'fruits', spanish_hint: 'Piña' },
+    { word: 'Carrot', emoji: '🥕', category: 'fruits', spanish_hint: 'Zanahoria' },
+    { word: 'Corn', emoji: '🌽', category: 'fruits', spanish_hint: 'Maíz' },
+    { word: 'Tomato', emoji: '🍅', category: 'fruits', spanish_hint: 'Tomate' },
+    { word: 'Potato', emoji: '🥔', category: 'fruits', spanish_hint: 'Papa' },
+    { word: 'Broccoli', emoji: '🥦', category: 'fruits', spanish_hint: 'Brócoli' },
+    // 3. FOOD & DRINKS (20)
+    { word: 'Pizza', emoji: '🍕', category: 'food', spanish_hint: 'Pizza' },
+    { word: 'Burger', emoji: '🍔', category: 'food', spanish_hint: 'Hamburguesa' },
+    { word: 'Bread', emoji: '🍞', category: 'food', spanish_hint: 'Pan' },
+    { word: 'Cheese', emoji: '🧀', category: 'food', spanish_hint: 'Queso' },
+    { word: 'Egg', emoji: '🥚', category: 'food', spanish_hint: 'Huevo' },
+    { word: 'Milk', emoji: '🥛', category: 'food', spanish_hint: 'Leche' },
+    { word: 'Juice', emoji: '🧃', category: 'food', spanish_hint: 'Jugo' },
+    { word: 'Water', emoji: '💧', category: 'food', spanish_hint: 'Agua' },
+    { word: 'Cake', emoji: '🎂', category: 'food', spanish_hint: 'Pastel' },
+    { word: 'Cookie', emoji: '🍪', category: 'food', spanish_hint: 'Galleta' },
+    { word: 'Donut', emoji: '🍩', category: 'food', spanish_hint: 'Dona' },
+    { word: 'Candy', emoji: '🍬', category: 'food', spanish_hint: 'Dulce' },
+    { word: 'Honey', emoji: '🍯', category: 'food', spanish_hint: 'Miel' },
+    { word: 'Soup', emoji: '🥣', category: 'food', spanish_hint: 'Sopa' },
+    { word: 'Rice', emoji: '🍚', category: 'food', spanish_hint: 'Arroz' },
+    { word: 'Salad', emoji: '🥗', category: 'food', spanish_hint: 'Ensalada' },
+    { word: 'Sandwich', emoji: '🥪', category: 'food', spanish_hint: 'Sándwich' },
+    { word: 'Taco', emoji: '🌮', category: 'food', spanish_hint: 'Taco' },
+    { word: 'Popcorn', emoji: '🍿', category: 'food', spanish_hint: 'Palomitas' },
+    { word: 'Ice cream', emoji: '🍦', category: 'food', spanish_hint: 'Helado' },
+    // 4. VEHICLES (15)
+    { word: 'Car', emoji: '🚗', category: 'vehicles', spanish_hint: 'Carro' },
+    { word: 'Bus', emoji: '🚌', category: 'vehicles', spanish_hint: 'Autobús' },
+    { word: 'Taxi', emoji: '🚕', category: 'vehicles', spanish_hint: 'Taxi' },
+    { word: 'Truck', emoji: '🚚', category: 'vehicles', spanish_hint: 'Camión' },
+    { word: 'Bike', emoji: '🚲', category: 'vehicles', spanish_hint: 'Bicicleta' },
+    { word: 'Train', emoji: '🚂', category: 'vehicles', spanish_hint: 'Tren' },
+    { word: 'Plane', emoji: '✈️', category: 'vehicles', spanish_hint: 'Avión' },
+    { word: 'Boat', emoji: '⛵', category: 'vehicles', spanish_hint: 'Barco' },
+    { word: 'Ship', emoji: '🚢', category: 'vehicles', spanish_hint: 'Crucero' },
+    { word: 'Rocket', emoji: '🚀', category: 'vehicles', spanish_hint: 'Cohete' },
+    { word: 'Tractor', emoji: '🚜', category: 'vehicles', spanish_hint: 'Tractor' },
+    { word: 'Scooter', emoji: '🛴', category: 'vehicles', spanish_hint: 'Patineta' },
+    { word: 'Subway', emoji: '🚇', category: 'vehicles', spanish_hint: 'Metro' },
+    { word: 'Ambulance', emoji: '🚑', category: 'vehicles', spanish_hint: 'Ambulancia' },
+    { word: 'Helicopter', emoji: '🚁', category: 'vehicles', spanish_hint: 'Helicóptero' },
+    // 5. NATURE (15)
+    { word: 'Sun', emoji: '🌞', category: 'nature', spanish_hint: 'Sol' },
+    { word: 'Moon', emoji: '🌙', category: 'nature', spanish_hint: 'Luna' },
+    { word: 'Star', emoji: '⭐', category: 'nature', spanish_hint: 'Estrella' },
+    { word: 'Cloud', emoji: '☁️', category: 'nature', spanish_hint: 'Nube' },
+    { word: 'Rain', emoji: '🌧️', category: 'nature', spanish_hint: 'Lluvia' },
+    { word: 'Snow', emoji: '❄️', category: 'nature', spanish_hint: 'Nieve' },
+    { word: 'Rainbow', emoji: '🌈', category: 'nature', spanish_hint: 'Arcoíris' },
+    { word: 'Tree', emoji: '🌳', category: 'nature', spanish_hint: 'Árbol' },
+    { word: 'Flower', emoji: '🌸', category: 'nature', spanish_hint: 'Flor' },
+    { word: 'Rose', emoji: '🌹', category: 'nature', spanish_hint: 'Rosa' },
+    { word: 'Leaf', emoji: '🍃', category: 'nature', spanish_hint: 'Hoja' },
+    { word: 'Fire', emoji: '🔥', category: 'nature', spanish_hint: 'Fuego' },
+    { word: 'Ocean', emoji: '🌊', category: 'nature', spanish_hint: 'Océano' },
+    { word: 'Mountain', emoji: '⛰️', category: 'nature', spanish_hint: 'Montaña' },
+    { word: 'Volcano', emoji: '🌋', category: 'nature', spanish_hint: 'Volcán' },
+    // 6. BODY (12)
+    { word: 'Eye', emoji: '👁️', category: 'body', spanish_hint: 'Ojo' },
+    { word: 'Ear', emoji: '👂', category: 'body', spanish_hint: 'Oreja' },
+    { word: 'Nose', emoji: '👃', category: 'body', spanish_hint: 'Nariz' },
+    { word: 'Mouth', emoji: '👄', category: 'body', spanish_hint: 'Boca' },
+    { word: 'Tooth', emoji: '🦷', category: 'body', spanish_hint: 'Diente' },
+    { word: 'Hand', emoji: '✋', category: 'body', spanish_hint: 'Mano' },
+    { word: 'Foot', emoji: '🦶', category: 'body', spanish_hint: 'Pie' },
+    { word: 'Leg', emoji: '🦵', category: 'body', spanish_hint: 'Pierna' },
+    { word: 'Arm', emoji: '💪', category: 'body', spanish_hint: 'Brazo' },
+    { word: 'Heart', emoji: '❤️', category: 'body', spanish_hint: 'Corazón' },
+    { word: 'Brain', emoji: '🧠', category: 'body', spanish_hint: 'Cerebro' },
+    { word: 'Bone', emoji: '🦴', category: 'body', spanish_hint: 'Hueso' },
+    // 7. CLOTHES (12)
+    { word: 'Hat', emoji: '🧢', category: 'clothes', spanish_hint: 'Gorra' },
+    { word: 'Crown', emoji: '👑', category: 'clothes', spanish_hint: 'Corona' },
+    { word: 'Shirt', emoji: '👕', category: 'clothes', spanish_hint: 'Camisa' },
+    { word: 'Dress', emoji: '👗', category: 'clothes', spanish_hint: 'Vestido' },
+    { word: 'Pants', emoji: '👖', category: 'clothes', spanish_hint: 'Pantalón' },
+    { word: 'Shoe', emoji: '👟', category: 'clothes', spanish_hint: 'Zapato' },
+    { word: 'Boot', emoji: '🥾', category: 'clothes', spanish_hint: 'Bota' },
+    { word: 'Socks', emoji: '🧦', category: 'clothes', spanish_hint: 'Medias' },
+    { word: 'Coat', emoji: '🧥', category: 'clothes', spanish_hint: 'Abrigo' },
+    { word: 'Gloves', emoji: '🧤', category: 'clothes', spanish_hint: 'Guantes' },
+    { word: 'Scarf', emoji: '🧣', category: 'clothes', spanish_hint: 'Bufanda' },
+    { word: 'Glasses', emoji: '👓', category: 'clothes', spanish_hint: 'Gafas' },
+    // 8. SCHOOL (12)
+    { word: 'Book', emoji: '📖', category: 'school', spanish_hint: 'Libro' },
+    { word: 'Pen', emoji: '🖊️', category: 'school', spanish_hint: 'Bolígrafo' },
+    { word: 'Pencil', emoji: '✏️', category: 'school', spanish_hint: 'Lápiz' },
+    { word: 'Crayon', emoji: '🖍️', category: 'school', spanish_hint: 'Crayón' },
+    { word: 'Ruler', emoji: '📏', category: 'school', spanish_hint: 'Regla' },
+    { word: 'Bag', emoji: '🎒', category: 'school', spanish_hint: 'Morral' },
+    { word: 'Clock', emoji: '⏰', category: 'school', spanish_hint: 'Reloj' },
+    { word: 'Bell', emoji: '🔔', category: 'school', spanish_hint: 'Campana' },
+    { word: 'Globe', emoji: '🌍', category: 'school', spanish_hint: 'Globo' },
+    { word: 'Paint', emoji: '🎨', category: 'school', spanish_hint: 'Pintura' },
+    { word: 'Scissors', emoji: '✂️', category: 'school', spanish_hint: 'Tijeras' },
+    { word: 'Paper', emoji: '📄', category: 'school', spanish_hint: 'Papel' },
+    // 9. TOYS (12)
+    { word: 'Ball', emoji: '⚽', category: 'toys', spanish_hint: 'Pelota' },
+    { word: 'Kite', emoji: '🪁', category: 'toys', spanish_hint: 'Cometa' },
+    { word: 'Drum', emoji: '🥁', category: 'toys', spanish_hint: 'Tambor' },
+    { word: 'Guitar', emoji: '🎸', category: 'toys', spanish_hint: 'Guitarra' },
+    { word: 'Piano', emoji: '🎹', category: 'toys', spanish_hint: 'Piano' },
+    { word: 'Robot', emoji: '🤖', category: 'toys', spanish_hint: 'Robot' },
+    { word: 'Teddy', emoji: '🧸', category: 'toys', spanish_hint: 'Osito' },
+    { word: 'Puzzle', emoji: '🧩', category: 'toys', spanish_hint: 'Rompecabezas' },
+    { word: 'Balloon', emoji: '🎈', category: 'toys', spanish_hint: 'Globo' },
+    { word: 'Gift', emoji: '🎁', category: 'toys', spanish_hint: 'Regalo' },
+    { word: 'Trophy', emoji: '🏆', category: 'toys', spanish_hint: 'Trofeo' },
+    { word: 'Skate', emoji: '⛸️', category: 'toys', spanish_hint: 'Patín' },
+    // 10. HOUSE (12)
+    { word: 'House', emoji: '🏠', category: 'house', spanish_hint: 'Casa' },
+    { word: 'Bed', emoji: '🛏️', category: 'house', spanish_hint: 'Cama' },
+    { word: 'Chair', emoji: '🪑', category: 'house', spanish_hint: 'Silla' },
+    { word: 'Door', emoji: '🚪', category: 'house', spanish_hint: 'Puerta' },
+    { word: 'Window', emoji: '🪟', category: 'house', spanish_hint: 'Ventana' },
+    { word: 'Key', emoji: '🔑', category: 'house', spanish_hint: 'Llave' },
+    { word: 'Lamp', emoji: '💡', category: 'house', spanish_hint: 'Lámpara' },
+    { word: 'Phone', emoji: '📱', category: 'house', spanish_hint: 'Teléfono' },
+    { word: 'Bath', emoji: '🛁', category: 'house', spanish_hint: 'Bañera' },
+    { word: 'Soap', emoji: '🧼', category: 'house', spanish_hint: 'Jabón' },
+    { word: 'Broom', emoji: '🧹', category: 'house', spanish_hint: 'Escoba' },
+    { word: 'Spoon', emoji: '🥄', category: 'house', spanish_hint: 'Cuchara' },
+    // 11. COLORS (10)
+    { word: 'Red', emoji: '🟥', category: 'colors', spanish_hint: 'Rojo' },
+    { word: 'Blue', emoji: '🟦', category: 'colors', spanish_hint: 'Azul' },
+    { word: 'Green', emoji: '🟩', category: 'colors', spanish_hint: 'Verde' },
+    { word: 'Yellow', emoji: '🟨', category: 'colors', spanish_hint: 'Amarillo' },
+    { word: 'Purple', emoji: '🟪', category: 'colors', spanish_hint: 'Morado' },
+    { word: 'Brown', emoji: '🟫', category: 'colors', spanish_hint: 'Café' },
+    { word: 'Black', emoji: '⬛', category: 'colors', spanish_hint: 'Negro' },
+    { word: 'White', emoji: '⬜', category: 'colors', spanish_hint: 'Blanco' },
+    { word: 'Pink', emoji: '🩷', category: 'colors', spanish_hint: 'Rosado' },
+    // 12. NUMBERS (10)
+    { word: 'One', emoji: '1️⃣', category: 'numbers', spanish_hint: 'Uno' },
+    { word: 'Two', emoji: '2️⃣', category: 'numbers', spanish_hint: 'Dos' },
+    { word: 'Three', emoji: '3️⃣', category: 'numbers', spanish_hint: 'Tres' },
+    { word: 'Four', emoji: '4️⃣', category: 'numbers', spanish_hint: 'Cuatro' },
+    { word: 'Five', emoji: '5️⃣', category: 'numbers', spanish_hint: 'Cinco' },
+    { word: 'Six', emoji: '6️⃣', category: 'numbers', spanish_hint: 'Seis' },
+    { word: 'Seven', emoji: '7️⃣', category: 'numbers', spanish_hint: 'Siete' },
+    { word: 'Eight', emoji: '8️⃣', category: 'numbers', spanish_hint: 'Ocho' },
+    { word: 'Nine', emoji: '9️⃣', category: 'numbers', spanish_hint: 'Nueve' },
+    { word: 'Ten', emoji: '🔟', category: 'numbers', spanish_hint: 'Diez' }
   ];
+
+  let KIDS_ITEMS = [...DEFAULT_KIDS_ITEMS];
+  let hasLoadedKidsFromSupabase = false;
+  const recentListenWords = [];
+  const recentSpellerWords = [];
+  const recentMemoryWords = [];
 
   const DEFAULT_DATA = [
     // --- LEVEL A1 ---
@@ -316,6 +493,58 @@
     return getFallbackQuestions(currentGeneralLevel);
   }
 
+  async function fetchKidsItemsFromSupabase() {
+    if (hasLoadedKidsFromSupabase && KIDS_ITEMS.length > 0) {
+      return KIDS_ITEMS;
+    }
+
+    const client = typeof window.getSupabaseClient === 'function' ? window.getSupabaseClient() : window.supabaseClient;
+    if (!client) {
+      return KIDS_ITEMS;
+    }
+
+    try {
+      const { data, error } = await client
+        .from('kids_games')
+        .select('word, emoji, category, spanish_hint')
+        .eq('active', true)
+        .limit(1000);
+
+      hasLoadedKidsFromSupabase = true;
+      if (!error && Array.isArray(data) && data.length > 0) {
+        const cleaned = data
+          .map(r => ({
+            word: String(r.word || '').trim(),
+            emoji: String(r.emoji || '').trim(),
+            category: String(r.category || 'animals').trim().toLowerCase(),
+            spanish_hint: String(r.spanish_hint || '').trim()
+          }))
+          .filter(r => r.word && r.emoji);
+
+        if (cleaned.length > 0) {
+          KIDS_ITEMS = cleaned;
+          return KIDS_ITEMS;
+        }
+      }
+    } catch (err) {
+      console.warn('⚠️ Usando banco infantil local (tabla kids_games aún no creada):', err);
+    }
+    return KIDS_ITEMS;
+  }
+
+  function pickNonRepeatingKidsItem(pool, historyArr, maxHistory = 35) {
+    const fresh = pool.filter(item => !historyArr.includes(item.word));
+    const source = fresh.length > 0 ? fresh : pool;
+    const picked = source[Math.floor(Math.random() * source.length)];
+    if (picked) {
+      historyArr.push(picked.word);
+      if (historyArr.length > maxHistory) {
+        historyArr.shift();
+      }
+    }
+    return picked;
+  }
+
   // ============================================================================
   // 5. CAMBIO ENTRE MODO NIÑOS (4 JUEGOS) Y MODO GENERAL A1-C1 (3 JUEGOS)
   // ============================================================================
@@ -338,7 +567,9 @@
       if (genNav) genNav.classList.add('hidden');
 
       document.querySelectorAll('.general-view').forEach(v => v.classList.add('hidden'));
-      switchKidsGame(currentKidsGame);
+      fetchKidsItemsFromSupabase().then(() => {
+        switchKidsGame(currentKidsGame);
+      });
     } else {
       stopBubbleSpawner();
       if (lvlContainer) lvlContainer.classList.remove('hidden');
@@ -383,9 +614,12 @@
   }
 
   function initKidsListenGame() {
-    const shuffled = [...KIDS_ITEMS].sort(() => 0.5 - Math.random());
-    currentListenTarget = shuffled[0];
-    const choices = shuffled.slice(0, 4).sort(() => 0.5 - Math.random());
+    currentListenTarget = pickNonRepeatingKidsItem(KIDS_ITEMS, recentListenWords, 40);
+    const distractors = KIDS_ITEMS
+      .filter(item => item.word !== currentListenTarget.word && item.emoji !== currentListenTarget.emoji)
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 3);
+    const choices = [currentListenTarget, ...distractors].sort(() => 0.5 - Math.random());
 
     const phonicsEl = document.getElementById('kidsListenPhonics');
     const feedbackEl = document.getElementById('kidsListenFeedback');
@@ -459,8 +693,8 @@
   let currentPlacedLetters = [];
 
   function initKidsSpellerGame() {
-    const easyPool = KIDS_ITEMS.filter(k => k.word.length <= 5 && !k.word.includes(' '));
-    currentSpellerItem = easyPool[Math.floor(Math.random() * easyPool.length)];
+    const easyPool = KIDS_ITEMS.filter(k => k.word.length <= 6 && !k.word.includes(' '));
+    currentSpellerItem = pickNonRepeatingKidsItem(easyPool.length > 0 ? easyPool : KIDS_ITEMS, recentSpellerWords, 35);
     spellerTargetWord = currentSpellerItem.word.toUpperCase();
     currentPlacedLetters = [];
 
@@ -568,7 +802,8 @@
   }
 
   function refreshBubbleGoal() {
-    const categories = ['animals', 'fruits', 'vehicles', 'food'];
+    const uniqueCats = [...new Set(KIDS_ITEMS.map(i => i.category).filter(Boolean))];
+    const categories = uniqueCats.length >= 2 ? uniqueCats : ['animals', 'fruits', 'vehicles', 'food'];
     const filtered = categories.filter(c => c !== bubbleGoalCategory);
     bubbleGoalCategory = filtered[Math.floor(Math.random() * filtered.length)];
 
@@ -604,7 +839,10 @@
     const sky = document.getElementById('bubbleSky');
     if (!sky || sky.childElementCount >= 7) return;
 
-    const randomItem = KIDS_ITEMS[Math.floor(Math.random() * KIDS_ITEMS.length)];
+    const goalPool = KIDS_ITEMS.filter(i => i.category === bubbleGoalCategory);
+    const useGoalPool = goalPool.length > 0 && Math.random() < 0.45;
+    const pool = useGoalPool ? goalPool : KIDS_ITEMS;
+    const randomItem = pool[Math.floor(Math.random() * pool.length)];
     const bubble = document.createElement('div');
 
     const leftPercent = Math.floor(Math.random() * 74) + 6;
@@ -669,7 +907,11 @@
     if (turnsEl) turnsEl.innerText = '0';
     flippedCards = [];
 
-    const picked = [...KIDS_ITEMS].sort(() => 0.5 - Math.random()).slice(0, 3);
+    const picked = [
+      pickNonRepeatingKidsItem(KIDS_ITEMS, recentMemoryWords, 36),
+      pickNonRepeatingKidsItem(KIDS_ITEMS, recentMemoryWords, 36),
+      pickNonRepeatingKidsItem(KIDS_ITEMS, recentMemoryWords, 36)
+    ];
     const deck = [];
     picked.forEach((item, index) => {
       deck.push({ id: `${index}-a`, pairId: index, word: item.word, emoji: item.emoji });
