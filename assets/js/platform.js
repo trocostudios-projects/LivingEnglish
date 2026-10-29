@@ -786,24 +786,30 @@ let studentActiveViewingLevel = null;
 
 function switchStudentTab(tab) {
   const btnGrades = document.getElementById('tabBtnGrades');
+  const btnExercises = document.getElementById('tabBtnExercises');
   const btnGames = document.getElementById('tabBtnGames');
   const contentGrades = document.getElementById('studentTabGrades');
+  const contentExercises = document.getElementById('studentTabExercises');
   const contentGames = document.getElementById('studentTabGames');
 
   if (!btnGrades || !btnGames || !contentGrades || !contentGames) return;
 
+  btnGrades.classList.toggle('active', tab === 'grades');
+  if (btnExercises) btnExercises.classList.toggle('active', tab === 'exercises');
+  btnGames.classList.toggle('active', tab === 'games');
+
+  contentGrades.classList.toggle('hidden', tab !== 'grades');
+  if (contentExercises) contentExercises.classList.toggle('hidden', tab !== 'exercises');
+  contentGames.classList.toggle('hidden', tab !== 'games');
+
   if (tab === 'games') {
-    btnGrades.classList.remove('active');
-    btnGames.classList.add('active');
-    contentGrades.classList.add('hidden');
-    contentGames.classList.remove('hidden');
     if (window.LivingGames) window.LivingGames.onTabOpened();
   } else {
-    btnGrades.classList.add('active');
-    btnGames.classList.remove('active');
-    contentGrades.classList.remove('hidden');
-    contentGames.classList.add('hidden');
     if (window.LivingGames) window.LivingGames.onTabClosed();
+  }
+
+  if (tab === 'exercises' && window.LessonExercises) {
+    window.LessonExercises.onExercisesTabOpened();
   }
 }
 
@@ -947,6 +953,9 @@ async function changeStudentViewLevel(newLevel) {
   studentActiveViewingLevel = newLevel;
   const config = getCourseConfig(studentActiveViewingLevel);
   document.getElementById('studentCourseTitle').innerText = config.title;
+  if (window.LessonExercises && typeof window.LessonExercises.selectBook === 'function') {
+    window.LessonExercises.selectBook(studentActiveViewingLevel);
+  }
   await loadStudentGrades();
 }
 

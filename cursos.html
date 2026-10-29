@@ -98,6 +98,11 @@
             <span style="font-size: 16px;">📊</span>
             <span>Mis Evaluaciones & Notas</span>
           </button>
+          <button type="button" class="student-tab-pill" id="tabBtnExercises" onclick="switchStudentTab('exercises')">
+            <span style="font-size: 16px;">📖</span>
+            <span>Ejercicios por Lección</span>
+            <span class="badge-pill-accent">Guías</span>
+          </button>
           <button type="button" class="student-tab-pill" id="tabBtnGames" onclick="switchStudentTab('games')">
             <span style="font-size: 16px;">🎮</span>
             <span>Juegos Interactivos</span>
@@ -625,6 +630,102 @@
             </section>
 
             </div><!-- /#lqGamesWorkspace -->
+          </div>
+        </div>
+
+        <!-- SUBSECCIÓN 3: EJERCICIOS DE PRÁCTICA POR LECCIÓN (ALIMENTADO DESDE SUPABASE `lesson_exercises`) -->
+        <div id="studentTabExercises" class="hidden">
+          <div class="lx-shell">
+            <!-- Barra Superior: Selección de Guía / Libro y Progreso -->
+            <div class="lx-toolbar">
+              <div class="lx-toolbar-left">
+                <span class="lx-eyebrow-pill">📚 CURRÍCULO OFICIAL LIVING ENGLISH</span>
+                <h2 id="lxCurrentBookTitle" class="lx-book-heading">Guía Adultos 1 — Basic (A1–A2)</h2>
+                <p class="lx-book-sub">Escoge la lección de tu libro que deseas practicar hoy. Todos los ejercicios se alimentan desde Supabase.</p>
+              </div>
+              <div class="lx-toolbar-right">
+                <div class="lx-book-selector-box">
+                  <label for="lxBookSelect" class="lx-selector-label">📖 Libro / Nivel:</label>
+                  <select id="lxBookSelect" class="lx-book-select" onchange="window.LessonExercises.selectBook(this.value)">
+                    <option value="Kids 1">🧸 Kids 1 (Pre-A1)</option>
+                    <option value="Junior 1">🚀 Junior 1 (A1)</option>
+                    <option value="Teens 1">🎒 Teens 1 — Basic</option>
+                    <option value="Teens 2">⚡ Teens 2 — Intermediate</option>
+                    <option value="Teens 3">🎓 Teens 3 — Advanced</option>
+                    <option value="Adultos 1">📘 Adultos 1 — Basic</option>
+                    <option value="Adultos 2">📗 Adultos 2 — Intermediate</option>
+                    <option value="Adultos 3">📕 Adultos 3 — Advanced</option>
+                  </select>
+                </div>
+                <div id="lxBookProgressSummary" class="lx-progress-pill">
+                  0 / 9 lecciones practicadas
+                </div>
+              </div>
+            </div>
+
+            <!-- VISTA 1: CUADRÍCULA DE LECCIONES DEL LIBRO -->
+            <div id="lxLessonGridView">
+              <div id="lxLessonsGrid" class="lx-lessons-grid">
+                <!-- Renderizado dinámicamente por assets/js/lessonExercises.js -->
+              </div>
+            </div>
+
+            <!-- VISTA 2: EJECUTOR INTERACTIVO DE PRÁCTICA POR LECCIÓN -->
+            <div id="lxPracticeRunnerView" class="hidden">
+              <div class="lx-practice-card">
+                <div class="lx-runner-topbar">
+                  <button type="button" class="lx-back-btn" onclick="window.LessonExercises.backToLessons()">
+                    ← Volver a las lecciones
+                  </button>
+                  <div class="lx-runner-meta">
+                    <span id="lxRunnerLessonTitle" class="lx-runner-lesson-name">L1 · The English Alphabet & Professions</span>
+                    <span id="lxRunnerStepText" class="lx-runner-step-badge">Ejercicio 1 de 8</span>
+                  </div>
+                </div>
+
+                <div class="lx-runner-progress-track">
+                  <div id="lxRunnerProgressBar" class="lx-runner-progress-fill" style="width: 12%;"></div>
+                </div>
+
+                <div class="lx-question-box">
+                  <div class="lx-question-box-top">
+                    <span id="lxQuestionTopicBadge" class="lx-topic-pill">📘 Grammar & Vocabulary</span>
+                    <button type="button" class="lq-audio-btn" onclick="window.LessonExercises.speakCurrentPrompt()" title="Escuchar pronunciación">
+                      🔊 Escuchar
+                    </button>
+                  </div>
+                  <h3 id="lxQuestionPrompt" class="lx-question-prompt">Cargando pregunta de la lección...</h3>
+                </div>
+
+                <div id="lxQuestionOptions" class="lx-options-list"></div>
+
+                <div id="lxExplanationBox" class="lx-explanation-card hidden"></div>
+
+                <div class="lx-runner-footer">
+                  <button type="button" id="lxNextQuestionBtn" class="lq-btn-3d lq-btn-indigo lx-next-btn hidden" onclick="window.LessonExercises.nextQuestion()">
+                    Siguiente Ejercicio →
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- VISTA 3: RESUMEN FINAL DE LA LECCIÓN -->
+            <div id="lxSummaryView" class="hidden">
+              <div class="lx-summary-card">
+                <div id="lxSummaryScoreBig" class="lx-summary-score-circle">100%</div>
+                <h3 id="lxSummaryTitle" class="lx-summary-title">¡Excelente dominio de la lección!</h3>
+                <p id="lxSummarySubtitle" class="lx-summary-sub">Respondiste correctamente 8 de 8 ejercicios (100%).</p>
+                <div class="lx-summary-actions">
+                  <button type="button" class="lq-btn-3d lq-btn-neutral lx-summary-btn" onclick="window.LessonExercises.backToLessons()">
+                    📚 Elegir Otra Lección
+                  </button>
+                  <button type="button" class="lq-btn-3d lq-btn-green lx-summary-btn" onclick="window.LessonExercises.retryCurrentLesson()">
+                    🔄 Practicar de Nuevo
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
@@ -1270,10 +1371,12 @@
   <!-- 3. Confetti para celebraciones de racha en Juegos -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <!-- 4. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261029_mode_picker"></script>
+  <script src="assets/js/onlineClasses.js?v=20261029_lx"></script>
   <!-- 5. Módulo Oficial de Juegos Interactivos (Tabla `games` en Supabase) -->
-  <script src="assets/js/studentGames.js?v=20261029_mode_picker"></script>
-  <!-- 6. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261029_mode_picker"></script>
+  <script src="assets/js/studentGames.js?v=20261029_lx"></script>
+  <!-- 6. Módulo Oficial de Ejercicios por Lección (Tabla `lesson_exercises` en Supabase) -->
+  <script src="assets/js/lessonExercises.js?v=20261029_lx"></script>
+  <!-- 7. Lógica de la Plataforma -->
+  <script src="assets/js/platform.js?v=20261029_lx"></script>
 </body>
 </html>
