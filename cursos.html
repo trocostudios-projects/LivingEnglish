@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_teens23">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261029_teens23">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261029_teens23">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_teens23">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_games">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261029_games">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261029_games">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_games">
 </head>
 <body>
 
@@ -187,133 +187,224 @@
           </div>
         </div>
 
-        <!-- SUBSECCIÓN 2: JUEGOS INTERACTIVOS (6 TARJETAS) -->
+        <!-- SUBSECCIÓN 2: LINGUAQUEST — JUEGOS INTERACTIVOS CONECTADOS A SUPABASE (TABLA `games`) -->
         <div id="studentTabGames" class="hidden">
-          <!-- Banner motivacional de Juegos -->
-          <div class="games-header-banner">
-            <div>
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                <span style="font-size: 26px;">🕹️</span>
-                <h2 style="font-family: var(--font-display); font-size: 22px; color: #ffffff; margin: 0;">Zona de Retos & Juegos Interactivos</h2>
-              </div>
-              <p style="color: var(--color-muted); font-size: 14px; margin: 0; line-height: 1.5;">
-                Refuerza tu vocabulario, fluidez oral y estructuras gramaticales de manera dinámica mientras ganas puntos de experiencia (XP).
-              </p>
-            </div>
-            <div style="background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.2); font-size: 13px; display: flex; align-items: center; gap: 8px;">
-              <span>🏆 Recompensa Total:</span>
-              <strong style="color: #fbbf24; font-size: 15px;">+405 XP</strong>
-            </div>
-          </div>
+          <div class="lq-shell">
+            <!-- Barra Superior: Selector de Nivel CEFR, Estado DB, Racha y XP -->
+            <div class="lq-topbar">
+              <div class="lq-topbar-left">
+                <!-- Selector de Nivel CEFR -->
+                <div class="lq-level-dropdown-wrap">
+                  <button type="button" id="levelBtn" class="lq-level-btn" onclick="window.LivingGames.toggleLevelMenu(event)">
+                    <span id="levelBadge" class="lq-level-badge lq-level-a1">A1</span>
+                    <span id="levelTitle">Principiante</span>
+                    <span class="lq-chevron">▾</span>
+                  </button>
 
-          <!-- Cuadrícula con 6 Tarjetas de Juegos Interactivos -->
-          <div class="games-grid">
-            <!-- 1. Word Hunter -->
-            <div class="game-card" onclick="openGameLauncher('word-hunter', 'Word Hunter', '🔤', 'Sopa de Letras & Vocabulario', 'Encuentra palabras clave de tu unidad actual en una cuadrícula interactiva contra el cronómetro. ¡Entrena tu rapidez mental y ortografía!', '+50 XP', 'Vocabulario')">
-              <div class="game-card-badge-row">
-                <span class="game-category-tag tag-vocab">Vocabulario</span>
-                <span class="game-xp-tag">⚡ +50 XP</span>
-              </div>
-              <div class="game-card-icon">🔤</div>
-              <h3 class="game-card-title">Word Hunter</h3>
-              <p class="game-card-subtitle">Sopa de letras & Agilidad léxica</p>
-              <p class="game-card-desc">
-                Localiza palabras clave del vocabulario oficial antes de que acabe el tiempo. ¡Entrena tu rapidez mental y ortografía!
-              </p>
-              <div class="game-card-footer">
-                <span class="game-card-level">Todos los niveles</span>
-                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
-              </div>
-            </div>
+                  <!-- Menú Desplegable de Niveles -->
+                  <div id="levelMenu" class="lq-level-menu hidden">
+                    <button type="button" onclick="setLevel('A1')" class="lq-level-option">
+                      <span class="lq-opt-title lq-text-a1">A1 - Principiante</span>
+                      <span class="lq-opt-tag lq-bg-a1">Easy</span>
+                    </button>
+                    <button type="button" onclick="setLevel('A2')" class="lq-level-option">
+                      <span class="lq-opt-title lq-text-a2">A2 - Elemental</span>
+                      <span class="lq-opt-tag lq-bg-a2">Basic</span>
+                    </button>
+                    <button type="button" onclick="setLevel('B1')" class="lq-level-option">
+                      <span class="lq-opt-title lq-text-b1">B1 - Intermedio</span>
+                      <span class="lq-opt-tag lq-bg-b1">Medium</span>
+                    </button>
+                    <button type="button" onclick="setLevel('B2')" class="lq-level-option">
+                      <span class="lq-opt-title lq-text-b2">B2 - Intermedio Alto</span>
+                      <span class="lq-opt-tag lq-bg-b2">Hard</span>
+                    </button>
+                    <button type="button" onclick="setLevel('C1')" class="lq-level-option">
+                      <span class="lq-opt-title lq-text-c1">C1 - Avanzado</span>
+                      <span class="lq-opt-tag lq-bg-c1">Expert</span>
+                    </button>
+                  </div>
+                </div>
 
-            <!-- 2. Grammar Rocket -->
-            <div class="game-card" onclick="openGameLauncher('grammar-rocket', 'Grammar Rocket', '🚀', 'Estructuras y Tiempos Verbales', 'Conecta y ordena sujetos, auxiliares y verbos en el orden sintáctico correcto para recargar el combustible del cohete.', '+75 XP', 'Gramática')">
-              <div class="game-card-badge-row">
-                <span class="game-category-tag tag-grammar">Gramática</span>
-                <span class="game-xp-tag">⚡ +75 XP</span>
+                <span id="lqDbStatusChip" class="lq-db-chip lq-db-online">🟢 Retos Oficiales</span>
               </div>
-              <div class="game-card-icon">🚀</div>
-              <h3 class="game-card-title">Grammar Rocket</h3>
-              <p class="game-card-subtitle">Estructuras y tiempos verbales</p>
-              <p class="game-card-desc">
-                Conecta sujetos, auxiliares y verbos en el orden sintáctico correcto para recargar el combustible del cohete espacial.
-              </p>
-              <div class="game-card-footer">
-                <span class="game-card-level">Básico a Avanzado</span>
-                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
-              </div>
-            </div>
 
-            <!-- 3. Flash Cards Match -->
-            <div class="game-card" onclick="openGameLauncher('flash-match', 'Flash Cards Match', '🃏', 'Memoria & Fonética Nativa', 'Descubre pares de tarjetas volteadas relacionando imágenes, conceptos y expresiones en inglés con pronunciación de hablantes nativos.', '+40 XP', 'Memoria & Audio')">
-              <div class="game-card-badge-row">
-                <span class="game-category-tag tag-memory">Memoria & Audio</span>
-                <span class="game-xp-tag">⚡ +40 XP</span>
-              </div>
-              <div class="game-card-icon">🃏</div>
-              <h3 class="game-card-title">Flash Cards Match</h3>
-              <p class="game-card-subtitle">Emparejamiento y audios nativos</p>
-              <p class="game-card-desc">
-                Descubre pares de tarjetas volteadas relacionando imágenes, palabras y su pronunciación oficial con acento natural.
-              </p>
-              <div class="game-card-footer">
-                <span class="game-card-level">Todos los cursos</span>
-                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
+              <!-- Contadores de Racha, XP y Audio -->
+              <div class="lq-topbar-right">
+                <div class="lq-stat-pill lq-stat-streak" title="Racha de aciertos seguidos">
+                  <span class="lq-stat-icon">🔥</span>
+                  <span id="streakDisplay">0</span>
+                </div>
+                <div class="lq-stat-pill lq-stat-xp" title="Puntos de experiencia ganados">
+                  <span class="lq-stat-icon">💎</span>
+                  <span id="xpDisplay">0</span>
+                  <span class="lq-stat-unit">XP</span>
+                </div>
+                <button type="button" id="lqSoundBtn" class="lq-sound-btn" onclick="window.LivingGames.toggleSound()" title="Sonido activado">
+                  🔊
+                </button>
               </div>
             </div>
 
-            <!-- 4. Speed Speaking Challenge -->
-            <div class="game-card" onclick="openGameLauncher('speed-speaking', 'Speed Speaking Challenge', '🎙️', 'Expresión Oral & Entonación', 'Escucha frases de conversaciones reales y repítelas con precisión ante el micrófono para ganar medallas de fluidez y claridad.', '+100 XP', 'Speaking')">
-              <div class="game-card-badge-row">
-                <span class="game-category-tag tag-speaking">Speaking</span>
-                <span class="game-xp-tag">⚡ +100 XP</span>
-              </div>
-              <div class="game-card-icon">🎙️</div>
-              <h3 class="game-card-title">Speed Speaking</h3>
-              <p class="game-card-subtitle">Reconocimiento oral & Fluidez</p>
-              <p class="game-card-desc">
-                Habla en voz alta frente al micrófono y recibe análisis de entonación y claridad para perfeccionar tu habla conversacional.
-              </p>
-              <div class="game-card-footer">
-                <span class="game-card-level">Conversacional</span>
-                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
-              </div>
+            <!-- Dock de Navegación de los 3 Juegos -->
+            <div class="lq-mode-dock" role="tablist" aria-label="Modos de juego">
+              <button type="button" onclick="switchMode('fillrush')" id="nav-fillrush" class="lq-nav-tab active">
+                <span class="lq-tab-emoji">⚡</span>
+                <div>
+                  <span class="lq-tab-title">Fill-in Rush</span>
+                  <span class="lq-tab-sub">Contra el reloj</span>
+                </div>
+              </button>
+              <button type="button" onclick="switchMode('swipe')" id="nav-swipe" class="lq-nav-tab">
+                <span class="lq-tab-emoji">🃏</span>
+                <div>
+                  <span class="lq-tab-title">Swipe Match</span>
+                  <span class="lq-tab-sub">¿Verdadero o Falso?</span>
+                </div>
+              </button>
+              <button type="button" onclick="switchMode('bubbles')" id="nav-bubbles" class="lq-nav-tab">
+                <span class="lq-tab-emoji">🧩</span>
+                <div>
+                  <span class="lq-tab-title">Word Bubbles</span>
+                  <span class="lq-tab-sub">Arma la respuesta</span>
+                </div>
+              </button>
             </div>
 
-            <!-- 5. Trivia English Arena -->
-            <div class="game-card" onclick="openGameLauncher('trivia-arena', 'Trivia English Arena', '🏆', 'Cultura General & Idioms', 'Preguntas de opción múltiple contra el reloj sobre cultura anglosajona, modismos populares (idioms) y falsos amigos.', '+60 XP', 'Cultura & Quiz')">
-              <div class="game-card-badge-row">
-                <span class="game-category-tag tag-trivia">Cultura & Quiz</span>
-                <span class="game-xp-tag">⚡ +60 XP</span>
-              </div>
-              <div class="game-card-icon">🏆</div>
-              <h3 class="game-card-title">Trivia English Arena</h3>
-              <p class="game-card-subtitle">Modismos, cultura e idioms</p>
-              <p class="game-card-desc">
-                Supera rondas de preguntas rápidas sobre expresiones de la vida diaria, modismos anglosajones y datos culturales.
-              </p>
-              <div class="game-card-footer">
-                <span class="game-card-level">Multinivel</span>
-                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
-              </div>
-            </div>
+            <!-- Contenedor Principal del Juego Activo -->
+            <div class="lq-stage-container">
 
-            <!-- 6. Sentence Builder Puzzle -->
-            <div class="game-card" onclick="openGameLauncher('sentence-puzzle', 'Sentence Builder Puzzle', '🧩', 'Diálogos de Situaciones Reales', 'Arma conversaciones cotidianas ordenando fragmentos en situaciones reales: en el aeropuerto, en un restaurante o de compras.', '+80 XP', 'Situaciones Reales')">
-              <div class="game-card-badge-row">
-                <span class="game-category-tag tag-situational">Situaciones Reales</span>
-                <span class="game-xp-tag">⚡ +80 XP</span>
-              </div>
-              <div class="game-card-icon">🧩</div>
-              <h3 class="game-card-title">Sentence Builder</h3>
-              <p class="game-card-subtitle">Diálogos situacionales interactivos</p>
-              <p class="game-card-desc">
-                Arrastra y organiza fragmentos de diálogo para resolver situaciones cotidianas: pedir comida, pedir indicaciones o compras.
-              </p>
-              <div class="game-card-footer">
-                <span class="game-card-level">Práctica Activa</span>
-                <button type="button" class="btn-play-game">Iniciar Reto ➔</button>
-              </div>
+              <!-- MODO 1: FILL-IN RUSH -->
+              <section id="game-fillrush" class="lq-game-view">
+                <div class="lq-rush-hud">
+                  <div class="lq-rush-timer-group">
+                    <div id="timerContainer" class="lq-timer-box">
+                      <span id="rushTimer">60</span>
+                    </div>
+                    <div>
+                      <span class="lq-hud-label">Tiempo</span>
+                      <button type="button" class="lq-restart-link" onclick="window.LivingGames.restartFillRushRound()">↻ Reiniciar</button>
+                    </div>
+                  </div>
+                  <div class="lq-rush-score-group">
+                    <span class="lq-hud-label">Aciertos:</span>
+                    <span id="rushScore" class="lq-rush-score-val">0</span>
+                  </div>
+                </div>
+
+                <!-- Tarjeta de Pista / Oración -->
+                <div id="fillCard" class="lq-clue-card">
+                  <div class="lq-clue-header">
+                    <span id="fillGrammarTag" class="lq-category-pill lq-tag-default">Grammar</span>
+                    <button type="button" onclick="speakCurrentClue()" class="lq-audio-btn" title="Escuchar pronunciación en inglés">
+                      🔊 Escuchar
+                    </button>
+                  </div>
+                  <p id="fillClueText" class="lq-clue-text">
+                    Cargando pregunta...
+                  </p>
+                </div>
+
+                <!-- Cuadrícula de 4 Opciones 3D -->
+                <div id="fillOptionsGrid" class="lq-options-grid">
+                  <!-- Botones generados dinámicamente -->
+                </div>
+
+                <!-- Barra de Retroalimentación -->
+                <div id="fillFeedback" class="lq-feedback-bar"></div>
+              </section>
+
+              <!-- MODO 2: SWIPE & MATCH -->
+              <section id="game-swipe" class="lq-game-view hidden">
+                <div class="lq-swipe-header-hint">
+                  ¿La palabra o expresión coincide con la definición / oración?
+                </div>
+
+                <!-- Contenedor de la Tarjeta Deslizable -->
+                <div class="lq-swipe-stage">
+                  <div id="swipeCard" class="lq-swipe-card">
+                    <!-- Sellos dinámicos MATCH / NOPE -->
+                    <div id="stampCorrect" class="lq-stamp lq-stamp-match">MATCH!</div>
+                    <div id="stampWrong" class="lq-stamp lq-stamp-nope">NOPE!</div>
+
+                    <div class="lq-swipe-card-top">
+                      <span id="swipeCategoryTag" class="lq-category-pill lq-tag-vocab">Vocab</span>
+                      <button type="button" onclick="speakSwipeWord()" class="lq-audio-btn" title="Escuchar palabra">
+                        🔊
+                      </button>
+                    </div>
+
+                    <div class="lq-swipe-card-body">
+                      <h3 id="swipeWord" class="lq-swipe-word">Word</h3>
+                      <div class="lq-swipe-divider"></div>
+                      <p id="swipeClue" class="lq-swipe-clue">
+                        Definición de la palabra aquí...
+                      </p>
+                    </div>
+
+                    <div class="lq-swipe-card-foot">
+                      <span>← Desliza: Falso</span>
+                      <span>Verdadero: Desliza →</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="swipeFeedback" class="lq-feedback-bar"></div>
+
+                <!-- Botones Táctiles 3D Inferiores -->
+                <div class="lq-swipe-actions">
+                  <button type="button" onclick="handleSwipeAction(false)" class="lq-btn-3d lq-btn-red lq-swipe-circle-btn" aria-label="Falso">
+                    ✕
+                  </button>
+                  <button type="button" onclick="handleSwipeAction(true)" class="lq-btn-3d lq-btn-green lq-swipe-circle-btn" aria-label="Verdadero">
+                    ✓
+                  </button>
+                </div>
+              </section>
+
+              <!-- MODO 3: WORD BUBBLES -->
+              <section id="game-bubbles" class="lq-game-view hidden">
+                <div class="lq-clue-card">
+                  <div class="lq-clue-header">
+                    <span class="lq-category-pill lq-tag-bubbles">Construye la respuesta</span>
+                    <button type="button" onclick="speakBubbleTarget()" class="lq-audio-btn" title="Escuchar respuesta en inglés">
+                      🔊 Escuchar pista
+                    </button>
+                  </div>
+                  <p id="bubbleClue" class="lq-clue-text">
+                    Cargando pista...
+                  </p>
+                </div>
+
+                <!-- Área de Respuesta -->
+                <div class="lq-bubble-answer-wrap">
+                  <div class="lq-bubble-label-row">
+                    <span class="lq-hud-label">Tu respuesta:</span>
+                    <button type="button" class="lq-restart-link" onclick="window.LivingGames.skipBubbleQuestion()">Saltar ejercicio ➔</button>
+                  </div>
+                  <div id="bubbleAnswerArea" class="lq-bubble-answer-area">
+                    <span class="lq-bubble-placeholder">Toca las fichas de abajo para formar la respuesta</span>
+                  </div>
+                </div>
+
+                <div id="bubbleFeedback" class="lq-feedback-bar"></div>
+
+                <!-- Banco de Fichas / Letras / Palabras -->
+                <div id="bubblePool" class="lq-bubble-pool">
+                  <!-- Fichas generadas dinámicamente -->
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="lq-bubble-controls">
+                  <button type="button" onclick="undoLastBubble()" class="lq-btn-3d lq-btn-neutral lq-bubble-undo-btn">
+                    ↺ Deshacer
+                  </button>
+                  <button type="button" id="checkBubbleBtn" onclick="checkBubbleSolution()" class="lq-btn-3d lq-btn-green lq-bubble-check-btn">
+                    ✓ Comprobar Respuesta
+                  </button>
+                </div>
+              </section>
+
             </div>
           </div>
         </div>
@@ -957,9 +1048,13 @@
   </script>
   <!-- 2. Cliente de Supabase -->
   <script src="assets/js/supabaseClient.js?v=20261027"></script>
-  <!-- 3. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261029_teens23"></script>
-  <!-- 4. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261029_teens23"></script>
+  <!-- 3. Confetti para celebraciones de racha en Juegos -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- 4. Módulo Oficial de Clases Online -->
+  <script src="assets/js/onlineClasses.js?v=20261029_games"></script>
+  <!-- 5. Módulo Oficial de Juegos Interactivos (Tabla `games` en Supabase) -->
+  <script src="assets/js/studentGames.js?v=20261029_games"></script>
+  <!-- 6. Lógica de la Plataforma -->
+  <script src="assets/js/platform.js?v=20261029_games"></script>
 </body>
 </html>

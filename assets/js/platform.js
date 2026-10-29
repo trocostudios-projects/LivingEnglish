@@ -721,6 +721,7 @@ async function initAuthenticatedUser(user) {
   }
 
   currentUserProfile = profile;
+  window.currentUserProfile = profile;
 
   // Interfaz de Usuario con Detección Automática de Rol (Estudiante o Profesor)
   document.getElementById('authSection').classList.add('hidden');
@@ -756,6 +757,8 @@ async function logout() {
   }
 
   currentUserProfile = null;
+  window.currentUserProfile = null;
+  if (window.LivingGames) window.LivingGames.onTabClosed();
   currentSessionUser = null;
   selectedStudent = null;
 
@@ -791,11 +794,13 @@ function switchStudentTab(tab) {
     btnGames.classList.add('active');
     contentGrades.classList.add('hidden');
     contentGames.classList.remove('hidden');
+    if (window.LivingGames) window.LivingGames.onTabOpened();
   } else {
     btnGrades.classList.add('active');
     btnGames.classList.remove('active');
     contentGrades.classList.remove('hidden');
     contentGames.classList.add('hidden');
+    if (window.LivingGames) window.LivingGames.onTabClosed();
   }
 }
 
@@ -2949,3 +2954,5 @@ window.openClassBookingsModal = openClassBookingsModal;
 window.closeClassBookingsModal = closeClassBookingsModal;
 window.updateTeacherClassesBadge = updateTeacherClassesBadge;
 
+
+window.switchStudentTab = switchStudentTab;
