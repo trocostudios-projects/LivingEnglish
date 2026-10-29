@@ -2027,13 +2027,6 @@ body.student-light-theme .app-header,
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
 }
 
-body.student-light-theme .brand-logo-link,
-.app-viewport:has(#studentDashboard:not(.hidden)) .brand-logo-link {
-  background: #002b76;
-  padding: 6px 14px;
-  border-radius: 12px;
-}
-
 body.student-light-theme .user-badge,
 .app-viewport:has(#studentDashboard:not(.hidden)) .user-badge {
   background: #f1f5f9 !important;
