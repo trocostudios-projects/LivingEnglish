@@ -2007,47 +2007,58 @@
 /* ==========================================================================
    TEMA CLARO Y ATRACTIVO PARA LA SECCIÓN DE ESTUDIANTES (#studentDashboard)
    ========================================================================== */
-body.student-light-theme {
+body.student-light-theme,
+body:has(#studentDashboard:not(.hidden)),
+body.student-light-theme .app-viewport,
+.app-viewport:has(#studentDashboard:not(.hidden)) {
   background: linear-gradient(180deg, #fffbeb 0%, #f0f9ff 50%, #f8fafc 100%) !important;
   color: #1e293b !important;
 }
 
-body.student-light-theme::before {
+body.student-light-theme::before,
+body:has(#studentDashboard:not(.hidden))::before {
   opacity: 0.08 !important;
 }
 
-body.student-light-theme .app-header {
-  background: rgba(255, 255, 255, 0.94);
-  border: 2px solid #e2e8f0;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+body.student-light-theme .app-header,
+.app-viewport:has(#studentDashboard:not(.hidden)) .app-header {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
 }
 
-body.student-light-theme .brand-logo-link {
+body.student-light-theme .brand-logo-link,
+.app-viewport:has(#studentDashboard:not(.hidden)) .brand-logo-link {
   background: #002b76;
   padding: 6px 14px;
   border-radius: 12px;
 }
 
-body.student-light-theme .user-badge {
-  background: #f1f5f9;
-  border: 2px solid #e2e8f0;
-  color: #1e293b;
+body.student-light-theme .user-badge,
+.app-viewport:has(#studentDashboard:not(.hidden)) .user-badge {
+  background: #f1f5f9 !important;
+  border: 2px solid #e2e8f0 !important;
+  color: #1e293b !important;
+  box-shadow: none !important;
 }
 
-body.student-light-theme .user-badge-name {
-  color: #0f172a;
+body.student-light-theme .user-badge-name,
+.app-viewport:has(#studentDashboard:not(.hidden)) .user-badge-name {
+  color: #0f172a !important;
   font-weight: 700;
 }
 
-body.student-light-theme .btn-logout {
-  background: #fff1f2;
-  color: #e11d48;
-  border: 2px solid #fecdd3;
+body.student-light-theme .btn-logout,
+.app-viewport:has(#studentDashboard:not(.hidden)) .btn-logout {
+  background: #fff1f2 !important;
+  color: #e11d48 !important;
+  border: 2px solid #fecdd3 !important;
   font-weight: 700;
 }
 
-body.student-light-theme .btn-logout:hover {
-  background: #ffe4e6;
+body.student-light-theme .btn-logout:hover,
+.app-viewport:has(#studentDashboard:not(.hidden)) .btn-logout:hover {
+  background: #ffe4e6 !important;
 }
 
 /* Tipografía y cabeceras en #studentDashboard */
