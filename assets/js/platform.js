@@ -214,6 +214,117 @@ const ACADEMIC_CURRICULUM = {
     ]
   },
 
+  // Teens 2 — Intermediate Study Guide
+  'Teens 2': {
+    title: 'Teens Nivel 2 — Intermediate Study Guide',
+    maxPoints: 3000,
+    passingScore: 2300,
+    stages: [
+      {
+        name: 'Review & Lesson 1 (700 pts)',
+        items: [
+          { number: 1, title: 'Microclass — Teach a Basic Level topic in groups', lesson: 'Review', type: 'Oral', maxPoints: 100 },
+          { number: 2, title: 'House Tour — “My future house” (there will be)', lesson: 'L1', type: 'Oral', maxPoints: 100 },
+          { number: 3, title: 'Favorite Movie or Series', lesson: 'L1', type: 'Oral', maxPoints: 100 },
+          { number: 4, title: 'My City — Mind map + tell the class', lesson: 'L1', type: 'Oral', maxPoints: 100 },
+          { number: 5, title: 'Recipe Reading — A family recipe', lesson: 'L1', type: 'Oral', maxPoints: 100 },
+          { number: 6, title: 'Pieces of a Story — Order it and read it', lesson: 'L1', type: 'Oral', maxPoints: 100 },
+          { number: 7, title: 'Written Test 1', lesson: 'L1', type: 'Escrito', maxPoints: 100 }
+        ]
+      },
+      {
+        name: 'Lessons 2–4 (700 pts)',
+        items: [
+          { number: 8, title: 'Last Vacations — Tell, then answer questions', lesson: 'L2', type: 'Oral', maxPoints: 100 },
+          { number: 9, title: 'About Me — “My life so far” presentation', lesson: 'L2', type: 'Oral', maxPoints: 100 },
+          { number: 10, title: 'Reading: Taylor Swift — Read aloud + past verbs', lesson: 'L2', type: 'Oral', maxPoints: 100 },
+          { number: 11, title: 'Written Test 2', lesson: 'L2', type: 'Escrito', maxPoints: 100 },
+          { number: 12, title: 'American State — 10 curiosities', lesson: 'L3', type: 'Oral', maxPoints: 100 },
+          { number: 13, title: 'Past Habits — Used to / be used to', lesson: 'L4', type: 'Oral', maxPoints: 100 },
+          { number: 14, title: 'Written Test 3 & 4', lesson: 'L3–L4', type: 'Escrito', maxPoints: 100 }
+        ]
+      },
+      {
+        name: 'Lessons 5–8 (1100 pts)',
+        items: [
+          { number: 15, title: 'Comic Writing — Write the dialogues', lesson: 'L5', type: 'Escrito', maxPoints: 100 },
+          { number: 16, title: 'Sing a Rap Song — Fluency, not voice', lesson: 'L5', type: 'Oral', maxPoints: 100 },
+          { number: 17, title: 'Situation to Speak — The word bowl', lesson: 'L5', type: 'Oral', maxPoints: 100 },
+          { number: 18, title: 'Classroom Debate', lesson: 'L6', type: 'Oral', maxPoints: 100 },
+          { number: 19, title: 'Pretend to Be — Guess who I am', lesson: 'L6', type: 'Oral', maxPoints: 100 },
+          { number: 20, title: 'Written Test 5 & 6', lesson: 'L5–L6', type: 'Escrito', maxPoints: 100 },
+          { number: 21, title: 'Talking Dice — 1, 2, 3… SPEAK!', lesson: 'L7', type: 'Oral', maxPoints: 100 },
+          { number: 22, title: 'Fictional Character — Abilities & obligations', lesson: 'L8', type: 'Oral', maxPoints: 100 },
+          { number: 23, title: 'Radio Commercial — In pairs', lesson: 'L8', type: 'Oral', maxPoints: 100 },
+          { number: 24, title: 'Friends Roleplay — Health problems & advice', lesson: 'L8', type: 'Oral', maxPoints: 100 },
+          { number: 25, title: 'Written Test 7 & 8', lesson: 'L7–L8', type: 'Escrito', maxPoints: 100 }
+        ]
+      },
+      {
+        name: 'Finals (500 pts)',
+        items: [
+          { number: 26, title: 'Written Final Test', lesson: 'Final', type: 'Escrito', maxPoints: 100 },
+          { number: 27, title: 'Final Interview', lesson: 'Final', type: 'Oral', maxPoints: 200 },
+          { number: 28, title: 'Final Presentation', lesson: 'Final', type: 'Oral', maxPoints: 200 }
+        ]
+      }
+    ]
+  },
+
+  // Teens 3 — Advanced Study Guide
+  'Teens 3': {
+    title: 'Teens Nivel 3 — Advanced Study Guide',
+    maxPoints: 3200,
+    passingScore: 2720,
+    stages: [
+      {
+        name: 'Lessons 1–4 (700 pts)',
+        items: [
+          { number: 1, title: 'Roleplay — Friends who meet again after the holidays', lesson: 'L1', type: 'Oral', maxPoints: 100 },
+          { number: 2, title: 'Out-Loud Reading — The three progressive tenses', lesson: 'L1', type: 'Oral', maxPoints: 100 },
+          { number: 3, title: 'My School Year — A paragraph with perfect tenses', lesson: 'L2', type: 'Escrito', maxPoints: 100 },
+          { number: 4, title: 'Written Test 1 & 2', lesson: 'L1–L2', type: 'Escrito', maxPoints: 100 },
+          { number: 5, title: 'Return It! — A complaint at the store', lesson: 'L3', type: 'Oral', maxPoints: 100 },
+          { number: 6, title: 'Student Council Campaign — Conditional promises', lesson: 'L4', type: 'Oral', maxPoints: 100 },
+          { number: 7, title: 'Written Test 3 & 4', lesson: 'L3–L4', type: 'Escrito', maxPoints: 100 }
+        ]
+      },
+      {
+        name: 'Lessons 5–7 (700 pts)',
+        items: [
+          { number: 8, title: 'Picture Telling — Explain the evidence', lesson: 'L5', type: 'Oral', maxPoints: 100 },
+          { number: 9, title: 'Bus Ride — A conversation on the way', lesson: 'L5', type: 'Oral', maxPoints: 100 },
+          { number: 10, title: 'House Rules — Teen and parent', lesson: 'L6', type: 'Oral', maxPoints: 100 },
+          { number: 11, title: 'Written Test 5 & 6', lesson: 'L5–L6', type: 'Escrito', maxPoints: 100 },
+          { number: 12, title: 'Detective Game — Reporting what was said', lesson: 'L7', type: 'Oral', maxPoints: 100 },
+          { number: 13, title: 'Message Chain — He said, she said', lesson: 'L7', type: 'Oral', maxPoints: 100 },
+          { number: 14, title: 'Written Test 7', lesson: 'L7', type: 'Escrito', maxPoints: 100 }
+        ]
+      },
+      {
+        name: 'Lessons 8–10 (600 pts)',
+        items: [
+          { number: 15, title: 'Mock Trial — Who broke the rule?', lesson: 'L8', type: 'Oral', maxPoints: 100 },
+          { number: 16, title: 'Comprehension Reading', lesson: 'L8', type: 'Escrito', maxPoints: 100 },
+          { number: 17, title: 'Written Test 8', lesson: 'L8', type: 'Escrito', maxPoints: 100 },
+          { number: 18, title: 'Story From Zero — Phrasal verbs', lesson: 'L9', type: 'Oral', maxPoints: 100 },
+          { number: 19, title: 'Speed Friending — Who, which, whose…', lesson: 'L10', type: 'Oral', maxPoints: 100 },
+          { number: 20, title: 'Written Test 9 & 10', lesson: 'L9–L10', type: 'Escrito', maxPoints: 100 }
+        ]
+      },
+      {
+        name: 'Whole Level & Finals (1200 pts)',
+        items: [
+          { number: 21, title: 'Social Work — Community project at the academy', lesson: 'Level', type: 'Proyecto', maxPoints: 100 },
+          { number: 22, title: 'Speaking Classes — At the academy, along the whole level', lesson: 'Level', type: 'Oral', maxPoints: 400 },
+          { number: 23, title: 'Written Final Test', lesson: 'Final', type: 'Escrito', maxPoints: 100 },
+          { number: 24, title: 'Final Interview', lesson: 'Final', type: 'Oral', maxPoints: 400 },
+          { number: 25, title: 'Final Speech', lesson: 'Final', type: 'Oral', maxPoints: 200 }
+        ]
+      }
+    ]
+  },
+
   // Junior 1
   'Junior 1': {
     title: 'Junior Nivel 1 — Study Guide',
@@ -1951,7 +2062,7 @@ function updateNewStudentLevelOptions() {
   list.forEach(lvl => {
     const opt = document.createElement('option');
     opt.value = lvl;
-    opt.textContent = lvl === 'Adultos 1' ? 'Adultos 1 (Basic)' : (lvl === 'Adultos 2' ? 'Adultos 2 (Intermediate)' : (lvl === 'Adultos 3' ? 'Adultos 3 (Advanced)' : (lvl === 'Teens 1' ? 'Teens 1 (Basic)' : (lvl === 'Kids 1' ? 'Kids 1 (Little Stars)' : lvl))));
+    opt.textContent = lvl === 'Adultos 1' ? 'Adultos 1 (Basic)' : (lvl === 'Adultos 2' ? 'Adultos 2 (Intermediate)' : (lvl === 'Adultos 3' ? 'Adultos 3 (Advanced)' : (lvl === 'Teens 1' ? 'Teens 1 (Basic)' : (lvl === 'Teens 2' ? 'Teens 2 (Intermediate)' : (lvl === 'Teens 3' ? 'Teens 3 (Advanced)' : (lvl === 'Kids 1' ? 'Kids 1 (Little Stars)' : lvl))))));
     levelSelect.appendChild(opt);
   });
 }
@@ -2109,7 +2220,7 @@ function updateRenewLevelOptions() {
   list.forEach(lvl => {
     const opt = document.createElement('option');
     opt.value = lvl;
-    opt.textContent = lvl === 'Adultos 1' ? 'Adultos 1 (Basic)' : (lvl === 'Adultos 2' ? 'Adultos 2 (Intermediate)' : (lvl === 'Adultos 3' ? 'Adultos 3 (Advanced)' : (lvl === 'Teens 1' ? 'Teens 1 (Basic)' : (lvl === 'Kids 1' ? 'Kids 1 (Little Stars)' : lvl))));
+    opt.textContent = lvl === 'Adultos 1' ? 'Adultos 1 (Basic)' : (lvl === 'Adultos 2' ? 'Adultos 2 (Intermediate)' : (lvl === 'Adultos 3' ? 'Adultos 3 (Advanced)' : (lvl === 'Teens 1' ? 'Teens 1 (Basic)' : (lvl === 'Teens 2' ? 'Teens 2 (Intermediate)' : (lvl === 'Teens 3' ? 'Teens 3 (Advanced)' : (lvl === 'Kids 1' ? 'Kids 1 (Little Stars)' : lvl))))));
     levelSelect.appendChild(opt);
   });
 }
@@ -2255,7 +2366,7 @@ function updateEditStudentLevelOptions() {
   list.forEach(lvl => {
     const opt = document.createElement('option');
     opt.value = lvl;
-    opt.textContent = lvl === 'Adultos 1' ? 'Adultos 1 (Basic)' : (lvl === 'Adultos 2' ? 'Adultos 2 (Intermediate)' : (lvl === 'Adultos 3' ? 'Adultos 3 (Advanced)' : (lvl === 'Teens 1' ? 'Teens 1 (Basic)' : (lvl === 'Kids 1' ? 'Kids 1 (Little Stars)' : lvl))));
+    opt.textContent = lvl === 'Adultos 1' ? 'Adultos 1 (Basic)' : (lvl === 'Adultos 2' ? 'Adultos 2 (Intermediate)' : (lvl === 'Adultos 3' ? 'Adultos 3 (Advanced)' : (lvl === 'Teens 1' ? 'Teens 1 (Basic)' : (lvl === 'Teens 2' ? 'Teens 2 (Intermediate)' : (lvl === 'Teens 3' ? 'Teens 3 (Advanced)' : (lvl === 'Kids 1' ? 'Kids 1 (Little Stars)' : lvl))))));
     levelSelect.appendChild(opt);
   });
 }
