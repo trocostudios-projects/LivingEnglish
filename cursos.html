@@ -8,13 +8,13 @@
   <!-- Fuentes Google: Fredoka y Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_games">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261029_games">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261029_games">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_games">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_kids_light">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261029_kids_light">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261029_kids_light">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_kids_light">
 </head>
 <body>
 
@@ -82,12 +82,12 @@
             <p class="page-description" id="studentCourseSub">Control oficial de evaluaciones y progreso curricular.</p>
           </div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <div id="studentLevelSelectorWrapper" class="hidden" style="background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); font-size: 13px; display: flex; align-items: center; gap: 6px;">
-              <label for="studentLevelSelect" style="color: var(--color-muted); font-size: 12px; margin: 0;">Nivel:</label>
-              <select id="studentLevelSelect" onchange="changeStudentViewLevel(this.value)" style="background: transparent; color: #ffffff; border: none; font-weight: 700; outline: none; cursor: pointer;"></select>
+            <div id="studentLevelSelectorWrapper" class="student-level-pill-box hidden">
+              <label for="studentLevelSelect" class="student-level-pill-label">Nivel:</label>
+              <select id="studentLevelSelect" onchange="changeStudentViewLevel(this.value)" class="student-level-select-input"></select>
             </div>
-            <div style="background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.25); font-size: 14px;">
-              Nivel actual: <strong id="studentCurrentLevelBadge" style="color: var(--color-primary-light);">Adultos 1</strong>
+            <div class="student-level-pill-box">
+              <span>Nivel actual:</span> <strong id="studentCurrentLevelBadge" class="student-current-level-strong">Adultos 1</strong>
             </div>
           </div>
         </div>
@@ -187,21 +187,33 @@
           </div>
         </div>
 
-        <!-- SUBSECCIÓN 2: LINGUAQUEST — JUEGOS INTERACTIVOS CONECTADOS A SUPABASE (TABLA `games`) -->
+        <!-- SUBSECCIÓN 2: LINGUAQUEST & KIDS — JUEGOS INTERACTIVOS PARA NIÑOS Y ADULTOS -->
         <div id="studentTabGames" class="hidden">
           <div class="lq-shell">
-            <!-- Barra Superior: Selector de Nivel CEFR, Estado DB, Racha y XP -->
+
+            <!-- Barra Superior: Selector Modo Niños / Modo Niveles A1-C1, Estrellas, Racha y Sonido -->
             <div class="lq-topbar">
               <div class="lq-topbar-left">
-                <!-- Selector de Nivel CEFR -->
-                <div class="lq-level-dropdown-wrap">
+                <!-- Switcher Modo Niños vs Modo Niveles A1-C1 -->
+                <div class="lq-audience-switcher" role="group" aria-label="Modo de juegos">
+                  <button type="button" id="modeBtnKids" onclick="setAudienceMode(true)" class="lq-audience-btn lq-audience-kids active">
+                    <span>🧸</span>
+                    <span>Modo Niños</span>
+                  </button>
+                  <button type="button" id="modeBtnGeneral" onclick="setAudienceMode(false)" class="lq-audience-btn lq-audience-gen">
+                    <span>🎓</span>
+                    <span>Niveles A1–C1</span>
+                  </button>
+                </div>
+
+                <!-- Selector de Nivel CEFR (Visible en Modo Niveles A1–C1) -->
+                <div id="generalLevelContainer" class="lq-level-dropdown-wrap hidden">
                   <button type="button" id="levelBtn" class="lq-level-btn" onclick="window.LivingGames.toggleLevelMenu(event)">
                     <span id="levelBadge" class="lq-level-badge lq-level-a1">A1</span>
                     <span id="levelTitle">Principiante</span>
                     <span class="lq-chevron">▾</span>
                   </button>
 
-                  <!-- Menú Desplegable de Niveles -->
                   <div id="levelMenu" class="lq-level-menu hidden">
                     <button type="button" onclick="setLevel('A1')" class="lq-level-option">
                       <span class="lq-opt-title lq-text-a1">A1 - Principiante</span>
@@ -225,187 +237,259 @@
                     </button>
                   </div>
                 </div>
-
-                <span id="lqDbStatusChip" class="lq-db-chip lq-db-online">🟢 Retos Oficiales</span>
               </div>
 
-              <!-- Contadores de Racha, XP y Audio -->
+              <!-- Contadores de Estrellas, Racha y Botón de Sonido -->
               <div class="lq-topbar-right">
+                <div class="lq-stat-pill lq-stat-stars" title="Estrellas ganadas">
+                  <span>⭐</span>
+                  <span id="starsDisplay">0</span>
+                </div>
                 <div class="lq-stat-pill lq-stat-streak" title="Racha de aciertos seguidos">
-                  <span class="lq-stat-icon">🔥</span>
+                  <span>🔥</span>
                   <span id="streakDisplay">0</span>
                 </div>
-                <div class="lq-stat-pill lq-stat-xp" title="Puntos de experiencia ganados">
-                  <span class="lq-stat-icon">💎</span>
-                  <span id="xpDisplay">0</span>
-                  <span class="lq-stat-unit">XP</span>
-                </div>
-                <button type="button" id="lqSoundBtn" class="lq-sound-btn" onclick="window.LivingGames.toggleSound()" title="Sonido activado">
+                <button type="button" id="soundToggleBtn" onclick="toggleSound()" class="lq-sound-btn" title="Sonido activado">
                   🔊
                 </button>
               </div>
             </div>
 
-            <!-- Dock de Navegación de los 3 Juegos -->
-            <div class="lq-mode-dock" role="tablist" aria-label="Modos de juego">
-              <button type="button" onclick="switchMode('fillrush')" id="nav-fillrush" class="lq-nav-tab active">
-                <span class="lq-tab-emoji">⚡</span>
-                <div>
-                  <span class="lq-tab-title">Fill-in Rush</span>
-                  <span class="lq-tab-sub">Contra el reloj</span>
-                </div>
+            <!-- ============================================================== -->
+            <!-- DOCK DE NAVEGACIÓN DE JUEGOS (NIÑOS: 4 JUEGOS / GENERAL: 3)    -->
+            <!-- ============================================================== -->
+            <!-- Barra de 4 Juegos Modo Niños -->
+            <div id="kidsNav" class="lq-nav-dock lq-kids-dock">
+              <button type="button" onclick="switchKidsGame('listen')" id="knav-listen" class="kids-nav-tab active">
+                <span class="lq-dock-emoji">🎧</span>
+                <span class="lq-dock-label">Escucha</span>
               </button>
-              <button type="button" onclick="switchMode('swipe')" id="nav-swipe" class="lq-nav-tab">
-                <span class="lq-tab-emoji">🃏</span>
-                <div>
-                  <span class="lq-tab-title">Swipe Match</span>
-                  <span class="lq-tab-sub">¿Verdadero o Falso?</span>
-                </div>
+              <button type="button" onclick="switchKidsGame('letters')" id="knav-letters" class="kids-nav-tab">
+                <span class="lq-dock-emoji">🧩</span>
+                <span class="lq-dock-label">Arma</span>
               </button>
-              <button type="button" onclick="switchMode('bubbles')" id="nav-bubbles" class="lq-nav-tab">
-                <span class="lq-tab-emoji">🧩</span>
-                <div>
-                  <span class="lq-tab-title">Word Bubbles</span>
-                  <span class="lq-tab-sub">Arma la respuesta</span>
-                </div>
+              <button type="button" onclick="switchKidsGame('bubbles')" id="knav-bubbles" class="kids-nav-tab">
+                <span class="lq-dock-emoji">🎈</span>
+                <span class="lq-dock-label">Explota</span>
+              </button>
+              <button type="button" onclick="switchKidsGame('memory')" id="knav-memory" class="kids-nav-tab">
+                <span class="lq-dock-emoji">✨</span>
+                <span class="lq-dock-label">Parejas</span>
               </button>
             </div>
 
-            <!-- Contenedor Principal del Juego Activo -->
-            <div class="lq-stage-container">
-
-              <!-- MODO 1: FILL-IN RUSH -->
-              <section id="game-fillrush" class="lq-game-view">
-                <div class="lq-rush-hud">
-                  <div class="lq-rush-timer-group">
-                    <div id="timerContainer" class="lq-timer-box">
-                      <span id="rushTimer">60</span>
-                    </div>
-                    <div>
-                      <span class="lq-hud-label">Tiempo</span>
-                      <button type="button" class="lq-restart-link" onclick="window.LivingGames.restartFillRushRound()">↻ Reiniciar</button>
-                    </div>
-                  </div>
-                  <div class="lq-rush-score-group">
-                    <span class="lq-hud-label">Aciertos:</span>
-                    <span id="rushScore" class="lq-rush-score-val">0</span>
-                  </div>
-                </div>
-
-                <!-- Tarjeta de Pista / Oración -->
-                <div id="fillCard" class="lq-clue-card">
-                  <div class="lq-clue-header">
-                    <span id="fillGrammarTag" class="lq-category-pill lq-tag-default">Grammar</span>
-                    <button type="button" onclick="speakCurrentClue()" class="lq-audio-btn" title="Escuchar pronunciación en inglés">
-                      🔊 Escuchar
-                    </button>
-                  </div>
-                  <p id="fillClueText" class="lq-clue-text">
-                    Cargando pregunta...
-                  </p>
-                </div>
-
-                <!-- Cuadrícula de 4 Opciones 3D -->
-                <div id="fillOptionsGrid" class="lq-options-grid">
-                  <!-- Botones generados dinámicamente -->
-                </div>
-
-                <!-- Barra de Retroalimentación -->
-                <div id="fillFeedback" class="lq-feedback-bar"></div>
-              </section>
-
-              <!-- MODO 2: SWIPE & MATCH -->
-              <section id="game-swipe" class="lq-game-view hidden">
-                <div class="lq-swipe-header-hint">
-                  ¿La palabra o expresión coincide con la definición / oración?
-                </div>
-
-                <!-- Contenedor de la Tarjeta Deslizable -->
-                <div class="lq-swipe-stage">
-                  <div id="swipeCard" class="lq-swipe-card">
-                    <!-- Sellos dinámicos MATCH / NOPE -->
-                    <div id="stampCorrect" class="lq-stamp lq-stamp-match">MATCH!</div>
-                    <div id="stampWrong" class="lq-stamp lq-stamp-nope">NOPE!</div>
-
-                    <div class="lq-swipe-card-top">
-                      <span id="swipeCategoryTag" class="lq-category-pill lq-tag-vocab">Vocab</span>
-                      <button type="button" onclick="speakSwipeWord()" class="lq-audio-btn" title="Escuchar palabra">
-                        🔊
-                      </button>
-                    </div>
-
-                    <div class="lq-swipe-card-body">
-                      <h3 id="swipeWord" class="lq-swipe-word">Word</h3>
-                      <div class="lq-swipe-divider"></div>
-                      <p id="swipeClue" class="lq-swipe-clue">
-                        Definición de la palabra aquí...
-                      </p>
-                    </div>
-
-                    <div class="lq-swipe-card-foot">
-                      <span>← Desliza: Falso</span>
-                      <span>Verdadero: Desliza →</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div id="swipeFeedback" class="lq-feedback-bar"></div>
-
-                <!-- Botones Táctiles 3D Inferiores -->
-                <div class="lq-swipe-actions">
-                  <button type="button" onclick="handleSwipeAction(false)" class="lq-btn-3d lq-btn-red lq-swipe-circle-btn" aria-label="Falso">
-                    ✕
-                  </button>
-                  <button type="button" onclick="handleSwipeAction(true)" class="lq-btn-3d lq-btn-green lq-swipe-circle-btn" aria-label="Verdadero">
-                    ✓
-                  </button>
-                </div>
-              </section>
-
-              <!-- MODO 3: WORD BUBBLES -->
-              <section id="game-bubbles" class="lq-game-view hidden">
-                <div class="lq-clue-card">
-                  <div class="lq-clue-header">
-                    <span class="lq-category-pill lq-tag-bubbles">Construye la respuesta</span>
-                    <button type="button" onclick="speakBubbleTarget()" class="lq-audio-btn" title="Escuchar respuesta en inglés">
-                      🔊 Escuchar pista
-                    </button>
-                  </div>
-                  <p id="bubbleClue" class="lq-clue-text">
-                    Cargando pista...
-                  </p>
-                </div>
-
-                <!-- Área de Respuesta -->
-                <div class="lq-bubble-answer-wrap">
-                  <div class="lq-bubble-label-row">
-                    <span class="lq-hud-label">Tu respuesta:</span>
-                    <button type="button" class="lq-restart-link" onclick="window.LivingGames.skipBubbleQuestion()">Saltar ejercicio ➔</button>
-                  </div>
-                  <div id="bubbleAnswerArea" class="lq-bubble-answer-area">
-                    <span class="lq-bubble-placeholder">Toca las fichas de abajo para formar la respuesta</span>
-                  </div>
-                </div>
-
-                <div id="bubbleFeedback" class="lq-feedback-bar"></div>
-
-                <!-- Banco de Fichas / Letras / Palabras -->
-                <div id="bubblePool" class="lq-bubble-pool">
-                  <!-- Fichas generadas dinámicamente -->
-                </div>
-
-                <!-- Botones de Acción -->
-                <div class="lq-bubble-controls">
-                  <button type="button" onclick="undoLastBubble()" class="lq-btn-3d lq-btn-neutral lq-bubble-undo-btn">
-                    ↺ Deshacer
-                  </button>
-                  <button type="button" id="checkBubbleBtn" onclick="checkBubbleSolution()" class="lq-btn-3d lq-btn-green lq-bubble-check-btn">
-                    ✓ Comprobar Respuesta
-                  </button>
-                </div>
-              </section>
-
+            <!-- Barra de 3 Juegos Modo General (A1–C1) -->
+            <div id="generalNav" class="lq-nav-dock lq-general-dock hidden">
+              <button type="button" onclick="switchGeneralGame('fillrush')" id="gnav-fillrush" class="gen-nav-tab active">
+                <span class="lq-dock-emoji">⚡</span>
+                <span class="lq-dock-label">Fill-in Rush</span>
+              </button>
+              <button type="button" onclick="switchGeneralGame('swipe')" id="gnav-swipe" class="gen-nav-tab">
+                <span class="lq-dock-emoji">🃏</span>
+                <span class="lq-dock-label">Swipe Match</span>
+              </button>
+              <button type="button" onclick="switchGeneralGame('bubbles')" id="gnav-bubbles" class="gen-nav-tab">
+                <span class="lq-dock-emoji">🧩</span>
+                <span class="lq-dock-label">Word Bubbles</span>
+              </button>
             </div>
+
+            <!-- ============================================================== -->
+            <!-- SECCIÓN A: JUEGOS MODO NIÑOS (4 JUEGOS)                        -->
+            <!-- ============================================================== -->
+
+            <!-- KIDS GAME 1: LISTEN & TAP (¡ESCUCHA Y TOCA!) -->
+            <section id="game-kids-listen" class="kids-view lq-kids-stage">
+              <div class="lq-kids-header">
+                <div class="lq-kids-badge lq-badge-pink">🎧 ¡Escucha y Toca!</div>
+                <p class="lq-kids-sub">Toca la imagen que dice la voz</p>
+
+                <button type="button" onclick="speakKidsListenTarget()" class="lq-btn-3d lq-btn-pink lq-megaphone-btn bounce-gentle">
+                  <span class="lq-megaphone-icon">📢</span>
+                  <span class="lq-megaphone-label">Escuchar</span>
+                </button>
+
+                <p id="kidsListenPhonics" class="lq-kids-phonics">???</p>
+              </div>
+
+              <div id="kidsListenGrid" class="lq-kids-listen-grid">
+                <!-- Tarjetas generadas por JS -->
+              </div>
+
+              <div id="kidsListenFeedback" class="lq-kids-feedback"></div>
+            </section>
+
+            <!-- KIDS GAME 2: ROMPECABEZAS DE LETRAS (ARMA LA PALABRA) -->
+            <section id="game-kids-letters" class="kids-view lq-kids-stage hidden">
+              <div class="lq-kids-header">
+                <div class="lq-kids-badge lq-badge-violet">🧩 Arma la Palabra</div>
+
+                <div class="lq-speller-card">
+                  <div id="spellerEmoji" class="lq-speller-emoji" onclick="speakCurrentSpellerWord()">🐶</div>
+                  <button type="button" onclick="speakCurrentSpellerWord()" class="lq-speller-audio-pill">
+                    🔊 Escuchar palabra
+                  </button>
+                </div>
+
+                <div id="spellerSlots" class="lq-speller-slots">
+                  <!-- Casillas de letras -->
+                </div>
+              </div>
+
+              <div class="lq-speller-bottom">
+                <p class="lq-kids-sub">Toca las letras en orden:</p>
+                <div id="spellerLetterPool" class="lq-speller-pool">
+                  <!-- Fichas de letras -->
+                </div>
+                <button type="button" onclick="resetSpellerWord()" class="lq-kids-reset-link">
+                  ↺ Empezar de nuevo
+                </button>
+              </div>
+            </section>
+
+            <!-- KIDS GAME 3: POP THE BUBBLES (¡EXPLOTA LAS BURBUJAS!) -->
+            <section id="game-kids-bubbles" class="kids-view lq-kids-stage hidden">
+              <div class="lq-kids-header">
+                <div class="lq-kids-badge lq-badge-cyan">
+                  <span>🎈 ¡Explota:</span>
+                  <strong id="kidsBubbleGoal" class="lq-bubble-goal-word">ANIMALS</strong>
+                  <span>!</span>
+                  <button type="button" onclick="speakBubbleGoal()" class="lq-inline-speaker">🔊</button>
+                </div>
+                <p class="lq-kids-sub">Revienta las burbujas que corresponden a la categoría</p>
+              </div>
+
+              <div id="bubbleSky" class="lq-bubble-sky">
+                <!-- Burbujas flotantes animadas -->
+              </div>
+
+              <div class="lq-bubble-footer-bar">
+                <div>
+                  <span>Explotadas:</span>
+                  <strong id="bubblePoppedCount" class="lq-popped-num">0</strong>
+                </div>
+                <button type="button" onclick="refreshBubbleGoal()" class="lq-btn-3d lq-btn-neutral lq-sm-pill-btn">
+                  🔄 Cambiar Reto
+                </button>
+              </div>
+            </section>
+
+            <!-- KIDS GAME 4: MEMORY KIDS (ENCUENTRA LAS PAREJAS) -->
+            <section id="game-kids-memory" class="kids-view lq-kids-stage hidden">
+              <div class="lq-kids-header">
+                <div class="lq-kids-badge lq-badge-amber">✨ Encuentra las Parejas</div>
+                <p class="lq-kids-sub">Voltea dos cartas y escucha su nombre en inglés</p>
+              </div>
+
+              <div id="memoryGrid" class="lq-memory-grid">
+                <!-- Cartas 3D generadas por JS -->
+              </div>
+
+              <div class="lq-bubble-footer-bar">
+                <div>
+                  <span>Intentos:</span>
+                  <strong id="memoryTurns" class="lq-turns-num">0</strong>
+                </div>
+                <button type="button" onclick="initKidsMemoryGame()" class="lq-btn-3d lq-btn-yellow lq-sm-pill-btn">
+                  🔄 Reiniciar Juego
+                </button>
+              </div>
+            </section>
+
+            <!-- ============================================================== -->
+            <!-- SECCIÓN B: JUEGOS MODO GENERAL (A1–C1 SUPABASE `games`)        -->
+            <!-- ============================================================== -->
+
+            <!-- MODE 1: FILL-IN RUSH -->
+            <section id="game-fillrush" class="general-view hidden">
+              <div class="lq-rush-hud">
+                <div class="lq-rush-timer-group">
+                  <div id="timerContainer" class="lq-timer-box">
+                    <span id="rushTimer">60</span>
+                  </div>
+                  <span class="lq-hud-label">Tiempo</span>
+                </div>
+                <div class="lq-rush-score-group">
+                  <span class="lq-hud-label">Aciertos:</span>
+                  <span id="rushScore" class="lq-rush-score-val">0</span>
+                </div>
+              </div>
+
+              <div id="fillCard" class="lq-clue-card">
+                <div class="lq-clue-header">
+                  <span id="fillGrammarTag" class="lq-category-pill lq-tag-default">Grammar</span>
+                  <button type="button" onclick="speakCurrentClue()" class="lq-audio-btn" title="Escuchar pronunciación">
+                    🔊 Escuchar
+                  </button>
+                </div>
+                <p id="fillClueText" class="lq-clue-text">Cargando pregunta...</p>
+              </div>
+
+              <div id="fillOptionsGrid" class="lq-options-grid"></div>
+              <div id="fillFeedback" class="lq-feedback-bar"></div>
+            </section>
+
+            <!-- MODE 2: SWIPE & MATCH -->
+            <section id="game-swipe" class="general-view hidden">
+              <p class="lq-swipe-header-hint">¿La palabra coincide con la definición?</p>
+
+              <div class="lq-swipe-stage">
+                <div id="swipeCard" class="lq-swipe-card">
+                  <div id="stampCorrect" class="lq-stamp lq-stamp-match">MATCH!</div>
+                  <div id="stampWrong" class="lq-stamp lq-stamp-nope">NOPE!</div>
+
+                  <div class="lq-swipe-card-top">
+                    <span id="swipeCategoryTag" class="lq-category-pill lq-tag-vocab">Vocab</span>
+                    <button type="button" onclick="speakSwipeWord()" class="lq-audio-btn">🔊</button>
+                  </div>
+
+                  <div class="lq-swipe-card-body">
+                    <h3 id="swipeWord" class="lq-swipe-word">Word</h3>
+                    <div class="lq-swipe-divider"></div>
+                    <p id="swipeClue" class="lq-swipe-clue">Definición de la palabra aquí...</p>
+                  </div>
+
+                  <div class="lq-swipe-card-foot">
+                    <span>← Falso</span>
+                    <span>Verdadero →</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="lq-swipe-actions">
+                <button type="button" onclick="handleSwipeAction(false)" class="lq-btn-3d lq-btn-red lq-swipe-circle-btn" aria-label="Falso">✕</button>
+                <button type="button" onclick="handleSwipeAction(true)" class="lq-btn-3d lq-btn-green lq-swipe-circle-btn" aria-label="Verdadero">✓</button>
+              </div>
+            </section>
+
+            <!-- MODE 3: WORD BUBBLES -->
+            <section id="game-bubbles" class="general-view hidden">
+              <div class="lq-clue-card">
+                <div class="lq-clue-header">
+                  <span class="lq-category-pill lq-tag-bubbles">Construye la respuesta</span>
+                  <button type="button" onclick="speakBubbleTarget()" class="lq-audio-btn">🔊 Escuchar</button>
+                </div>
+                <p id="bubbleClue" class="lq-clue-text">Cargando pista...</p>
+              </div>
+
+              <div class="lq-bubble-answer-wrap">
+                <div id="bubbleAnswerArea" class="lq-bubble-answer-area">
+                  <span class="lq-bubble-placeholder">Toca las fichas de abajo</span>
+                </div>
+              </div>
+
+              <div id="bubblePool" class="lq-bubble-pool"></div>
+
+              <div class="lq-bubble-controls">
+                <button type="button" onclick="undoLastBubble()" class="lq-btn-3d lq-btn-neutral lq-bubble-undo-btn">
+                  ↺ Deshacer
+                </button>
+                <button type="button" id="checkBubbleBtn" onclick="checkBubbleSolution()" class="lq-btn-3d lq-btn-green lq-bubble-check-btn">
+                  ✓ Comprobar
+                </button>
+              </div>
+            </section>
+
           </div>
         </div>
       </section>
@@ -1051,10 +1135,10 @@
   <!-- 3. Confetti para celebraciones de racha en Juegos -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <!-- 4. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261029_games"></script>
+  <script src="assets/js/onlineClasses.js?v=20261029_kids_light"></script>
   <!-- 5. Módulo Oficial de Juegos Interactivos (Tabla `games` en Supabase) -->
-  <script src="assets/js/studentGames.js?v=20261029_games"></script>
+  <script src="assets/js/studentGames.js?v=20261029_kids_light"></script>
   <!-- 6. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261029_games"></script>
+  <script src="assets/js/platform.js?v=20261029_kids_light"></script>
 </body>
 </html>

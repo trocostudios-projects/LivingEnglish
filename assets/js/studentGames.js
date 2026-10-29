@@ -1,105 +1,246 @@
 /**
- * Academia Living English — Módulo Oficial de Juegos Interactivos (LinguaQuest)
- * Conectado a la tabla `public.games` en Supabase (columnas: NIVEL, WORDS, CLUE, PICTURE)
+ * Academia Living English — Módulo Oficial de Juegos Interactivos (LinguaQuest & Kids)
+ * - Modo Niños (4 juegos): Escucha y Toca, Arma la Palabra, Explota Burbujas y Parejas de Memoria
+ * - Modo Niveles A1–C1 (3 juegos): Fill-in Rush, Swipe Match y Word Bubbles conectados a `public.games` en Supabase
  */
 
 (function () {
-  // Base de respaldo ligera por si la tabla `games` en Supabase tiene RLS restringido o sin conexión temporal
-  const DEFAULT_DATA = [
-    // --- LEVEL A1 ---
-    { NIVEL: 'A1', CLUE: '(Noun) A round red or green fruit that grows on trees', RESPUESTA: 'Apple' },
-    { NIVEL: 'A1', CLUE: '(Noun) A domesticated carnivorous mammal that barks', RESPUESTA: 'Dog' },
-    { NIVEL: 'A1', CLUE: '(Noun) A building for human habitation', RESPUESTA: 'House' },
-    { NIVEL: 'A1', CLUE: 'She ___ to the gym every Monday morning.', RESPUESTA: 'goes' },
-    { NIVEL: 'A1', CLUE: '(Verb) To take liquid into the mouth and swallow it', RESPUESTA: 'Drink' },
-    { NIVEL: 'A1', CLUE: '(Noun) A road vehicle with four wheels powered by an engine', RESPUESTA: 'Car' },
-    { NIVEL: 'A1', CLUE: 'Last night, my father ___ a delicious pasta dinner.', RESPUESTA: 'cooked' },
-    { NIVEL: 'A1', CLUE: '(Noun) A piece of furniture with a flat top and legs', RESPUESTA: 'Table' },
-    { NIVEL: 'A1', CLUE: 'Look! The dog is ___ water from the bowl right now.', RESPUESTA: 'drinking' },
-    { NIVEL: 'A1', CLUE: '(Adjective) Having a high temperature', RESPUESTA: 'Hot' },
-    { NIVEL: 'A1', CLUE: 'She is ___ a very interesting book in her bedroom.', RESPUESTA: 'reading' },
-    { NIVEL: 'A1', CLUE: '(Noun) An institution for educating children', RESPUESTA: 'School' },
-    { NIVEL: 'A1', CLUE: 'They ___ English together every afternoon.', RESPUESTA: 'study' },
-    { NIVEL: 'A1', CLUE: '(Noun) A small domesticated carnivorous mammal with soft fur', RESPUESTA: 'Cat' },
-    { NIVEL: 'A1', CLUE: 'I ___ a new jacket at the shopping mall last Saturday.', RESPUESTA: 'bought' },
-
-    // --- LEVEL A2 ---
-    { NIVEL: 'A2', CLUE: '(Noun) A complex of runways and buildings for aircraft', RESPUESTA: 'Airport' },
-    { NIVEL: 'A2', CLUE: 'The movie ___ ten minutes ago, so hurry up!', RESPUESTA: 'started' },
-    { NIVEL: 'A2', CLUE: '(Noun) A place where bread and cakes are baked and sold', RESPUESTA: 'Bakery' },
-    { NIVEL: 'A2', CLUE: 'While I was reading, my mom was ___ dinner.', RESPUESTA: 'cooking' },
-    { NIVEL: 'A2', CLUE: 'I ___ that movie twice already this month.', RESPUESTA: 'have seen' },
-    { NIVEL: 'A2', CLUE: '(Verb) To reach a destination', RESPUESTA: 'Arrive' },
-    { NIVEL: 'A2', CLUE: 'Next year, they ___ to Japan for their holidays.', RESPUESTA: 'will travel' },
-    { NIVEL: 'A2', CLUE: '(Adjective) Costing a lot of money', RESPUESTA: 'Expensive' },
-    { NIVEL: 'A2', CLUE: 'When we arrived at the station, the train ___.', RESPUESTA: 'had left' },
-    { NIVEL: 'A2', CLUE: '(Noun) An official document certifying identity for travel', RESPUESTA: 'Passport' },
-    { NIVEL: 'A2', CLUE: 'We ___ each other since primary school.', RESPUESTA: 'have known' },
-    { NIVEL: 'A2', CLUE: '(Adverb) At a low speed or unhurriedly', RESPUESTA: 'Slowly' },
-
-    // --- LEVEL B1 ---
-    { NIVEL: 'B1', CLUE: 'By the time the movie started, we ___ our popcorn.', RESPUESTA: 'had finished' },
-    { NIVEL: 'B1', CLUE: '(Noun) A strong desire to achieve success', RESPUESTA: 'Ambition' },
-    { NIVEL: 'B1', CLUE: 'A new shopping bridge ___ across the river this year.', RESPUESTA: 'is being built' },
-    { NIVEL: 'B1', CLUE: '(Adjective) Showing kindness towards others', RESPUESTA: 'Generous' },
-    { NIVEL: 'B1', CLUE: 'She was exhausted because she ___ for hours in the cold.', RESPUESTA: 'had been waiting' },
-    { NIVEL: 'B1', CLUE: '(Verb) To put forward with approval as being suitable', RESPUESTA: 'Recommend' },
-    { NIVEL: 'B1', CLUE: 'If I won the lottery, I ___ a house near the sea.', RESPUESTA: 'would buy' },
-    { NIVEL: 'B1', CLUE: '(Noun) A biological community of interacting organisms', RESPUESTA: 'Ecosystem' },
-    { NIVEL: 'B1', CLUE: 'If you had studied harder, you ___ the final examination.', RESPUESTA: 'would have passed' },
-    { NIVEL: 'B1', CLUE: '(Verb) To successfully bring about a desired result', RESPUESTA: 'Achieve' },
-    { NIVEL: 'B1', CLUE: 'By next December, he ___ his university degree.', RESPUESTA: 'will have completed' },
-    { NIVEL: 'B1', CLUE: '(Adjective) Achieving maximum productivity with minimum effort', RESPUESTA: 'Efficient' },
-
-    // --- LEVEL B2 ---
-    { NIVEL: 'B2', CLUE: 'She ___ at the firm for five years before she got promoted.', RESPUESTA: 'had been working' },
-    { NIVEL: 'B2', CLUE: '(Noun) The capacity to recover quickly from difficulties', RESPUESTA: 'Resilience' },
-    { NIVEL: 'B2', CLUE: 'If I had known you were in hospital, I ___ you immediately.', RESPUESTA: 'would have called' },
-    { NIVEL: 'B2', CLUE: '(Verb) To make suffering or a problem less severe', RESPUESTA: 'Mitigate' },
-    { NIVEL: 'B2', CLUE: 'You ___ the weather forecast before leaving without an umbrella.', RESPUESTA: 'should have checked' },
-    { NIVEL: 'B2', CLUE: '(Adjective) Open to more than one interpretation', RESPUESTA: 'Ambiguous' },
-    { NIVEL: 'B2', CLUE: 'The accident ___ if safety regulations had been enforced.', RESPUESTA: 'could have been prevented' },
-    { NIVEL: 'B2', CLUE: '(Verb) To examine or inspect closely and thoroughly', RESPUESTA: 'Scrutinize' },
-    { NIVEL: 'B2', CLUE: 'By 2030, we ___ in this city for over two decades.', RESPUESTA: 'will have been living' },
-    { NIVEL: 'B2', CLUE: '(Adjective) Dealing with things sensibly and realistically', RESPUESTA: 'Pragmatic' },
-
-    // --- LEVEL C1 ---
-    { NIVEL: 'C1', CLUE: '___ for her intervention, the negotiation would have collapsed.', RESPUESTA: 'had it not been' },
-    { NIVEL: 'C1', CLUE: '(Adjective) Present, appearing, or found everywhere', RESPUESTA: 'Ubiquitous' },
-    { NIVEL: 'C1', CLUE: 'It is imperative that every candidate ___ equal opportunities.', RESPUESTA: 'be given' },
-    { NIVEL: 'C1', CLUE: '(Verb) To make a problem or negative situation worse', RESPUESTA: 'Exacerbate' },
-    { NIVEL: 'C1', CLUE: 'Scarcely ___ the risk involved when he signed the contract.', RESPUESTA: 'had he realized' },
-    { NIVEL: 'C1', CLUE: '(Adjective) Lasting for a very short time', RESPUESTA: 'Ephemeral' },
-    { NIVEL: 'C1', CLUE: 'Seldom ___ such fierce opposition to her proposed reforms.', RESPUESTA: 'had she anticipated' },
-    { NIVEL: 'C1', CLUE: '(Verb) To confirm or give support to a statement or theory', RESPUESTA: 'Corroborate' },
-    { NIVEL: 'C1', CLUE: '___ the consequences, they would never have approved the motion.', RESPUESTA: 'had they known' },
-    { NIVEL: 'C1', CLUE: '(Noun) The occurrence of events by chance in a happy way', RESPUESTA: 'Serendipity' }
+  // ============================================================================
+  // 1. DICCIONARIO INFANTIL (KIDS MODE) Y RESPALDO MULTINIVEL (A1–C1)
+  // ============================================================================
+  const KIDS_ITEMS = [
+    { word: 'Cat', emoji: '🐱', category: 'animals', letters: ['C', 'A', 'T'] },
+    { word: 'Dog', emoji: '🐶', category: 'animals', letters: ['D', 'O', 'G'] },
+    { word: 'Lion', emoji: '🦁', category: 'animals', letters: ['L', 'I', 'O', 'N'] },
+    { word: 'Frog', emoji: '🐸', category: 'animals', letters: ['F', 'R', 'O', 'G'] },
+    { word: 'Duck', emoji: '🦆', category: 'animals', letters: ['D', 'U', 'C', 'K'] },
+    { word: 'Elephant', emoji: '🐘', category: 'animals', letters: ['E', 'L', 'E', 'P', 'H', 'A', 'N', 'T'] },
+    { word: 'Apple', emoji: '🍎', category: 'fruits', letters: ['A', 'P', 'P', 'L', 'E'] },
+    { word: 'Banana', emoji: '🍌', category: 'fruits', letters: ['B', 'A', 'N', 'A', 'N', 'A'] },
+    { word: 'Orange', emoji: '🍊', category: 'fruits', letters: ['O', 'R', 'A', 'N', 'G', 'E'] },
+    { word: 'Grape', emoji: '🍇', category: 'fruits', letters: ['G', 'R', 'A', 'P', 'E'] },
+    { word: 'Car', emoji: '🚗', category: 'vehicles', letters: ['C', 'A', 'R'] },
+    { word: 'Bus', emoji: '🚌', category: 'vehicles', letters: ['B', 'U', 'S'] },
+    { word: 'Train', emoji: '🚂', category: 'vehicles', letters: ['T', 'R', 'A', 'I', 'N'] },
+    { word: 'Plane', emoji: '✈️', category: 'vehicles', letters: ['P', 'L', 'A', 'N', 'E'] },
+    { word: 'Sun', emoji: '🌞', category: 'nature', letters: ['S', 'U', 'N'] },
+    { word: 'Moon', emoji: '🌙', category: 'nature', letters: ['M', 'O', 'O', 'N'] },
+    { word: 'Star', emoji: '⭐', category: 'nature', letters: ['S', 'T', 'A', 'R'] },
+    { word: 'Pizza', emoji: '🍕', category: 'food', letters: ['P', 'I', 'Z', 'Z', 'A'] },
+    { word: 'Milk', emoji: '🥛', category: 'food', letters: ['M', 'I', 'L', 'K'] },
+    { word: 'Ice cream', emoji: '🍦', category: 'food', letters: ['I', 'C', 'E'] }
   ];
 
-  // Caché en memoria por nivel CEFR traído desde Supabase (`public.games`)
+  const DEFAULT_DATA = [
+    // --- LEVEL A1 ---
+    { NIVEL: 'A1', CLUE: '(Noun) A round red or green fruit that grows on apple trees.', RESPUESTA: 'Apple' },
+    { NIVEL: 'A1', CLUE: '(Noun) A domestic animal with four legs, a tail, and a bark.', RESPUESTA: 'Dog' },
+    { NIVEL: 'A1', CLUE: '(Noun) A building in which people live, usually one family.', RESPUESTA: 'House' },
+    { NIVEL: 'A1', CLUE: 'She goes to ___ every morning to study with her friends.', RESPUESTA: 'school' },
+    { NIVEL: 'A1', CLUE: '(Verb) To drink liquid, especially water or tea.', RESPUESTA: 'Drink' },
+    { NIVEL: 'A1', CLUE: '(Noun) A large vehicle with four wheels used for carrying passengers.', RESPUESTA: 'Car' },
+    { NIVEL: 'A1', CLUE: 'My mother is ___ dinner in the kitchen right now.', RESPUESTA: 'cooking' },
+    { NIVEL: 'A1', CLUE: '(Noun) The color of the clear sky or the ocean.', RESPUESTA: 'Blue' },
+    { NIVEL: 'A1', CLUE: 'I have two brothers and one ___.', RESPUESTA: 'sister' },
+    { NIVEL: 'A1', CLUE: '(Noun) A small animal with fur, whiskers, and claws that purrs.', RESPUESTA: 'Cat' },
+    // --- LEVEL A2 ---
+    { NIVEL: 'A2', CLUE: 'We ___ to Paris last summer and visited the Eiffel Tower.', RESPUESTA: 'travelled' },
+    { NIVEL: 'A2', CLUE: '(Noun) A place where airplanes take off and land.', RESPUESTA: 'Airport' },
+    { NIVEL: 'A2', CLUE: 'She is much taller ___ her younger sister.', RESPUESTA: 'than' },
+    { NIVEL: 'A2', CLUE: '(Verb) To exchange goods or services for money.', RESPUESTA: 'Sell' },
+    { NIVEL: 'A2', CLUE: 'What time does the train usually ___ at the station?', RESPUESTA: 'arrive' },
+    { NIVEL: 'A2', CLUE: '(Noun) The meal eaten in the middle of the day.', RESPUESTA: 'Lunch' },
+    // --- LEVEL B1 ---
+    { NIVEL: 'B1', CLUE: 'By the time we got to the cinema, the movie had already ___.', RESPUESTA: 'started' },
+    { NIVEL: 'B1', CLUE: '(Noun) An agreement between two or more people or groups.', RESPUESTA: 'Contract' },
+    { NIVEL: 'B1', CLUE: '(Adjective) Willing to give money, help, or time freely.', RESPUESTA: 'Generous' },
+    { NIVEL: 'B1', CLUE: 'Although she was exhausted, she kept on ___ until midnight.', RESPUESTA: 'working' },
+    { NIVEL: 'B1', CLUE: '(Verb) To formally suggest a person or action for consideration.', RESPUESTA: 'Recommend' },
+    { NIVEL: 'B1', CLUE: '(Noun) The general weather conditions usually found in a place.', RESPUESTA: 'Climate' },
+    // --- LEVEL B2 ---
+    { NIVEL: 'B2', CLUE: 'Hardly had she entered the office ___ the phone rang incessantly.', RESPUESTA: 'when' },
+    { NIVEL: 'B2', CLUE: '(Adjective) Happening or existing at the same time; modern.', RESPUESTA: 'Contemporary' },
+    { NIVEL: 'B2', CLUE: 'The manager insisted that all safety protocols ___ strictly respected.', RESPUESTA: 'be' },
+    { NIVEL: 'B2', CLUE: '(Verb) To lessen the seriousness or intensity of a problem or pain.', RESPUESTA: 'Mitigate' },
+    { NIVEL: 'B2', CLUE: 'Had you warned me earlier, I ___ made other arrangements.', RESPUESTA: 'would have' },
+    { NIVEL: 'B2', CLUE: '(Noun) The quality of being able to endure difficult situations.', RESPUESTA: 'Resilience' },
+    // --- LEVEL C1 ---
+    { NIVEL: 'C1', CLUE: 'Seldom ___ such an articulate defense presented in court.', RESPUESTA: 'have I heard' },
+    { NIVEL: 'C1', CLUE: '(Adjective) Existing or being everywhere at the same time; omnipresent.', RESPUESTA: 'Ubiquitous' },
+    { NIVEL: 'C1', CLUE: 'The committee demanded that the proposal ___ thoroughly scrutinized before vote.', RESPUESTA: 'be' },
+    { NIVEL: 'C1', CLUE: '(Noun) An expression of sharp disapproval, criticism, or rebuke.', RESPUESTA: 'Reprimand' },
+    { NIVEL: 'C1', CLUE: 'Were the board to approve the merger, hundreds of jobs ___ created.', RESPUESTA: 'would be' },
+    { NIVEL: 'C1', CLUE: '(Adjective) Clear, transparent, or easily understood without ambiguity.', RESPUESTA: 'Lucid' }
+  ];
+
+  const LEVEL_META = {
+    A1: { name: 'Principiante', badgeClass: 'lq-level-a1' },
+    A2: { name: 'Elemental', badgeClass: 'lq-level-a2' },
+    B1: { name: 'Intermedio', badgeClass: 'lq-level-b1' },
+    B2: { name: 'Intermedio Alto', badgeClass: 'lq-level-b2' },
+    C1: { name: 'Avanzado', badgeClass: 'lq-level-c1' }
+  };
+
+  // Estado general
   const supabaseLevelCache = {};
-  let isFetchingSupabase = false;
   let hasLoadedAllFromSupabase = false;
   let allSupabaseRows = [];
 
-  let currentLevel = 'A1';
-  let currentMode = 'fillrush'; // 'fillrush' | 'swipe' | 'bubbles'
-  let scoreStreak = 0;
-  let scoreXP = 0;
+  let isKidsMode = true;
+  let currentGeneralLevel = 'A1';
+  let currentKidsGame = 'listen';      // 'listen' | 'letters' | 'bubbles' | 'memory'
+  let currentGeneralGame = 'fillrush'; // 'fillrush' | 'swipe' | 'bubbles'
+
+  let starsCount = 0;
+  let streakCount = 0;
   let soundEnabled = true;
   let isGamesTabActive = false;
   let swipeEventsBound = false;
 
-  const LEVEL_META = {
-    A1: { name: 'Principiante', difficulty: 'Easy', badgeClass: 'lq-level-a1' },
-    A2: { name: 'Elemental', difficulty: 'Basic', badgeClass: 'lq-level-a2' },
-    B1: { name: 'Intermedio', difficulty: 'Medium', badgeClass: 'lq-level-b1' },
-    B2: { name: 'Intermedio Alto', difficulty: 'Hard', badgeClass: 'lq-level-b2' },
-    C1: { name: 'Avanzado', difficulty: 'Expert', badgeClass: 'lq-level-c1' }
-  };
+  // ============================================================================
+  // 2. SISTEMA DE SONIDO SINTETIZADO Y VOZ (WEB SPEECH API)
+  // ============================================================================
+  let audioCtx = null;
+
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+    }
+    return audioCtx;
+  }
+
+  function playSynth(type) {
+    if (!soundEnabled) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      if (type === 'success') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+        osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+        osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.3); // C6
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } else if (type === 'pop') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } else if (type === 'error') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(170, now);
+        osc.frequency.linearRampToValueAtTime(120, now + 0.2);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'tap') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.start(now);
+        osc.stop(now + 0.06);
+      }
+    } catch (e) {}
+  }
+
+  function speakWord(text, rate = 0.88) {
+    if (!soundEnabled || !('speechSynthesis' in window) || !text) return;
+    try {
+      window.speechSynthesis.cancel();
+      const cleanText = String(text)
+        .replace(/^\([A-Za-z]+\)\s*/i, '')
+        .replace(/_{2,}/g, 'blank');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'en-US';
+      utterance.rate = isKidsMode ? 0.8 : rate;
+      utterance.pitch = isKidsMode ? 1.15 : 1.0;
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {}
+  }
+
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('soundToggleBtn');
+    if (btn) {
+      btn.innerText = soundEnabled ? '🔊' : '🔇';
+      btn.title = soundEnabled ? 'Sonido activado' : 'Sonido silenciado';
+    }
+  }
 
   // ============================================================================
-  // 1. CONEXIÓN A LA TABLA `games` EN SUPABASE
+  // 3. ESTADÍSTICAS (ESTRELLAS Y RACHA POR ESTUDIANTE)
+  // ============================================================================
+  function getStorageKey(suffix) {
+    const uid = (window.currentUserProfile && window.currentUserProfile.id) ? window.currentUserProfile.id : 'guest';
+    return `le_linguaquest_${uid}_${suffix}`;
+  }
+
+  function loadStats() {
+    const savedStars = localStorage.getItem(getStorageKey('stars'));
+    starsCount = savedStars ? (parseInt(savedStars, 10) || 0) : 0;
+
+    const savedStreak = localStorage.getItem(getStorageKey('streak'));
+    streakCount = savedStreak ? (parseInt(savedStreak, 10) || 0) : 0;
+
+    updateStatsUI();
+  }
+
+  function saveStats() {
+    try {
+      localStorage.setItem(getStorageKey('stars'), String(starsCount));
+      localStorage.setItem(getStorageKey('streak'), String(streakCount));
+    } catch (e) {}
+    updateStatsUI();
+  }
+
+  function updateStatsUI() {
+    const starsEl = document.getElementById('starsDisplay');
+    const streakEl = document.getElementById('streakDisplay');
+    if (starsEl) starsEl.innerText = starsCount;
+    if (streakEl) streakEl.innerText = streakCount;
+  }
+
+  function addScore(isSuccess) {
+    if (isSuccess) {
+      starsCount += 1;
+      streakCount += 1;
+      playSynth('success');
+      if (typeof window.confetti === 'function' && (isKidsMode || streakCount % 3 === 0)) {
+        window.confetti({
+          particleCount: 32,
+          spread: 58,
+          origin: { y: 0.82 }
+        });
+      }
+    } else {
+      streakCount = 0;
+      playSynth('error');
+    }
+    saveStats();
+  }
+
+  // ============================================================================
+  // 4. CONEXIÓN A LA TABLA `public.games` EN SUPABASE (PARA MODO GENERAL A1–C1)
   // ============================================================================
   function normalizeGameRow(row, fallbackLevel) {
     if (!row) return null;
@@ -107,7 +248,6 @@
     const clue = String(row.CLUE || row.clue || '').trim();
     const respuesta = String(row.WORDS || row.words || row.RESPUESTA || row.respuesta || '').trim();
     const picture = String(row.PICTURE || row.picture || '').trim();
-
     if (!clue || !respuesta) return null;
     return { NIVEL: nivel, CLUE: clue, RESPUESTA: respuesta, PICTURE: picture };
   }
@@ -115,43 +255,29 @@
   async function fetchLevelFromSupabase(level) {
     const lvl = (level || 'A1').toUpperCase();
     if (supabaseLevelCache[lvl] && supabaseLevelCache[lvl].length > 0) {
-      updateDbStatusChip(true, supabaseLevelCache[lvl].length);
       return supabaseLevelCache[lvl];
     }
 
     const client = typeof window.getSupabaseClient === 'function' ? window.getSupabaseClient() : window.supabaseClient;
     if (!client) {
-      updateDbStatusChip(false, 0);
       return getFallbackQuestions(lvl);
     }
 
     try {
-      isFetchingSupabase = true;
-      updateDbStatusChip('loading');
-
-      // Consultar la tabla `games` filtrando por el nivel CEFR seleccionado
       const { data, error } = await client
         .from('games')
         .select('NIVEL, WORDS, CLUE, PICTURE')
         .ilike('NIVEL', `${lvl}%`)
         .limit(1000);
 
-      if (error) {
-        console.warn('⚠️ Aviso al consultar tabla games en Supabase:', error.message);
-        updateDbStatusChip(false, 0);
-        return getFallbackQuestions(lvl);
-      }
-
-      if (Array.isArray(data) && data.length > 0) {
+      if (!error && Array.isArray(data) && data.length > 0) {
         const cleaned = data.map(r => normalizeGameRow(r, lvl)).filter(Boolean);
         if (cleaned.length > 0) {
           supabaseLevelCache[lvl] = cleaned;
-          updateDbStatusChip(true, cleaned.length);
           return cleaned;
         }
       }
 
-      // Si no devolvió filas para ese filtro (por ejemplo si NIVEL tiene otro formato o RLS bloquea SELECT)
       if (!hasLoadedAllFromSupabase) {
         const { data: allData, error: allErr } = await client
           .from('games')
@@ -168,21 +294,14 @@
             }
           });
           if (supabaseLevelCache[lvl] && supabaseLevelCache[lvl].length > 0) {
-            updateDbStatusChip(true, supabaseLevelCache[lvl].length);
             return supabaseLevelCache[lvl];
           }
         }
       }
-
-      updateDbStatusChip(false, 0);
-      return getFallbackQuestions(lvl);
     } catch (err) {
-      console.warn('⚠️ Error de red consultando tabla games:', err);
-      updateDbStatusChip(false, 0);
-      return getFallbackQuestions(lvl);
-    } finally {
-      isFetchingSupabase = false;
+      console.warn('⚠️ Aviso consultando tabla games:', err);
     }
+    return getFallbackQuestions(lvl);
   }
 
   function getFallbackQuestions(lvl) {
@@ -191,170 +310,433 @@
   }
 
   function getLevelQuestionsSync() {
-    if (supabaseLevelCache[currentLevel] && supabaseLevelCache[currentLevel].length > 0) {
-      return supabaseLevelCache[currentLevel];
+    if (supabaseLevelCache[currentGeneralLevel] && supabaseLevelCache[currentGeneralLevel].length > 0) {
+      return supabaseLevelCache[currentGeneralLevel];
     }
-    return getFallbackQuestions(currentLevel);
+    return getFallbackQuestions(currentGeneralLevel);
   }
 
-  function updateDbStatusChip(status, count) {
-    const chip = document.getElementById('lqDbStatusChip');
-    if (!chip) return;
-    if (status === 'loading') {
-      chip.innerHTML = '⏳ Sincronizando banco de ejercicios...';
-      chip.className = 'lq-db-chip lq-db-loading';
-    } else if (status === true) {
-      chip.innerHTML = `🟢 ${count} retos oficiales (${currentLevel})`;
-      chip.className = 'lq-db-chip lq-db-online';
+  // ============================================================================
+  // 5. CAMBIO ENTRE MODO NIÑOS (4 JUEGOS) Y MODO GENERAL A1-C1 (3 JUEGOS)
+  // ============================================================================
+  function setAudienceMode(kidsModeActive) {
+    isKidsMode = Boolean(kidsModeActive);
+
+    const btnKids = document.getElementById('modeBtnKids');
+    const btnGen = document.getElementById('modeBtnGeneral');
+    const lvlContainer = document.getElementById('generalLevelContainer');
+    const kidsNav = document.getElementById('kidsNav');
+    const genNav = document.getElementById('generalNav');
+
+    if (btnKids) btnKids.classList.toggle('active', isKidsMode);
+    if (btnGen) btnGen.classList.toggle('active', !isKidsMode);
+
+    if (isKidsMode) {
+      stopRushTimer();
+      if (lvlContainer) lvlContainer.classList.add('hidden');
+      if (kidsNav) kidsNav.classList.remove('hidden');
+      if (genNav) genNav.classList.add('hidden');
+
+      document.querySelectorAll('.general-view').forEach(v => v.classList.add('hidden'));
+      switchKidsGame(currentKidsGame);
     } else {
-      chip.innerHTML = `⚡ Modo Práctica Activo (${currentLevel})`;
-      chip.className = 'lq-db-chip lq-db-fallback';
-    }
-  }
+      stopBubbleSpawner();
+      if (lvlContainer) lvlContainer.classList.remove('hidden');
+      if (kidsNav) kidsNav.classList.add('hidden');
+      if (genNav) genNav.classList.remove('hidden');
 
-  // ============================================================================
-  // 2. AUDIO SINTETIZADO Y PRONUNCIACIÓN NATIVA (WEB SPEECH API)
-  // ============================================================================
-  let audioCtx = null;
-
-  function getAudioContext() {
-    if (!audioCtx) {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (AudioContextClass) {
-        audioCtx = new AudioContextClass();
-      }
-    }
-    return audioCtx;
-  }
-
-  function playTone(type) {
-    if (!soundEnabled) return;
-    try {
-      const ctx = getAudioContext();
-      if (!ctx) return;
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      if (type === 'success') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(587.33, now); // D5
-        osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
-        gain.gain.setValueAtTime(0.18, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-        osc.start(now);
-        osc.stop(now + 0.35);
-      } else if (type === 'error') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(160, now);
-        osc.frequency.linearRampToValueAtTime(110, now + 0.2);
-        gain.gain.setValueAtTime(0.14, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-        osc.start(now);
-        osc.stop(now + 0.25);
-      } else if (type === 'tick') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(800, now);
-        gain.gain.setValueAtTime(0.05, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-        osc.start(now);
-        osc.stop(now + 0.05);
-      }
-    } catch (e) {}
-  }
-
-  function speakText(text) {
-    if (!('speechSynthesis' in window) || !text) return;
-    try {
-      window.speechSynthesis.cancel();
-      const cleanText = String(text)
-        .replace(/^\([A-Za-z]+\)\s*/i, '')
-        .replace(/_{2,}/g, 'blank');
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.lang = 'en-US';
-      utterance.rate = 0.95;
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {}
-  }
-
-  function toggleSound() {
-    soundEnabled = !soundEnabled;
-    const btn = document.getElementById('lqSoundBtn');
-    if (btn) {
-      btn.innerText = soundEnabled ? '🔊' : '🔇';
-      btn.title = soundEnabled ? 'Sonido activado (clic para silenciar)' : 'Sonido silenciado (clic para activar)';
-    }
-  }
-
-  // ============================================================================
-  // 3. PERSISTENCIA DE RACHA Y XP POR ESTUDIANTE
-  // ============================================================================
-  function getStorageKey(suffix) {
-    const uid = (window.currentUserProfile && window.currentUserProfile.id) ? window.currentUserProfile.id : 'guest';
-    return `le_linguaquest_${uid}_${suffix}`;
-  }
-
-  function loadSavedStats() {
-    const savedStreak = localStorage.getItem(getStorageKey('streak'));
-    scoreStreak = savedStreak ? (parseInt(savedStreak, 10) || 0) : 0;
-
-    const savedXP = localStorage.getItem(getStorageKey('xp'));
-    scoreXP = savedXP ? (parseInt(savedXP, 10) || 0) : 0;
-
-    updateStatsUI();
-  }
-
-  function saveStats() {
-    try {
-      localStorage.setItem(getStorageKey('streak'), String(scoreStreak));
-      localStorage.setItem(getStorageKey('xp'), String(scoreXP));
-    } catch (e) {}
-    updateStatsUI();
-  }
-
-  function updateStatsUI() {
-    const streakEl = document.getElementById('streakDisplay');
-    const xpEl = document.getElementById('xpDisplay');
-    if (streakEl) streakEl.innerText = scoreStreak;
-    if (xpEl) xpEl.innerText = scoreXP;
-  }
-
-  function triggerWinEffects() {
-    playTone('success');
-    scoreStreak++;
-    scoreXP += 10;
-    saveStats();
-
-    if (scoreStreak > 0 && scoreStreak % 5 === 0 && typeof window.confetti === 'function') {
-      window.confetti({
-        particleCount: 45,
-        spread: 65,
-        origin: { y: 0.78 }
+      document.querySelectorAll('.kids-view').forEach(v => v.classList.add('hidden'));
+      fetchLevelFromSupabase(currentGeneralLevel).then(() => {
+        switchGeneralGame(currentGeneralGame);
       });
     }
   }
 
-  function triggerFailEffects() {
-    playTone('error');
-    scoreStreak = 0;
-    saveStats();
+  function toggleAudienceMode() {
+    setAudienceMode(!isKidsMode);
   }
 
   // ============================================================================
-  // 4. NAVEGACIÓN DE NIVEL CEFR Y MODOS DE JUEGO
+  // 6. KIDS GAME 1: LISTEN & TAP (¡ESCUCHA Y TOCA!)
   // ============================================================================
-  function inferDefaultCefrFromCourse(courseLevel) {
-    const raw = String(courseLevel || '').toLowerCase();
-    if (raw.includes('3')) return 'B2';
-    if (raw.includes('2')) return 'B1';
-    return 'A1';
+  let currentListenTarget = null;
+
+  function switchKidsGame(gameKey) {
+    currentKidsGame = gameKey;
+    if (gameKey !== 'bubbles') {
+      stopBubbleSpawner();
+    }
+
+    document.querySelectorAll('.kids-view').forEach(v => v.classList.add('hidden'));
+    document.querySelectorAll('.kids-nav-tab').forEach(b => b.classList.remove('active'));
+
+    const activeView = document.getElementById(`game-kids-${gameKey}`);
+    const activeNav = document.getElementById(`knav-${gameKey}`);
+    if (activeView) activeView.classList.remove('hidden');
+    if (activeNav) activeNav.classList.add('active');
+
+    if (!isGamesTabActive) return;
+    if (gameKey === 'listen') initKidsListenGame();
+    if (gameKey === 'letters') initKidsSpellerGame();
+    if (gameKey === 'bubbles') initKidsBubbleGame();
+    if (gameKey === 'memory') initKidsMemoryGame();
   }
 
+  function initKidsListenGame() {
+    const shuffled = [...KIDS_ITEMS].sort(() => 0.5 - Math.random());
+    currentListenTarget = shuffled[0];
+    const choices = shuffled.slice(0, 4).sort(() => 0.5 - Math.random());
+
+    const phonicsEl = document.getElementById('kidsListenPhonics');
+    const feedbackEl = document.getElementById('kidsListenFeedback');
+    if (phonicsEl) phonicsEl.innerText = `"${currentListenTarget.word}"`;
+    if (feedbackEl) {
+      feedbackEl.innerText = '';
+      feedbackEl.className = 'lq-kids-feedback';
+    }
+
+    const grid = document.getElementById('kidsListenGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    choices.forEach(item => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'lq-btn-3d lq-btn-neutral lq-kids-emoji-card';
+      card.innerHTML = `
+        <span class="lq-kids-card-emoji">${item.emoji}</span>
+        <span class="lq-kids-card-word">${item.word}</span>
+      `;
+      card.onclick = () => checkKidsListen(card, item);
+      grid.appendChild(card);
+    });
+
+    setTimeout(() => {
+      if (isGamesTabActive && isKidsMode && currentKidsGame === 'listen') {
+        speakKidsListenTarget();
+      }
+    }, 280);
+  }
+
+  function speakKidsListenTarget() {
+    if (currentListenTarget) {
+      speakWord(currentListenTarget.word);
+    }
+  }
+
+  function checkKidsListen(cardBtn, chosenItem) {
+    if (!currentListenTarget) return;
+    const isRight = chosenItem.word === currentListenTarget.word;
+    const feedback = document.getElementById('kidsListenFeedback');
+
+    if (isRight) {
+      cardBtn.className = 'lq-btn-3d lq-btn-green lq-kids-emoji-card';
+      if (feedback) {
+        feedback.innerText = `¡YAY! 🎉 "${chosenItem.word}"`;
+        feedback.className = 'lq-kids-feedback lq-feedback-ok';
+      }
+      addScore(true);
+      setTimeout(initKidsListenGame, 1050);
+    } else {
+      cardBtn.classList.add('lq-shake', 'lq-card-wrong-border');
+      if (feedback) {
+        feedback.innerText = '¡Casi! Escucha de nuevo... 🎧';
+        feedback.className = 'lq-kids-feedback lq-feedback-err';
+      }
+      addScore(false);
+      setTimeout(() => {
+        cardBtn.classList.remove('lq-shake', 'lq-card-wrong-border');
+        speakKidsListenTarget();
+      }, 600);
+    }
+  }
+
+  // ============================================================================
+  // 7. KIDS GAME 2: ROMPECABEZAS DE LETRAS (ARMA LA PALABRA)
+  // ============================================================================
+  let currentSpellerItem = null;
+  let spellerTargetWord = '';
+  let currentPlacedLetters = [];
+
+  function initKidsSpellerGame() {
+    const easyPool = KIDS_ITEMS.filter(k => k.word.length <= 5 && !k.word.includes(' '));
+    currentSpellerItem = easyPool[Math.floor(Math.random() * easyPool.length)];
+    spellerTargetWord = currentSpellerItem.word.toUpperCase();
+    currentPlacedLetters = [];
+
+    const emojiEl = document.getElementById('spellerEmoji');
+    if (emojiEl) emojiEl.innerText = currentSpellerItem.emoji;
+
+    renderSpellerBoard();
+    speakCurrentSpellerWord();
+  }
+
+  function speakCurrentSpellerWord() {
+    if (currentSpellerItem) {
+      speakWord(currentSpellerItem.word);
+    }
+  }
+
+  function renderSpellerBoard() {
+    const slotsContainer = document.getElementById('spellerSlots');
+    const poolContainer = document.getElementById('spellerLetterPool');
+    if (!slotsContainer || !poolContainer) return;
+
+    slotsContainer.innerHTML = '';
+    for (let i = 0; i < spellerTargetWord.length; i++) {
+      const slot = document.createElement('div');
+      const letterAtIdx = currentPlacedLetters[i] || '';
+      slot.className = `lq-speller-slot ${letterAtIdx ? 'filled' : ''}`;
+      slot.innerText = letterAtIdx;
+      slotsContainer.appendChild(slot);
+    }
+
+    poolContainer.innerHTML = '';
+    if (currentPlacedLetters.length === spellerTargetWord.length) {
+      return;
+    }
+
+    const neededLetters = [...spellerTargetWord];
+    currentPlacedLetters.forEach(placed => {
+      const idx = neededLetters.indexOf(placed);
+      if (idx !== -1) neededLetters.splice(idx, 1);
+    });
+
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const randomExtra = alphabet[Math.floor(Math.random() * alphabet.length)];
+    const lettersToShow = [...neededLetters, randomExtra].sort(() => 0.5 - Math.random());
+
+    lettersToShow.forEach(l => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'lq-btn-3d lq-btn-neutral lq-speller-letter-btn';
+      btn.innerText = l;
+      btn.onclick = () => onLetterTapped(l);
+      poolContainer.appendChild(btn);
+    });
+  }
+
+  function onLetterTapped(letter) {
+    playSynth('tap');
+    speakWord(letter, 1.0);
+
+    const nextExpected = spellerTargetWord[currentPlacedLetters.length];
+    if (letter === nextExpected) {
+      currentPlacedLetters.push(letter);
+      renderSpellerBoard();
+
+      if (currentPlacedLetters.length === spellerTargetWord.length) {
+        addScore(true);
+        setTimeout(() => speakCurrentSpellerWord(), 250);
+        setTimeout(initKidsSpellerGame, 1300);
+      }
+    } else {
+      addScore(false);
+      const slots = document.getElementById('spellerSlots');
+      if (slots) {
+        slots.classList.add('lq-shake');
+        setTimeout(() => slots.classList.remove('lq-shake'), 400);
+      }
+    }
+  }
+
+  function resetSpellerWord() {
+    currentPlacedLetters = [];
+    renderSpellerBoard();
+  }
+
+  // ============================================================================
+  // 8. KIDS GAME 3: POP THE BUBBLES (¡EXPLOTA LAS BURBUJAS!)
+  // ============================================================================
+  let bubbleGoalCategory = 'animals';
+  let poppedCount = 0;
+  let bubbleSpawnInterval = null;
+
+  function stopBubbleSpawner() {
+    if (bubbleSpawnInterval) {
+      clearInterval(bubbleSpawnInterval);
+      bubbleSpawnInterval = null;
+    }
+  }
+
+  function initKidsBubbleGame() {
+    poppedCount = 0;
+    const countEl = document.getElementById('bubblePoppedCount');
+    if (countEl) countEl.innerText = '0';
+    refreshBubbleGoal();
+    startBubbleSpawner();
+  }
+
+  function refreshBubbleGoal() {
+    const categories = ['animals', 'fruits', 'vehicles', 'food'];
+    const filtered = categories.filter(c => c !== bubbleGoalCategory);
+    bubbleGoalCategory = filtered[Math.floor(Math.random() * filtered.length)];
+
+    const goalEl = document.getElementById('kidsBubbleGoal');
+    if (goalEl) goalEl.innerText = bubbleGoalCategory.toUpperCase();
+    speakBubbleGoal();
+  }
+
+  function speakBubbleGoal() {
+    speakWord(`Pop all the ${bubbleGoalCategory}!`);
+  }
+
+  function startBubbleSpawner() {
+    stopBubbleSpawner();
+    const sky = document.getElementById('bubbleSky');
+    if (!sky) return;
+    sky.innerHTML = '';
+
+    for (let i = 0; i < 4; i++) {
+      spawnSingleBubble();
+    }
+
+    bubbleSpawnInterval = setInterval(() => {
+      if (isGamesTabActive && isKidsMode && currentKidsGame === 'bubbles') {
+        spawnSingleBubble();
+      } else {
+        stopBubbleSpawner();
+      }
+    }, 1500);
+  }
+
+  function spawnSingleBubble() {
+    const sky = document.getElementById('bubbleSky');
+    if (!sky || sky.childElementCount >= 7) return;
+
+    const randomItem = KIDS_ITEMS[Math.floor(Math.random() * KIDS_ITEMS.length)];
+    const bubble = document.createElement('div');
+
+    const leftPercent = Math.floor(Math.random() * 74) + 6;
+    const duration = (Math.random() * 2.8 + 5.2).toFixed(1);
+    const size = Math.floor(Math.random() * 16) + 64;
+
+    bubble.className = 'lq-floating-bubble';
+    bubble.style.width = `${size}px`;
+    bubble.style.height = `${size}px`;
+    bubble.style.left = `${leftPercent}%`;
+    bubble.style.animationDuration = `${duration}s`;
+    bubble.innerHTML = `<span>${randomItem.emoji}</span>`;
+
+    bubble.onclick = (e) => {
+      e.stopPropagation();
+      handleBubblePop(bubble, randomItem);
+    };
+
+    sky.appendChild(bubble);
+
+    setTimeout(() => {
+      if (bubble && bubble.parentNode) {
+        bubble.remove();
+      }
+    }, Number(duration) * 1000);
+  }
+
+  function handleBubblePop(bubbleElement, item) {
+    playSynth('pop');
+    speakWord(item.word);
+
+    bubbleElement.style.transform = 'scale(1.4)';
+    bubbleElement.style.opacity = '0';
+    bubbleElement.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
+
+    setTimeout(() => {
+      if (bubbleElement && bubbleElement.parentNode) bubbleElement.remove();
+    }, 150);
+
+    if (item.category === bubbleGoalCategory) {
+      poppedCount++;
+      const countEl = document.getElementById('bubblePoppedCount');
+      if (countEl) countEl.innerText = poppedCount;
+      addScore(true);
+    } else {
+      addScore(false);
+    }
+  }
+
+  // ============================================================================
+  // 9. KIDS GAME 4: MEMORY KIDS (ENCUENTRA LAS PAREJAS)
+  // ============================================================================
+  let memoryCards = [];
+  let flippedCards = [];
+  let memoryTurns = 0;
+  let matchedPairs = 0;
+
+  function initKidsMemoryGame() {
+    memoryTurns = 0;
+    matchedPairs = 0;
+    const turnsEl = document.getElementById('memoryTurns');
+    if (turnsEl) turnsEl.innerText = '0';
+    flippedCards = [];
+
+    const picked = [...KIDS_ITEMS].sort(() => 0.5 - Math.random()).slice(0, 3);
+    const deck = [];
+    picked.forEach((item, index) => {
+      deck.push({ id: `${index}-a`, pairId: index, word: item.word, emoji: item.emoji });
+      deck.push({ id: `${index}-b`, pairId: index, word: item.word, emoji: item.emoji });
+    });
+
+    memoryCards = deck.sort(() => 0.5 - Math.random());
+
+    const grid = document.getElementById('memoryGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    memoryCards.forEach(card => {
+      const cardBox = document.createElement('div');
+      cardBox.className = 'lq-memory-card';
+      cardBox.innerHTML = `
+        <div class="lq-memory-card-inner">
+          <div class="lq-memory-front">⭐</div>
+          <div class="lq-memory-back">
+            <span class="lq-memory-emoji">${card.emoji}</span>
+            <span class="lq-memory-word">${card.word}</span>
+          </div>
+        </div>
+      `;
+      cardBox.onclick = () => onMemoryCardClick(cardBox, card);
+      grid.appendChild(cardBox);
+    });
+  }
+
+  function onMemoryCardClick(cardBox, cardData) {
+    if (cardBox.classList.contains('flipped') || flippedCards.length >= 2) return;
+
+    playSynth('tap');
+    cardBox.classList.add('flipped');
+    speakWord(cardData.word);
+    flippedCards.push({ element: cardBox, data: cardData });
+
+    if (flippedCards.length === 2) {
+      memoryTurns++;
+      const turnsEl = document.getElementById('memoryTurns');
+      if (turnsEl) turnsEl.innerText = memoryTurns;
+
+      const [card1, card2] = flippedCards;
+      if (card1.data.pairId === card2.data.pairId) {
+        matchedPairs++;
+        addScore(true);
+        flippedCards = [];
+
+        if (matchedPairs === 3) {
+          setTimeout(() => {
+            if (typeof window.confetti === 'function') window.confetti();
+            setTimeout(initKidsMemoryGame, 1400);
+          }, 450);
+        }
+      } else {
+        setTimeout(() => {
+          card1.element.classList.remove('flipped');
+          card2.element.classList.remove('flipped');
+          flippedCards = [];
+        }, 880);
+      }
+    }
+  }
+
+  // ============================================================================
+  // 10. GENERAL MODE GAMES (A1–C1 CONECTADOS A SUPABASE)
+  // ============================================================================
   function toggleLevelMenu(e) {
     if (e) e.stopPropagation();
     const menu = document.getElementById('levelMenu');
@@ -363,7 +745,7 @@
 
   async function setLevel(lvl) {
     const target = LEVEL_META[lvl] ? lvl : 'A1';
-    currentLevel = target;
+    currentGeneralLevel = target;
 
     const badge = document.getElementById('levelBadge');
     const title = document.getElementById('levelTitle');
@@ -373,50 +755,50 @@
       badge.innerText = target;
       badge.className = `lq-level-badge ${LEVEL_META[target].badgeClass}`;
     }
-    if (title) {
-      title.innerText = LEVEL_META[target].name;
-    }
-    if (menu) {
-      menu.classList.add('hidden');
-    }
+    if (title) title.innerText = LEVEL_META[target].name;
+    if (menu) menu.classList.add('hidden');
 
     await fetchLevelFromSupabase(target);
-    initActiveGame(true);
+    initActiveGeneralGame(true);
   }
 
-  function switchMode(mode) {
-    currentMode = mode;
-
-    // Detener timer de Fill-in Rush si cambiamos a otro modo
-    if (mode !== 'fillrush') {
+  function switchGeneralGame(gameKey) {
+    currentGeneralGame = gameKey;
+    if (gameKey !== 'fillrush') {
       stopRushTimer();
     }
 
-    document.querySelectorAll('.lq-game-view').forEach(v => v.classList.add('hidden'));
-    document.querySelectorAll('.lq-nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.general-view').forEach(v => v.classList.add('hidden'));
+    document.querySelectorAll('.gen-nav-tab').forEach(b => b.classList.remove('active'));
 
-    const activeView = document.getElementById(`game-${mode}`);
-    const activeBtn = document.getElementById(`nav-${mode}`);
+    const activeView = document.getElementById(`game-${gameKey}`);
+    const activeNav = document.getElementById(`gnav-${gameKey}`);
     if (activeView) activeView.classList.remove('hidden');
-    if (activeBtn) activeBtn.classList.add('active');
+    if (activeNav) activeNav.classList.add('active');
 
-    initActiveGame(false);
+    initActiveGeneralGame(false);
   }
 
-  function initActiveGame(resetTimerIfRush) {
-    if (!isGamesTabActive) return;
-    if (currentMode === 'fillrush') {
-      startFillRush(resetTimerIfRush);
-    } else if (currentMode === 'swipe') {
-      initSwipeGame();
-    } else if (currentMode === 'bubbles') {
-      initBubbleGame();
+  function initActiveGeneralGame(resetRush) {
+    if (!isGamesTabActive || isKidsMode) return;
+    if (currentGeneralGame === 'fillrush') startFillRush(resetRush);
+    if (currentGeneralGame === 'swipe') initSwipeGame();
+    if (currentGeneralGame === 'bubbles') initGeneralBubbleGame();
+  }
+
+  function formatClueAndTag(rawClue) {
+    const clue = String(rawClue || '').trim();
+    if (clue.includes('___') || clue.includes('__')) {
+      return { tag: 'Sentence Complete', tagClass: 'lq-tag-sentence', displayClue: clue };
     }
+    const match = clue.match(/^\(([^)]+)\)\s*(.*)$/);
+    if (match) {
+      return { tag: match[1], tagClass: 'lq-tag-vocab', displayClue: match[2] || clue };
+    }
+    return { tag: 'Definition', tagClass: 'lq-tag-default', displayClue: clue };
   }
 
-  // ============================================================================
-  // 5. MODO 1: FILL-IN RUSH (60s Timer, 4 Opciones 3D, Audio)
-  // ============================================================================
+  // 10.1 Fill-in Rush
   let rushTimerInterval = null;
   let rushTimeLeft = 60;
   let rushHits = 0;
@@ -435,17 +817,15 @@
       stopRushTimer();
       rushTimeLeft = 60;
       rushHits = 0;
-
       const scoreEl = document.getElementById('rushScore');
       const timerEl = document.getElementById('rushTimer');
       const timerBox = document.getElementById('timerContainer');
-
       if (scoreEl) scoreEl.innerText = '0';
       if (timerEl) timerEl.innerText = rushTimeLeft;
       if (timerBox) timerBox.classList.remove('lq-timer-danger');
 
       rushTimerInterval = setInterval(() => {
-        if (!isGamesTabActive || currentMode !== 'fillrush') {
+        if (!isGamesTabActive || isKidsMode || currentGeneralGame !== 'fillrush') {
           stopRushTimer();
           return;
         }
@@ -453,60 +833,17 @@
         const tEl = document.getElementById('rushTimer');
         const tBox = document.getElementById('timerContainer');
         if (tEl) tEl.innerText = rushTimeLeft;
-        if (tBox) {
-          tBox.classList.toggle('lq-timer-danger', rushTimeLeft <= 10);
-        }
+        if (tBox) tBox.classList.toggle('lq-timer-danger', rushTimeLeft <= 10);
 
         if (rushTimeLeft <= 0) {
           stopRushTimer();
-          onRushTimeOver();
+          const fb = document.getElementById('fillFeedback');
+          if (fb) fb.innerHTML = `<span class="lq-feedback-err">⏱️ ¡Tiempo agotado! (${rushHits} aciertos)</span>`;
+          setTimeout(() => startFillRush(true), 2000);
         }
       }, 1000);
     }
     nextFillQuestion();
-  }
-
-  function restartFillRushRound() {
-    startFillRush(true);
-  }
-
-  function onRushTimeOver() {
-    const feedback = document.getElementById('fillFeedback');
-    const grid = document.getElementById('fillOptionsGrid');
-    if (feedback) {
-      feedback.innerHTML = `<span class="lq-feedback-over">⏱️ ¡Tiempo completado! Lograste <strong>${rushHits} aciertos</strong> en esta ronda.</span>`;
-    }
-    if (grid) {
-      grid.innerHTML = `
-        <button type="button" onclick="window.LivingGames.restartFillRushRound()" class="lq-btn-3d lq-btn-blue lq-btn-full-span">
-          🔄 Jugar Nueva Ronda de 60s
-        </button>
-      `;
-    }
-  }
-
-  function formatClueAndTag(rawClue) {
-    const clue = String(rawClue || '').trim();
-    if (clue.includes('___') || clue.includes('__')) {
-      return {
-        tag: 'Sentence Complete',
-        tagClass: 'lq-tag-sentence',
-        displayClue: clue
-      };
-    }
-    const match = clue.match(/^\(([^)]+)\)\s*(.*)$/);
-    if (match) {
-      return {
-        tag: match[1],
-        tagClass: 'lq-tag-vocab',
-        displayClue: match[2] || clue
-      };
-    }
-    return {
-      tag: 'Definition',
-      tagClass: 'lq-tag-default',
-      displayClue: clue
-    };
   }
 
   function nextFillQuestion() {
@@ -514,27 +851,23 @@
     const items = getLevelQuestionsSync();
     currentFillItem = items[Math.floor(Math.random() * items.length)];
 
-    const feedback = document.getElementById('fillFeedback');
-    if (feedback) feedback.innerHTML = '';
+    const fb = document.getElementById('fillFeedback');
+    if (fb) fb.innerText = '';
 
     const parsed = formatClueAndTag(currentFillItem.CLUE);
-    const tagEl = document.getElementById('fillGrammarTag');
+    const tag = document.getElementById('fillGrammarTag');
     const clueEl = document.getElementById('fillClueText');
-
-    if (tagEl) {
-      tagEl.innerText = parsed.tag;
-      tagEl.className = `lq-category-pill ${parsed.tagClass}`;
+    if (tag) {
+      tag.innerText = parsed.tag;
+      tag.className = `lq-category-pill ${parsed.tagClass}`;
     }
-    if (clueEl) {
-      clueEl.innerText = parsed.displayClue;
-    }
+    if (clueEl) clueEl.innerText = parsed.displayClue;
 
-    // Generar 4 opciones (1 correcta + 3 distractores del mismo nivel)
     const correctAns = currentFillItem.RESPUESTA.trim();
     const options = [correctAns];
     const pool = items.filter(i => i.RESPUESTA && i.RESPUESTA.trim().toLowerCase() !== correctAns.toLowerCase());
-
     const shuffledPool = [...pool].sort(() => 0.5 - Math.random());
+
     for (let i = 0; i < shuffledPool.length && options.length < 4; i++) {
       const candidate = shuffledPool[i].RESPUESTA.trim();
       if (!options.some(o => o.toLowerCase() === candidate.toLowerCase())) {
@@ -555,98 +888,61 @@
       btn.type = 'button';
       btn.className = 'lq-btn-3d lq-btn-neutral lq-option-btn';
       btn.innerText = opt;
-      btn.onclick = () => checkFillAnswer(btn, opt);
+      btn.onclick = () => {
+        if (isFillAnswering || rushTimeLeft <= 0) return;
+        isFillAnswering = true;
+        if (opt.trim().toLowerCase() === correctAns.toLowerCase()) {
+          btn.className = 'lq-btn-3d lq-btn-green lq-option-btn';
+          rushHits++;
+          const sEl = document.getElementById('rushScore');
+          if (sEl) sEl.innerText = rushHits;
+          rushTimeLeft += 3;
+          if (fb) fb.innerHTML = '<span class="lq-feedback-ok">¡Correcto! (+3s) ⭐</span>';
+          addScore(true);
+          setTimeout(nextFillQuestion, 480);
+        } else {
+          btn.className = 'lq-btn-3d lq-btn-red lq-option-btn lq-shake';
+          rushTimeLeft = Math.max(0, rushTimeLeft - 2);
+          if (fb) fb.innerHTML = `<span class="lq-feedback-err">Respuesta: <strong>${correctAns}</strong> (-2s)</span>`;
+          addScore(false);
+          setTimeout(nextFillQuestion, 1050);
+        }
+      };
       grid.appendChild(btn);
     });
   }
 
-  function checkFillAnswer(buttonElement, chosenWord) {
-    if (isFillAnswering || rushTimeLeft <= 0 || !currentFillItem) return;
-    isFillAnswering = true;
-
-    const expected = currentFillItem.RESPUESTA.trim();
-    const isCorrect = chosenWord.trim().toLowerCase() === expected.toLowerCase();
-    const feedback = document.getElementById('fillFeedback');
-
-    if (isCorrect) {
-      buttonElement.className = 'lq-btn-3d lq-btn-green lq-option-btn';
-      if (feedback) {
-        feedback.innerHTML = '<span class="lq-feedback-ok">✨ ¡Excelente! (+3s y +10 XP)</span>';
-      }
-      rushHits++;
-      const scoreEl = document.getElementById('rushScore');
-      if (scoreEl) scoreEl.innerText = rushHits;
-      rushTimeLeft += 3;
-      const timerEl = document.getElementById('rushTimer');
-      if (timerEl) timerEl.innerText = rushTimeLeft;
-      triggerWinEffects();
-      setTimeout(() => {
-        if (rushTimeLeft > 0) nextFillQuestion();
-      }, 480);
-    } else {
-      buttonElement.className = 'lq-btn-3d lq-btn-red lq-option-btn lq-shake';
-      if (feedback) {
-        feedback.innerHTML = `<span class="lq-feedback-err">Respuesta correcta: <strong>${expected}</strong> (-2s)</span>`;
-      }
-      rushTimeLeft = Math.max(0, rushTimeLeft - 2);
-      const timerEl = document.getElementById('rushTimer');
-      if (timerEl) timerEl.innerText = rushTimeLeft;
-      triggerFailEffects();
-      setTimeout(() => {
-        if (rushTimeLeft > 0) nextFillQuestion();
-        else onRushTimeOver();
-      }, 1150);
-    }
-  }
-
   function speakCurrentClue() {
     if (currentFillItem) {
-      speakText(currentFillItem.CLUE);
+      speakWord(currentFillItem.CLUE, 0.95);
     }
   }
 
-  // ============================================================================
-  // 6. MODO 2: SWIPE & MATCH (Gestos Touch / Mouse + Botones)
-  // ============================================================================
-  const swipeCardState = {
-    isMatching: true,
-    currentWord: '',
-    currentClue: '',
-    correctWordForClue: ''
-  };
-  let cardElement = null;
-  let startX = 0;
-  let currentX = 0;
-  let isDragging = false;
-  let isAnimatingSwipe = false;
+  // 10.2 Swipe & Match
+  const swipeCardState = { isMatching: true, currentWord: '', currentClue: '' };
+  let swipeCardEl = null;
+  let sStartX = 0, sCurX = 0, sDragging = false;
 
   function initSwipeGame() {
-    cardElement = document.getElementById('swipeCard');
+    swipeCardEl = document.getElementById('swipeCard');
     setupSwipeEvents();
     loadNextSwipeCard();
   }
 
   function loadNextSwipeCard() {
-    isAnimatingSwipe = false;
     const items = getLevelQuestionsSync();
-    const targetItem = items[Math.floor(Math.random() * items.length)];
-
+    const target = items[Math.floor(Math.random() * items.length)];
     const isMatch = Math.random() >= 0.5;
+
     swipeCardState.isMatching = isMatch;
-    swipeCardState.currentWord = targetItem.RESPUESTA;
-
-    let chosenClueItem = targetItem;
-    if (!isMatch) {
-      const pool = items.filter(i => i.RESPUESTA.trim().toLowerCase() !== targetItem.RESPUESTA.trim().toLowerCase());
-      if (pool.length > 0) {
-        chosenClueItem = pool[Math.floor(Math.random() * pool.length)];
-      } else {
-        swipeCardState.isMatching = true;
-      }
+    swipeCardState.currentWord = target.RESPUESTA;
+    if (isMatch) {
+      swipeCardState.currentClue = target.CLUE;
+    } else {
+      const pool = items.filter(i => i.RESPUESTA !== target.RESPUESTA);
+      const dist = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : target;
+      swipeCardState.currentClue = dist.CLUE;
     }
-
-    swipeCardState.currentClue = chosenClueItem.CLUE;
-    swipeCardState.correctWordForClue = chosenClueItem.RESPUESTA;
 
     const parsed = formatClueAndTag(swipeCardState.currentClue);
     const catTag = document.getElementById('swipeCategoryTag');
@@ -655,284 +951,246 @@
       catTag.className = `lq-category-pill ${parsed.tagClass}`;
     }
 
-    if (cardElement) {
-      cardElement.style.transform = 'translate(0px, 0px) rotate(0deg)';
-      cardElement.style.opacity = '1';
-      cardElement.classList.remove('dragging');
+    if (swipeCardEl) {
+      swipeCardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
+      swipeCardEl.style.opacity = '1';
+      swipeCardEl.classList.remove('dragging');
     }
+    const stOk = document.getElementById('stampCorrect');
+    const stNo = document.getElementById('stampWrong');
+    if (stOk) stOk.style.opacity = '0';
+    if (stNo) stNo.style.opacity = '0';
 
-    const stampOk = document.getElementById('stampCorrect');
-    const stampNo = document.getElementById('stampWrong');
-    if (stampOk) stampOk.style.opacity = '0';
-    if (stampNo) stampNo.style.opacity = '0';
-
-    const wordEl = document.getElementById('swipeWord');
-    const clueEl = document.getElementById('swipeClue');
-    if (wordEl) wordEl.innerText = swipeCardState.currentWord;
-    if (clueEl) clueEl.innerText = parsed.displayClue;
+    const wEl = document.getElementById('swipeWord');
+    const cEl = document.getElementById('swipeClue');
+    if (wEl) wEl.innerText = swipeCardState.currentWord;
+    if (cEl) cEl.innerText = parsed.displayClue;
   }
 
   function setupSwipeEvents() {
-    if (!cardElement || swipeEventsBound) return;
+    if (!swipeCardEl || swipeEventsBound) return;
     swipeEventsBound = true;
-
-    cardElement.addEventListener('touchstart', onDragStart, { passive: true });
-    window.addEventListener('touchmove', onDragMove, { passive: false });
-    window.addEventListener('touchend', onDragEnd);
-
-    cardElement.addEventListener('mousedown', onDragStart);
-    window.addEventListener('mousemove', onDragMove);
-    window.addEventListener('mouseup', onDragEnd);
+    swipeCardEl.addEventListener('touchstart', onSStart, { passive: true });
+    window.addEventListener('touchmove', onSMove, { passive: false });
+    window.addEventListener('touchend', onSEnd);
+    swipeCardEl.addEventListener('mousedown', onSStart);
+    window.addEventListener('mousemove', onSMove);
+    window.addEventListener('mouseup', onSEnd);
   }
 
-  function onDragStart(e) {
-    if (!isGamesTabActive || currentMode !== 'swipe' || isAnimatingSwipe) return;
+  function onSStart(e) {
+    if (!isGamesTabActive || isKidsMode || currentGeneralGame !== 'swipe') return;
     if (e.target && e.target.closest('button')) return;
-    isDragging = true;
-    startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-    if (cardElement) cardElement.classList.add('dragging');
+    sDragging = true;
+    sStartX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    if (swipeCardEl) swipeCardEl.classList.add('dragging');
   }
 
-  function onDragMove(e) {
-    if (!isDragging || !cardElement) return;
-    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-    currentX = clientX - startX;
+  function onSMove(e) {
+    if (!sDragging || !swipeCardEl) return;
+    sCurX = (e.type.includes('touch') ? e.touches[0].clientX : e.clientX) - sStartX;
+    const rot = sCurX * 0.08;
+    swipeCardEl.style.transform = `translate(${sCurX}px, 0px) rotate(${rot}deg)`;
 
-    const rotate = currentX * 0.08;
-    cardElement.style.transform = `translate(${currentX}px, 0px) rotate(${rotate}deg)`;
-
-    const rightStamp = document.getElementById('stampCorrect');
-    const leftStamp = document.getElementById('stampWrong');
-    if (rightStamp && leftStamp) {
-      if (currentX > 30) {
-        rightStamp.style.opacity = String(Math.min(1, currentX / 100));
-        leftStamp.style.opacity = '0';
-      } else if (currentX < -30) {
-        leftStamp.style.opacity = String(Math.min(1, Math.abs(currentX) / 100));
-        rightStamp.style.opacity = '0';
+    const rightS = document.getElementById('stampCorrect');
+    const leftS = document.getElementById('stampWrong');
+    if (rightS && leftS) {
+      if (sCurX > 30) {
+        rightS.style.opacity = String(Math.min(1, sCurX / 100));
+        leftS.style.opacity = '0';
+      } else if (sCurX < -30) {
+        leftS.style.opacity = String(Math.min(1, Math.abs(sCurX) / 100));
+        rightS.style.opacity = '0';
       } else {
-        rightStamp.style.opacity = '0';
-        leftStamp.style.opacity = '0';
+        rightS.style.opacity = '0';
+        leftS.style.opacity = '0';
       }
     }
   }
 
-  function onDragEnd() {
-    if (!isDragging || !cardElement) return;
-    isDragging = false;
-    cardElement.classList.remove('dragging');
-
-    if (currentX > 85) {
+  function onSEnd() {
+    if (!sDragging || !swipeCardEl) return;
+    sDragging = false;
+    swipeCardEl.classList.remove('dragging');
+    if (sCurX > 85) {
       animateCardOut(true);
-    } else if (currentX < -85) {
+    } else if (sCurX < -85) {
       animateCardOut(false);
     } else {
-      cardElement.style.transform = 'translate(0px, 0px) rotate(0deg)';
-      const rightStamp = document.getElementById('stampCorrect');
-      const leftStamp = document.getElementById('stampWrong');
-      if (rightStamp) rightStamp.style.opacity = '0';
-      if (leftStamp) leftStamp.style.opacity = '0';
+      swipeCardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
+      const rightS = document.getElementById('stampCorrect');
+      const leftS = document.getElementById('stampWrong');
+      if (rightS) rightS.style.opacity = '0';
+      if (leftS) leftS.style.opacity = '0';
     }
-    currentX = 0;
+    sCurX = 0;
   }
 
-  function handleSwipeAction(userChoseTrue) {
-    if (isAnimatingSwipe) return;
-    animateCardOut(userChoseTrue);
+  function handleSwipeAction(val) {
+    animateCardOut(val);
   }
 
-  function animateCardOut(userChoice) {
-    if (!cardElement) return;
-    isAnimatingSwipe = true;
+  function animateCardOut(userVal) {
+    if (!swipeCardEl) return;
+    const destX = userVal ? 360 : -360;
+    swipeCardEl.style.transform = `translate(${destX}px, 20px) rotate(${userVal ? 22 : -22}deg)`;
+    swipeCardEl.style.opacity = '0';
 
-    const targetTranslateX = userChoice ? 360 : -360;
-    const rotate = userChoice ? 22 : -22;
-    cardElement.style.transform = `translate(${targetTranslateX}px, 16px) rotate(${rotate}deg)`;
-    cardElement.style.opacity = '0';
-
-    const isCorrectDecision = (userChoice === swipeCardState.isMatching);
-    const feedback = document.getElementById('swipeFeedback');
-
-    if (isCorrectDecision) {
-      triggerWinEffects();
-      if (feedback) {
-        feedback.innerHTML = '<span class="lq-feedback-ok">🎯 ¡Correcto! (+10 XP)</span>';
-      }
-    } else {
-      triggerFailEffects();
-      if (feedback) {
-        feedback.innerHTML = `<span class="lq-feedback-err">❌ Era ${swipeCardState.isMatching ? 'VERDADERO' : `FALSO (${swipeCardState.correctWordForClue})`}</span>`;
-      }
-    }
-
-    setTimeout(() => {
-      loadNextSwipeCard();
-    }, 260);
+    const success = (userVal === swipeCardState.isMatching);
+    addScore(success);
+    setTimeout(loadNextSwipeCard, 250);
   }
 
   function speakSwipeWord() {
-    speakText(swipeCardState.currentWord);
+    speakWord(swipeCardState.currentWord, 0.95);
   }
 
-  // ============================================================================
-  // 7. MODO 3: WORD BUBBLES (Constructor de Palabras y Oraciones)
-  // ============================================================================
-  let currentBubbleItem = null;
-  let targetTokens = [];
-  let selectedTokens = [];
-  let poolTokens = [];
+  // 10.3 Word Bubbles (General)
+  let currentGenBubbleItem = null;
+  let genTargetTokens = [];
+  let genSelectedTokens = [];
+  let genPoolTokens = [];
 
-  function initBubbleGame() {
+  function initGeneralBubbleGame() {
     const items = getLevelQuestionsSync();
-    currentBubbleItem = items[Math.floor(Math.random() * items.length)];
-
-    const parsed = formatClueAndTag(currentBubbleItem.CLUE);
+    currentGenBubbleItem = items[Math.floor(Math.random() * items.length)];
+    const parsed = formatClueAndTag(currentGenBubbleItem.CLUE);
     const clueEl = document.getElementById('bubbleClue');
-    const feedbackEl = document.getElementById('bubbleFeedback');
     if (clueEl) clueEl.innerText = parsed.displayClue;
-    if (feedbackEl) feedbackEl.innerHTML = '';
 
-    const rawAnswer = currentBubbleItem.RESPUESTA.trim();
-
-    if (rawAnswer.includes(' ') || rawAnswer.length > 9) {
-      targetTokens = rawAnswer.split(/\s+/);
-    } else {
-      targetTokens = rawAnswer.split('');
-    }
-
-    selectedTokens = [];
-    poolTokens = targetTokens
-      .map((val, idx) => ({ id: idx, value: val }))
-      .sort(() => 0.5 - Math.random());
-
-    // Evitar que salga exactamente en el mismo orden si tiene más de 1 ficha
-    if (poolTokens.length > 1 && poolTokens.every((t, i) => t.value === targetTokens[i])) {
-      poolTokens.reverse();
-    }
-
-    renderBubbleBoard();
+    const ans = currentGenBubbleItem.RESPUESTA.trim();
+    genTargetTokens = (ans.includes(' ') || ans.length > 9) ? ans.split(/\s+/) : ans.split('');
+    genSelectedTokens = [];
+    genPoolTokens = genTargetTokens.map((val, idx) => ({ id: idx, value: val })).sort(() => 0.5 - Math.random());
+    renderGenBubbleBoard();
   }
 
-  function renderBubbleBoard() {
-    const answerArea = document.getElementById('bubbleAnswerArea');
+  function renderGenBubbleBoard() {
+    const ansArea = document.getElementById('bubbleAnswerArea');
     const poolArea = document.getElementById('bubblePool');
-    if (!answerArea || !poolArea) return;
+    if (!ansArea || !poolArea) return;
 
-    answerArea.innerHTML = '';
-    if (selectedTokens.length === 0) {
-      answerArea.innerHTML = '<span class="lq-bubble-placeholder">Toca las fichas de abajo para formar la respuesta</span>';
+    ansArea.innerHTML = '';
+    if (genSelectedTokens.length === 0) {
+      ansArea.innerHTML = '<span class="lq-bubble-placeholder">Toca las fichas de abajo</span>';
     } else {
-      selectedTokens.forEach(token => {
-        const chip = document.createElement('button');
-        chip.type = 'button';
-        chip.className = 'lq-bubble-selected';
-        chip.innerText = token.value;
-        chip.onclick = () => returnTokenToPool(token);
-        answerArea.appendChild(chip);
+      genSelectedTokens.forEach(t => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'lq-bubble-selected';
+        btn.innerText = t.value;
+        btn.onclick = () => {
+          playSynth('tap');
+          genPoolTokens.push(t);
+          genSelectedTokens = genSelectedTokens.filter(x => x.id !== t.id);
+          renderGenBubbleBoard();
+        };
+        ansArea.appendChild(btn);
       });
     }
 
     poolArea.innerHTML = '';
-    poolTokens.forEach(token => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'lq-btn-3d lq-btn-neutral lq-bubble-token';
-      chip.innerText = token.value;
-      chip.onclick = () => pushTokenToAnswer(token);
-      poolArea.appendChild(chip);
+    genPoolTokens.forEach(t => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'lq-btn-3d lq-btn-neutral lq-bubble-token';
+      btn.innerText = t.value;
+      btn.onclick = () => {
+        playSynth('tap');
+        genSelectedTokens.push(t);
+        genPoolTokens = genPoolTokens.filter(x => x.id !== t.id);
+        renderGenBubbleBoard();
+      };
+      poolArea.appendChild(btn);
     });
   }
 
-  function pushTokenToAnswer(token) {
-    playTone('tick');
-    selectedTokens.push(token);
-    poolTokens = poolTokens.filter(t => t.id !== token.id);
-    renderBubbleBoard();
-  }
-
-  function returnTokenToPool(token) {
-    playTone('tick');
-    poolTokens.push(token);
-    selectedTokens = selectedTokens.filter(t => t.id !== token.id);
-    renderBubbleBoard();
-  }
-
   function undoLastBubble() {
-    if (selectedTokens.length > 0) {
-      playTone('tick');
-      const last = selectedTokens.pop();
-      poolTokens.push(last);
-      renderBubbleBoard();
+    if (genSelectedTokens.length > 0) {
+      playSynth('tap');
+      const last = genSelectedTokens.pop();
+      genPoolTokens.push(last);
+      renderGenBubbleBoard();
     }
   }
 
   function checkBubbleSolution() {
-    if (!currentBubbleItem) return;
-    const joiner = (currentBubbleItem.RESPUESTA.includes(' ') || currentBubbleItem.RESPUESTA.trim().length > 9) ? ' ' : '';
-    const userAnswer = selectedTokens.map(t => t.value).join(joiner).trim();
-    const expected = currentBubbleItem.RESPUESTA.trim();
+    if (!currentGenBubbleItem) return;
+    const glue = (currentGenBubbleItem.RESPUESTA.includes(' ') || currentGenBubbleItem.RESPUESTA.trim().length > 9) ? ' ' : '';
+    const user = genSelectedTokens.map(t => t.value).join(glue).trim();
+    const expected = currentGenBubbleItem.RESPUESTA.trim();
 
-    const answerArea = document.getElementById('bubbleAnswerArea');
-    const feedbackEl = document.getElementById('bubbleFeedback');
-    if (!answerArea) return;
+    const ansArea = document.getElementById('bubbleAnswerArea');
+    if (!ansArea) return;
 
-    if (userAnswer.toLowerCase() === expected.toLowerCase()) {
-      answerArea.classList.add('lq-bubble-area-correct');
-      if (feedbackEl) {
-        feedbackEl.innerHTML = `<span class="lq-feedback-ok">🎉 ¡Perfecto! "${expected}" (+10 XP)</span>`;
-      }
-      triggerWinEffects();
+    if (user.toLowerCase() === expected.toLowerCase()) {
+      ansArea.classList.add('lq-bubble-area-correct');
+      addScore(true);
       setTimeout(() => {
-        answerArea.classList.remove('lq-bubble-area-correct');
-        initBubbleGame();
-      }, 850);
+        ansArea.classList.remove('lq-bubble-area-correct');
+        initGeneralBubbleGame();
+      }, 800);
     } else {
-      answerArea.classList.add('lq-bubble-area-wrong', 'lq-shake');
-      if (feedbackEl) {
-        feedbackEl.innerHTML = `<span class="lq-feedback-err">Sigue intentando o usa 🔊 para escuchar la respuesta</span>`;
-      }
-      triggerFailEffects();
+      ansArea.classList.add('lq-bubble-area-wrong', 'lq-shake');
+      addScore(false);
       setTimeout(() => {
-        answerArea.classList.remove('lq-bubble-area-wrong', 'lq-shake');
+        ansArea.classList.remove('lq-bubble-area-wrong', 'lq-shake');
       }, 600);
     }
   }
 
   function speakBubbleTarget() {
-    if (currentBubbleItem) {
-      speakText(currentBubbleItem.RESPUESTA);
+    if (currentGenBubbleItem) {
+      speakWord(currentGenBubbleItem.RESPUESTA, 0.95);
     }
   }
 
   // ============================================================================
-  // 8. CICLO DE VIDA AL ABRIR / CERRAR LA PESTAÑA DE JUEGOS
+  // 11. CICLO DE VIDA AL ABRIR / CERRAR LA PESTAÑA DE JUEGOS
   // ============================================================================
   let hasInitializedOnce = false;
 
   async function onTabOpened() {
     isGamesTabActive = true;
-    loadSavedStats();
+    loadStats();
 
     if (!hasInitializedOnce) {
       hasInitializedOnce = true;
-      const studentCourse = (window.currentUserProfile && window.currentUserProfile.course_level)
-        ? window.currentUserProfile.course_level
-        : 'Adultos 1';
-      const defaultCefr = inferDefaultCefrFromCourse(studentCourse);
-      await setLevel(defaultCefr);
-      switchMode(currentMode || 'fillrush');
+      const profile = window.currentUserProfile || {};
+      const prog = String(profile.program || '').toLowerCase();
+      const lvl = String(profile.course_level || '').toLowerCase();
+
+      // Si el alumno es de Kids, Nursery o Junior (o por defecto), abre en Modo Niños; si es Adultos/Teens abre en su nivel pero puede cambiar con 1 clic
+      const startInKids = prog === 'kids' || prog === 'nursery' || prog === 'junior' || lvl.includes('kids') || lvl.includes('junior') || lvl.includes('nursery');
+      const defaultCefr = lvl.includes('3') ? 'B2' : (lvl.includes('2') ? 'B1' : 'A1');
+      currentGeneralLevel = defaultCefr;
+
+      const badge = document.getElementById('levelBadge');
+      const title = document.getElementById('levelTitle');
+      if (badge) {
+        badge.innerText = defaultCefr;
+        badge.className = `lq-level-badge ${LEVEL_META[defaultCefr].badgeClass}`;
+      }
+      if (title) title.innerText = LEVEL_META[defaultCefr].name;
+
+      // Iniciar en Modo Niños por defecto para niños o permitir ambos modos
+      setAudienceMode(startInKids || true);
     } else {
-      await fetchLevelFromSupabase(currentLevel);
-      initActiveGame(false);
+      if (isKidsMode) {
+        switchKidsGame(currentKidsGame);
+      } else {
+        await fetchLevelFromSupabase(currentGeneralLevel);
+        switchGeneralGame(currentGeneralGame);
+      }
     }
   }
 
   function onTabClosed() {
     isGamesTabActive = false;
     stopRushTimer();
+    stopBubbleSpawner();
   }
 
-  // Cerrar el menú de niveles al hacer clic fuera
   document.addEventListener('click', (e) => {
     const menu = document.getElementById('levelMenu');
     const btn = document.getElementById('levelBtn');
@@ -943,27 +1201,31 @@
     }
   });
 
-  // Exponer API global para el HTML y para `platform.js`
+  // Exponer funciones globales
   window.LivingGames = {
     onTabOpened,
     onTabClosed,
+    setAudienceMode,
+    toggleAudienceMode,
+    switchKidsGame,
+    switchGeneralGame,
+    toggleLevelMenu,
     setLevel,
-     toggleLevelMenu,
-    switchMode,
-    speakCurrentClue,
-    speakSwipeWord,
-    handleSwipeAction,
-    undoLastBubble,
-    checkBubbleSolution,
-    speakBubbleTarget,
-    restartFillRushRound,
-    toggleSound,
-    skipBubbleQuestion: initBubbleGame
+    toggleSound
   };
 
-  // Funciones puente con los nombres del template original para compatibilidad directa
+  window.toggleAudienceMode = toggleAudienceMode;
+  window.setAudienceMode = setAudienceMode;
+  window.switchKidsGame = switchKidsGame;
+  window.switchGeneralGame = switchGeneralGame;
   window.setLevel = setLevel;
-  window.switchMode = switchMode;
+  window.toggleSound = toggleSound;
+  window.speakKidsListenTarget = speakKidsListenTarget;
+  window.speakCurrentSpellerWord = speakCurrentSpellerWord;
+  window.resetSpellerWord = resetSpellerWord;
+  window.speakBubbleGoal = speakBubbleGoal;
+  window.refreshBubbleGoal = refreshBubbleGoal;
+  window.initKidsMemoryGame = initKidsMemoryGame;
   window.speakCurrentClue = speakCurrentClue;
   window.speakSwipeWord = speakSwipeWord;
   window.handleSwipeAction = handleSwipeAction;

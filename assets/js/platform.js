@@ -736,13 +736,15 @@ async function initAuthenticatedUser(user) {
 
   if (isTeacher) {
     // Ingreso directo como Profesor: accede al panel docente exclusivo
+    document.body.classList.remove('student-light-theme');
     document.getElementById('teacherDashboard').classList.remove('hidden');
     document.getElementById('studentDashboard').classList.add('hidden');
     switchTeacherTab('students');
     await loadTeacherStudents();
     updateTeacherClassesBadge();
   } else {
-    // Ingreso directo como Estudiante: accede únicamente a su portal de estudio y notas
+    // Ingreso directo como Estudiante: activa tema claro y amigable
+    document.body.classList.add('student-light-theme');
     document.getElementById('studentDashboard').classList.remove('hidden');
     document.getElementById('teacherDashboard').classList.add('hidden');
     setupStudentView();
@@ -758,6 +760,7 @@ async function logout() {
 
   currentUserProfile = null;
   window.currentUserProfile = null;
+  document.body.classList.remove('student-light-theme');
   if (window.LivingGames) window.LivingGames.onTabClosed();
   currentSessionUser = null;
   selectedStudent = null;
