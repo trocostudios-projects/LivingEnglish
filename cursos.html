@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_no_logo_box">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261029_no_logo_box">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261029_no_logo_box">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_no_logo_box">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_pro_games">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261029_pro_games">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261029_pro_games">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_pro_games">
 </head>
 <body>
 
@@ -191,6 +191,20 @@
         <div id="studentTabGames" class="hidden">
           <div class="lq-shell">
 
+            <!-- Barra de Progreso de Rango del Jugador -->
+            <div class="lq-rank-bar">
+              <div class="lq-rank-info">
+                <span id="lqRankIcon" class="lq-rank-icon">🌱</span>
+                <div>
+                  <span id="lqRankTitle" class="lq-rank-title">Rango: Explorer</span>
+                  <span id="lqRankNext" class="lq-rank-sub">Siguiente rango a las 10 ⭐</span>
+                </div>
+              </div>
+              <div class="lq-rank-progress-track">
+                <div id="lqRankProgressFill" class="lq-rank-progress-fill" style="width: 8%;"></div>
+              </div>
+            </div>
+
             <!-- Barra Superior: Selector Modo Niños / Modo Niveles A1-C1, Estrellas, Racha y Sonido -->
             <div class="lq-topbar">
               <div class="lq-topbar-left">
@@ -249,7 +263,7 @@
                   <span>🔥</span>
                   <span id="streakDisplay">0</span>
                 </div>
-                <button type="button" id="soundToggleBtn" onclick="toggleSound()" class="lq-sound-btn" title="Sonido activado">
+                <button type="button" id="soundToggleBtn" onclick="toggleSound()" class="lq-sound-btn" title="Activar/Desactivar sonido">
                   🔊
                 </button>
               </div>
@@ -258,7 +272,6 @@
             <!-- ============================================================== -->
             <!-- DOCK DE NAVEGACIÓN DE JUEGOS (NIÑOS: 4 JUEGOS / GENERAL: 3)    -->
             <!-- ============================================================== -->
-            <!-- Barra de 4 Juegos Modo Niños -->
             <div id="kidsNav" class="lq-nav-dock lq-kids-dock">
               <button type="button" onclick="switchKidsGame('listen')" id="knav-listen" class="kids-nav-tab active">
                 <span class="lq-dock-emoji">🎧</span>
@@ -270,7 +283,7 @@
               </button>
               <button type="button" onclick="switchKidsGame('bubbles')" id="knav-bubbles" class="kids-nav-tab">
                 <span class="lq-dock-emoji">🎈</span>
-                <span class="lq-dock-label">Explota</span>
+                <span class="lq-dock-label">Burbujas</span>
               </button>
               <button type="button" onclick="switchKidsGame('memory')" id="knav-memory" class="kids-nav-tab">
                 <span class="lq-dock-emoji">✨</span>
@@ -278,7 +291,6 @@
               </button>
             </div>
 
-            <!-- Barra de 3 Juegos Modo General (A1–C1) -->
             <div id="generalNav" class="lq-nav-dock lq-general-dock hidden">
               <button type="button" onclick="switchGeneralGame('fillrush')" id="gnav-fillrush" class="gen-nav-tab active">
                 <span class="lq-dock-emoji">⚡</span>
@@ -302,14 +314,18 @@
             <section id="game-kids-listen" class="kids-view lq-kids-stage">
               <div class="lq-kids-header">
                 <div class="lq-kids-badge lq-badge-pink">🎧 ¡Escucha y Toca!</div>
-                <p class="lq-kids-sub">Toca la imagen que dice la voz</p>
+                <p class="lq-kids-sub">Escucha la pronunciación en inglés y elige la tarjeta correcta</p>
 
-                <button type="button" onclick="speakKidsListenTarget()" class="lq-btn-3d lq-btn-pink lq-megaphone-btn bounce-gentle">
-                  <span class="lq-megaphone-icon">📢</span>
-                  <span class="lq-megaphone-label">Escuchar</span>
-                </button>
-
-                <p id="kidsListenPhonics" class="lq-kids-phonics">???</p>
+                <div class="lq-listen-hero">
+                  <button type="button" id="kidsMegaphoneBtn" onclick="speakKidsListenTarget()" class="lq-btn-3d lq-btn-pink lq-megaphone-btn bounce-gentle">
+                    <span class="lq-megaphone-icon">🔊</span>
+                    <span class="lq-megaphone-label">Escuchar</span>
+                  </button>
+                  <div class="lq-listen-meta">
+                    <span id="kidsListenHint" class="lq-spanish-hint-pill">💡 Pista: ...</span>
+                    <p id="kidsListenPhonics" class="lq-kids-phonics">🎧 ¿Qué palabra escuchaste?</p>
+                  </div>
+                </div>
               </div>
 
               <div id="kidsListenGrid" class="lq-kids-listen-grid">
@@ -323,12 +339,16 @@
             <section id="game-kids-letters" class="kids-view lq-kids-stage hidden">
               <div class="lq-kids-header">
                 <div class="lq-kids-badge lq-badge-violet">🧩 Arma la Palabra</div>
+                <p class="lq-kids-sub">Ordena las letras para escribir la palabra en inglés</p>
 
                 <div class="lq-speller-card">
-                  <div id="spellerEmoji" class="lq-speller-emoji" onclick="speakCurrentSpellerWord()">🐶</div>
-                  <button type="button" onclick="speakCurrentSpellerWord()" class="lq-speller-audio-pill">
-                    🔊 Escuchar palabra
-                  </button>
+                  <div id="spellerEmoji" class="lq-speller-emoji" onclick="speakCurrentSpellerWord()" title="Toca para escuchar">🐶</div>
+                  <div class="lq-speller-meta">
+                    <span id="spellerSpanishHint" class="lq-spanish-hint-pill">Significa: Perro</span>
+                    <button type="button" onclick="speakCurrentSpellerWord()" class="lq-speller-audio-pill">
+                      🔊 Escuchar pronunciación
+                    </button>
+                  </div>
                 </div>
 
                 <div id="spellerSlots" class="lq-speller-slots">
@@ -337,13 +357,17 @@
               </div>
 
               <div class="lq-speller-bottom">
-                <p class="lq-kids-sub">Toca las letras en orden:</p>
                 <div id="spellerLetterPool" class="lq-speller-pool">
                   <!-- Fichas de letras -->
                 </div>
-                <button type="button" onclick="resetSpellerWord()" class="lq-kids-reset-link">
-                  ↺ Empezar de nuevo
-                </button>
+                <div class="lq-speller-actions">
+                  <button type="button" onclick="resetSpellerWord()" class="lq-btn-3d lq-btn-neutral lq-sm-pill-btn">
+                    ↺ Borrar letras
+                  </button>
+                  <button type="button" onclick="giveKidsSpellerHint()" class="lq-btn-3d lq-btn-yellow lq-sm-pill-btn">
+                    💡 Dar una letra
+                  </button>
+                </div>
               </div>
             </section>
 
@@ -351,12 +375,11 @@
             <section id="game-kids-bubbles" class="kids-view lq-kids-stage hidden">
               <div class="lq-kids-header">
                 <div class="lq-kids-badge lq-badge-cyan">
-                  <span>🎈 ¡Explota:</span>
-                  <strong id="kidsBubbleGoal" class="lq-bubble-goal-word">ANIMALS</strong>
-                  <span>!</span>
-                  <button type="button" onclick="speakBubbleGoal()" class="lq-inline-speaker">🔊</button>
+                  <span>🎈 Explota:</span>
+                  <strong id="kidsBubbleGoal" class="lq-bubble-goal-word">🐾 ANIMALS (Animales)</strong>
+                  <button type="button" onclick="speakBubbleGoal()" class="lq-inline-speaker" title="Escuchar categoría">🔊</button>
                 </div>
-                <p class="lq-kids-sub">Revienta las burbujas que corresponden a la categoría</p>
+                <p class="lq-kids-sub">Toca solo las burbujas que pertenecen a esta categoría</p>
               </div>
 
               <div id="bubbleSky" class="lq-bubble-sky">
@@ -364,12 +387,12 @@
               </div>
 
               <div class="lq-bubble-footer-bar">
-                <div>
-                  <span>Explotadas:</span>
+                <div class="lq-bubble-score-box">
+                  <span>Aciertos de categoría:</span>
                   <strong id="bubblePoppedCount" class="lq-popped-num">0</strong>
                 </div>
-                <button type="button" onclick="refreshBubbleGoal()" class="lq-btn-3d lq-btn-neutral lq-sm-pill-btn">
-                  🔄 Cambiar Reto
+                <button type="button" onclick="refreshBubbleGoal()" class="lq-btn-3d lq-btn-blue lq-sm-pill-btn">
+                  🔄 Cambiar Categoría
                 </button>
               </div>
             </section>
@@ -377,21 +400,23 @@
             <!-- KIDS GAME 4: MEMORY KIDS (ENCUENTRA LAS PAREJAS) -->
             <section id="game-kids-memory" class="kids-view lq-kids-stage hidden">
               <div class="lq-kids-header">
-                <div class="lq-kids-badge lq-badge-amber">✨ Encuentra las Parejas</div>
-                <p class="lq-kids-sub">Voltea dos cartas y escucha su nombre en inglés</p>
+                <div class="lq-kids-badge lq-badge-amber">✨ Memoria en Inglés</div>
+                <p class="lq-kids-sub">Encuentra las 3 parejas y aprende su pronunciación</p>
               </div>
 
               <div id="memoryGrid" class="lq-memory-grid">
                 <!-- Cartas 3D generadas por JS -->
               </div>
 
+              <div id="memoryFeedback" class="lq-kids-feedback"></div>
+
               <div class="lq-bubble-footer-bar">
-                <div>
-                  <span>Intentos:</span>
-                  <strong id="memoryTurns" class="lq-turns-num">0</strong>
+                <div class="lq-memory-stats-row">
+                  <span>Parejas: <strong id="memoryPairsCount" class="lq-popped-num">0/3</strong></span>
+                  <span>Intentos: <strong id="memoryTurns" class="lq-turns-num">0</strong></span>
                 </div>
                 <button type="button" onclick="initKidsMemoryGame()" class="lq-btn-3d lq-btn-yellow lq-sm-pill-btn">
-                  🔄 Reiniciar Juego
+                  🔄 Nuevas Cartas
                 </button>
               </div>
             </section>
@@ -407,40 +432,60 @@
                   <div id="timerContainer" class="lq-timer-box">
                     <span id="rushTimer">60</span>
                   </div>
-                  <span class="lq-hud-label">Tiempo</span>
+                  <div>
+                    <span class="lq-hud-label">Segundos</span>
+                    <div class="lq-timer-mini-bar">
+                      <div id="rushTimerBar" class="lq-timer-mini-fill" style="width: 100%;"></div>
+                    </div>
+                  </div>
                 </div>
                 <div class="lq-rush-score-group">
-                  <span class="lq-hud-label">Aciertos:</span>
+                  <span class="lq-hud-label">Aciertos</span>
                   <span id="rushScore" class="lq-rush-score-val">0</span>
                 </div>
               </div>
 
-              <div id="fillCard" class="lq-clue-card">
-                <div class="lq-clue-header">
-                  <span id="fillGrammarTag" class="lq-category-pill lq-tag-default">Grammar</span>
-                  <button type="button" onclick="speakCurrentClue()" class="lq-audio-btn" title="Escuchar pronunciación">
-                    🔊 Escuchar
-                  </button>
+              <div id="rushPlayArea">
+                <div id="fillCard" class="lq-clue-card">
+                  <div class="lq-clue-header">
+                    <span id="fillGrammarTag" class="lq-category-pill lq-tag-default">Grammar</span>
+                    <button type="button" onclick="speakCurrentClue()" class="lq-audio-btn" title="Escuchar oración o definición">
+                      🔊 Escuchar
+                    </button>
+                  </div>
+                  <p id="fillClueText" class="lq-clue-text">Cargando pregunta...</p>
                 </div>
-                <p id="fillClueText" class="lq-clue-text">Cargando pregunta...</p>
+
+                <div id="fillOptionsGrid" class="lq-options-grid"></div>
+                <div id="fillFeedback" class="lq-feedback-bar"></div>
               </div>
 
-              <div id="fillOptionsGrid" class="lq-options-grid"></div>
-              <div id="fillFeedback" class="lq-feedback-bar"></div>
+              <!-- Pantalla de Fin de Ronda (cuando el reloj llega a 0) -->
+              <div id="rushGameOverPanel" class="lq-gameover-card hidden">
+                <div class="lq-gameover-icon">🏆</div>
+                <h3 class="lq-gameover-title">¡Ronda Completada!</h3>
+                <p id="rushFinalSummary" class="lq-gameover-sub">Lograste 0 aciertos en este nivel.</p>
+                <button type="button" onclick="window.LivingGames.restartFillRush()" class="lq-btn-3d lq-btn-green lq-gameover-btn">
+                  ⚡ Jugar Nueva Ronda (60s)
+                </button>
+              </div>
             </section>
 
             <!-- MODE 2: SWIPE & MATCH -->
             <section id="game-swipe" class="general-view hidden">
-              <p class="lq-swipe-header-hint">¿La palabra coincide con la definición?</p>
+              <p class="lq-swipe-header-hint">¿La palabra coincide con la definición o frase?</p>
 
               <div class="lq-swipe-stage">
+                <div class="lq-swipe-deck-bg lq-swipe-deck-bg-2"></div>
+                <div class="lq-swipe-deck-bg lq-swipe-deck-bg-1"></div>
+
                 <div id="swipeCard" class="lq-swipe-card">
-                  <div id="stampCorrect" class="lq-stamp lq-stamp-match">MATCH!</div>
-                  <div id="stampWrong" class="lq-stamp lq-stamp-nope">NOPE!</div>
+                  <div id="stampCorrect" class="lq-stamp lq-stamp-match">TRUE ✓</div>
+                  <div id="stampWrong" class="lq-stamp lq-stamp-nope">FALSE ✕</div>
 
                   <div class="lq-swipe-card-top">
                     <span id="swipeCategoryTag" class="lq-category-pill lq-tag-vocab">Vocab</span>
-                    <button type="button" onclick="speakSwipeWord()" class="lq-audio-btn">🔊</button>
+                    <button type="button" onclick="speakSwipeWord()" class="lq-audio-btn">🔊 Pronunciar</button>
                   </div>
 
                   <div class="lq-swipe-card-body">
@@ -450,15 +495,23 @@
                   </div>
 
                   <div class="lq-swipe-card-foot">
-                    <span>← Falso</span>
-                    <span>Verdadero →</span>
+                    <span class="lq-swipe-foot-false">← Falso (No coincide)</span>
+                    <span class="lq-swipe-foot-true">Verdadero (Sí coincide) →</span>
                   </div>
                 </div>
               </div>
 
+              <div id="swipeFeedback" class="lq-feedback-bar"></div>
+
               <div class="lq-swipe-actions">
-                <button type="button" onclick="handleSwipeAction(false)" class="lq-btn-3d lq-btn-red lq-swipe-circle-btn" aria-label="Falso">✕</button>
-                <button type="button" onclick="handleSwipeAction(true)" class="lq-btn-3d lq-btn-green lq-swipe-circle-btn" aria-label="Verdadero">✓</button>
+                <button type="button" onclick="handleSwipeAction(false)" class="lq-btn-3d lq-btn-red lq-swipe-action-pill" aria-label="Falso">
+                  <span>✕</span>
+                  <span>Falso</span>
+                </button>
+                <button type="button" onclick="handleSwipeAction(true)" class="lq-btn-3d lq-btn-green lq-swipe-action-pill" aria-label="Verdadero">
+                  <span>✓</span>
+                  <span>Verdadero</span>
+                </button>
               </div>
             </section>
 
@@ -466,23 +519,28 @@
             <section id="game-bubbles" class="general-view hidden">
               <div class="lq-clue-card">
                 <div class="lq-clue-header">
-                  <span class="lq-category-pill lq-tag-bubbles">Construye la respuesta</span>
-                  <button type="button" onclick="speakBubbleTarget()" class="lq-audio-btn">🔊 Escuchar</button>
+                  <span id="genBubbleTag" class="lq-category-pill lq-tag-bubbles">Ordena las letras</span>
+                  <button type="button" onclick="speakBubbleTarget()" class="lq-audio-btn">🔊 Escuchar respuesta</button>
                 </div>
                 <p id="bubbleClue" class="lq-clue-text">Cargando pista...</p>
               </div>
 
               <div class="lq-bubble-answer-wrap">
                 <div id="bubbleAnswerArea" class="lq-bubble-answer-area">
-                  <span class="lq-bubble-placeholder">Toca las fichas de abajo</span>
+                  <span class="lq-bubble-placeholder">Toca las fichas de abajo en orden</span>
                 </div>
               </div>
 
               <div id="bubblePool" class="lq-bubble-pool"></div>
 
+              <div id="genBubbleFeedback" class="lq-feedback-bar"></div>
+
               <div class="lq-bubble-controls">
                 <button type="button" onclick="undoLastBubble()" class="lq-btn-3d lq-btn-neutral lq-bubble-undo-btn">
-                  ↺ Deshacer
+                  ↺ Quitar
+                </button>
+                <button type="button" onclick="giveGeneralBubbleHint()" class="lq-btn-3d lq-btn-yellow lq-bubble-hint-btn">
+                  💡 Pista
                 </button>
                 <button type="button" id="checkBubbleBtn" onclick="checkBubbleSolution()" class="lq-btn-3d lq-btn-green lq-bubble-check-btn">
                   ✓ Comprobar
@@ -1135,10 +1193,10 @@
   <!-- 3. Confetti para celebraciones de racha en Juegos -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <!-- 4. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261029_no_logo_box"></script>
+  <script src="assets/js/onlineClasses.js?v=20261029_pro_games"></script>
   <!-- 5. Módulo Oficial de Juegos Interactivos (Tabla `games` en Supabase) -->
-  <script src="assets/js/studentGames.js?v=20261029_no_logo_box"></script>
+  <script src="assets/js/studentGames.js?v=20261029_pro_games"></script>
   <!-- 6. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261029_no_logo_box"></script>
+  <script src="assets/js/platform.js?v=20261029_pro_games"></script>
 </body>
 </html>

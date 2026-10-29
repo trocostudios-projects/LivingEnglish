@@ -258,10 +258,34 @@
     C1: { name: 'Avanzado', badgeClass: 'lq-level-c1' }
   };
 
+  const CATEGORY_META = {
+    animals: { label: '🐾 ANIMALS (Animales)', speech: 'animals' },
+    fruits: { label: '🍎 FRUITS (Frutas)', speech: 'fruits' },
+    food: { label: '🍕 FOOD (Comida)', speech: 'food' },
+    vehicles: { label: '🚗 VEHICLES (Transporte)', speech: 'vehicles' },
+    nature: { label: '🌞 NATURE (Naturaleza)', speech: 'nature' },
+    body: { label: '✋ BODY (Cuerpo)', speech: 'body parts' },
+    clothes: { label: '👕 CLOTHES (Ropa)', speech: 'clothes' },
+    school: { label: '🎒 SCHOOL (Escuela)', speech: 'school items' },
+    toys: { label: '🧸 TOYS (Juguetes)', speech: 'toys' },
+    house: { label: '🏠 HOUSE (Casa)', speech: 'house objects' },
+    colors: { label: '🎨 COLORS (Colores)', speech: 'colors' },
+    numbers: { label: '🔢 NUMBERS (Números)', speech: 'numbers' }
+  };
+
+  const PLAYER_RANKS = [
+    { min: 0, max: 10, icon: '🌱', title: 'Explorer' },
+    { min: 10, max: 25, icon: '🚀', title: 'Adventurer' },
+    { min: 25, max: 50, icon: '⚡', title: 'Scholar' },
+    { min: 50, max: 100, icon: '👑', title: 'Champion' },
+    { min: 100, max: 250, icon: '💎', title: 'Master Legend' }
+  ];
+
   // Estado general
   const supabaseLevelCache = {};
   let hasLoadedAllFromSupabase = false;
   let allSupabaseRows = [];
+  const recentGeneralClues = [];
 
   let isKidsMode = true;
   let currentGeneralLevel = 'A1';
@@ -305,37 +329,37 @@
 
       if (type === 'success') {
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(523.25, now); // C5
-        osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
-        osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
-        osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.3); // C6
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.09);
+        osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.18);
+        osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.28);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
         osc.start(now);
-        osc.stop(now + 0.45);
+        osc.stop(now + 0.42);
       } else if (type === 'pop') {
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, now);
-        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
-        gain.gain.setValueAtTime(0.3, now);
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(1180, now + 0.08);
+        gain.gain.setValueAtTime(0.26, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
         osc.start(now);
         osc.stop(now + 0.1);
       } else if (type === 'error') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(170, now);
-        osc.frequency.linearRampToValueAtTime(120, now + 0.2);
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(125, now + 0.2);
+        gain.gain.setValueAtTime(0.11, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
         osc.start(now);
-        osc.stop(now + 0.25);
+        osc.stop(now + 0.24);
       } else if (type === 'tap') {
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.setValueAtTime(620, now);
         gain.gain.setValueAtTime(0.05, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
         osc.start(now);
-        osc.stop(now + 0.06);
+        osc.stop(now + 0.05);
       }
     } catch (e) {}
   }
@@ -345,18 +369,29 @@
     try {
       window.speechSynthesis.cancel();
       const cleanText = String(text)
-        .replace(/^\([A-Za-z]+\)\s*/i, '')
-        .replace(/_{2,}/g, 'blank');
+        .replace(/^\([A-Za-z\s]+\)\s*/i, '')
+        .replace(/_{2,}/g, ' blank ');
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.lang = 'en-US';
-      utterance.rate = isKidsMode ? 0.8 : rate;
-      utterance.pitch = isKidsMode ? 1.15 : 1.0;
+      utterance.rate = isKidsMode ? 0.82 : rate;
+      utterance.pitch = isKidsMode ? 1.12 : 1.0;
+
+      const megaBtn = document.getElementById('kidsMegaphoneBtn');
+      if (megaBtn && isKidsMode && currentKidsGame === 'listen') {
+        megaBtn.classList.add('speaking');
+        utterance.onend = () => megaBtn.classList.remove('speaking');
+        utterance.onerror = () => megaBtn.classList.remove('speaking');
+      }
+
       window.speechSynthesis.speak(utterance);
     } catch (e) {}
   }
 
   function toggleSound() {
     soundEnabled = !soundEnabled;
+    if (!soundEnabled && 'speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
     const btn = document.getElementById('soundToggleBtn');
     if (btn) {
       btn.innerText = soundEnabled ? '🔊' : '🔇';
@@ -365,7 +400,7 @@
   }
 
   // ============================================================================
-  // 3. ESTADÍSTICAS (ESTRELLAS Y RACHA POR ESTUDIANTE)
+  // 3. ESTADÍSTICAS Y RANGO DEL JUGADOR (ESTRELLAS Y RACHA)
   // ============================================================================
   function getStorageKey(suffix) {
     const uid = (window.currentUserProfile && window.currentUserProfile.id) ? window.currentUserProfile.id : 'guest';
@@ -395,6 +430,34 @@
     const streakEl = document.getElementById('streakDisplay');
     if (starsEl) starsEl.innerText = starsCount;
     if (streakEl) streakEl.innerText = streakCount;
+
+    // Actualizar barra de rango
+    let rank = PLAYER_RANKS[PLAYER_RANKS.length - 1];
+    for (let i = 0; i < PLAYER_RANKS.length; i++) {
+      if (starsCount < PLAYER_RANKS[i].max) {
+        rank = PLAYER_RANKS[i];
+        break;
+      }
+    }
+
+    const iconEl = document.getElementById('lqRankIcon');
+    const titleEl = document.getElementById('lqRankTitle');
+    const nextEl = document.getElementById('lqRankNext');
+    const fillEl = document.getElementById('lqRankProgressFill');
+
+    if (iconEl) iconEl.innerText = rank.icon;
+    if (titleEl) titleEl.innerText = `Rango: ${rank.title}`;
+    if (nextEl) {
+      const remaining = Math.max(0, rank.max - starsCount);
+      nextEl.innerText = remaining > 0
+        ? `Faltan ${remaining} ⭐ para el siguiente rango`
+        : '¡Rango máximo alcanzado! 🏆';
+    }
+    if (fillEl) {
+      const span = Math.max(1, rank.max - rank.min);
+      const pct = Math.min(100, Math.max(6, Math.round(((starsCount - rank.min) / span) * 100)));
+      fillEl.style.width = `${pct}%`;
+    }
   }
 
   function addScore(isSuccess) {
@@ -404,8 +467,8 @@
       playSynth('success');
       if (typeof window.confetti === 'function' && (isKidsMode || streakCount % 3 === 0)) {
         window.confetti({
-          particleCount: 32,
-          spread: 58,
+          particleCount: 28,
+          spread: 56,
           origin: { y: 0.82 }
         });
       }
@@ -417,7 +480,7 @@
   }
 
   // ============================================================================
-  // 4. CONEXIÓN A LA TABLA `public.games` EN SUPABASE (PARA MODO GENERAL A1–C1)
+  // 4. CONEXIÓN A SUPABASE (`public.games` Y `public.kids_games`)
   // ============================================================================
   function normalizeGameRow(row, fallbackLevel) {
     if (!row) return null;
@@ -493,6 +556,20 @@
     return getFallbackQuestions(currentGeneralLevel);
   }
 
+  function pickNonRepeatingGeneralQuestion() {
+    const pool = getLevelQuestionsSync();
+    const fresh = pool.filter(item => !recentGeneralClues.includes(item.CLUE));
+    const source = fresh.length > 0 ? fresh : pool;
+    const picked = source[Math.floor(Math.random() * source.length)];
+    if (picked) {
+      recentGeneralClues.push(picked.CLUE);
+      if (recentGeneralClues.length > 25) {
+        recentGeneralClues.shift();
+      }
+    }
+    return picked;
+  }
+
   async function fetchKidsItemsFromSupabase() {
     if (hasLoadedKidsFromSupabase && KIDS_ITEMS.length > 0) {
       return KIDS_ITEMS;
@@ -532,9 +609,11 @@
     return KIDS_ITEMS;
   }
 
-  function pickNonRepeatingKidsItem(pool, historyArr, maxHistory = 35) {
-    const fresh = pool.filter(item => !historyArr.includes(item.word));
-    const source = fresh.length > 0 ? fresh : pool;
+  function pickNonRepeatingKidsItem(pool, historyArr, maxHistory = 35, excludeWords = []) {
+    const available = pool.filter(item => !excludeWords.includes(item.word));
+    const basePool = available.length > 0 ? available : pool;
+    const fresh = basePool.filter(item => !historyArr.includes(item.word));
+    const source = fresh.length > 0 ? fresh : basePool;
     const picked = source[Math.floor(Math.random() * source.length)];
     if (picked) {
       historyArr.push(picked.word);
@@ -591,6 +670,7 @@
   // 6. KIDS GAME 1: LISTEN & TAP (¡ESCUCHA Y TOCA!)
   // ============================================================================
   let currentListenTarget = null;
+  let isListenLocked = false;
 
   function switchKidsGame(gameKey) {
     currentKidsGame = gameKey;
@@ -614,6 +694,7 @@
   }
 
   function initKidsListenGame() {
+    isListenLocked = false;
     currentListenTarget = pickNonRepeatingKidsItem(KIDS_ITEMS, recentListenWords, 40);
     const distractors = KIDS_ITEMS
       .filter(item => item.word !== currentListenTarget.word && item.emoji !== currentListenTarget.emoji)
@@ -621,9 +702,18 @@
       .slice(0, 3);
     const choices = [currentListenTarget, ...distractors].sort(() => 0.5 - Math.random());
 
+    const hintEl = document.getElementById('kidsListenHint');
     const phonicsEl = document.getElementById('kidsListenPhonics');
     const feedbackEl = document.getElementById('kidsListenFeedback');
-    if (phonicsEl) phonicsEl.innerText = `"${currentListenTarget.word}"`;
+
+    if (hintEl) {
+      hintEl.innerText = currentListenTarget.spanish_hint
+        ? `💡 Significa: ${currentListenTarget.spanish_hint}`
+        : '💡 Escucha con atención';
+    }
+    if (phonicsEl) {
+      phonicsEl.innerText = '🎧 ¿Qué palabra escuchaste?';
+    }
     if (feedbackEl) {
       feedbackEl.innerText = '';
       feedbackEl.className = 'lq-kids-feedback';
@@ -649,7 +739,7 @@
       if (isGamesTabActive && isKidsMode && currentKidsGame === 'listen') {
         speakKidsListenTarget();
       }
-    }, 280);
+    }, 240);
   }
 
   function speakKidsListenTarget() {
@@ -659,18 +749,28 @@
   }
 
   function checkKidsListen(cardBtn, chosenItem) {
-    if (!currentListenTarget) return;
+    if (!currentListenTarget || isListenLocked) return;
     const isRight = chosenItem.word === currentListenTarget.word;
     const feedback = document.getElementById('kidsListenFeedback');
+    const phonicsEl = document.getElementById('kidsListenPhonics');
 
     if (isRight) {
+      isListenLocked = true;
       cardBtn.className = 'lq-btn-3d lq-btn-green lq-kids-emoji-card';
+      if (phonicsEl) {
+        phonicsEl.innerText = `✨ "${chosenItem.word.toUpperCase()}" ✨`;
+      }
       if (feedback) {
-        feedback.innerText = `¡YAY! 🎉 "${chosenItem.word}"`;
+        feedback.innerText = `¡Excelente! 🎉 "${chosenItem.word}"`;
         feedback.className = 'lq-kids-feedback lq-feedback-ok';
       }
       addScore(true);
-      setTimeout(initKidsListenGame, 1050);
+      speakWord(chosenItem.word);
+      setTimeout(() => {
+        if (isGamesTabActive && isKidsMode && currentKidsGame === 'listen') {
+          initKidsListenGame();
+        }
+      }, 1100);
     } else {
       cardBtn.classList.add('lq-shake', 'lq-card-wrong-border');
       if (feedback) {
@@ -681,7 +781,7 @@
       setTimeout(() => {
         cardBtn.classList.remove('lq-shake', 'lq-card-wrong-border');
         speakKidsListenTarget();
-      }, 600);
+      }, 580);
     }
   }
 
@@ -691,18 +791,42 @@
   let currentSpellerItem = null;
   let spellerTargetWord = '';
   let currentPlacedLetters = [];
+  let spellerPoolTiles = [];
+  let isSpellerLocked = false;
 
   function initKidsSpellerGame() {
+    isSpellerLocked = false;
     const easyPool = KIDS_ITEMS.filter(k => k.word.length <= 6 && !k.word.includes(' '));
     currentSpellerItem = pickNonRepeatingKidsItem(easyPool.length > 0 ? easyPool : KIDS_ITEMS, recentSpellerWords, 35);
     spellerTargetWord = currentSpellerItem.word.toUpperCase();
     currentPlacedLetters = [];
 
+    // Crear fichas fijas por ronda (las letras de la palabra + 1 letra distractora) para que no salten al tocarlas
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const nonWordLetters = alphabet.split('').filter(ch => !spellerTargetWord.includes(ch));
+    const distractor = nonWordLetters[Math.floor(Math.random() * nonWordLetters.length)] || 'Z';
+    const rawLetters = [...spellerTargetWord.split(''), distractor].sort(() => 0.5 - Math.random());
+    spellerPoolTiles = rawLetters.map((letter, idx) => ({
+      id: idx,
+      letter,
+      used: false
+    }));
+
     const emojiEl = document.getElementById('spellerEmoji');
+    const hintEl = document.getElementById('spellerSpanishHint');
     if (emojiEl) emojiEl.innerText = currentSpellerItem.emoji;
+    if (hintEl) {
+      hintEl.innerText = currentSpellerItem.spanish_hint
+        ? `Significa: ${currentSpellerItem.spanish_hint}`
+        : `Categoría: ${currentSpellerItem.category}`;
+    }
 
     renderSpellerBoard();
-    speakCurrentSpellerWord();
+    setTimeout(() => {
+      if (isGamesTabActive && isKidsMode && currentKidsGame === 'letters') {
+        speakCurrentSpellerWord();
+      }
+    }, 220);
   }
 
   function speakCurrentSpellerWord() {
@@ -716,66 +840,73 @@
     const poolContainer = document.getElementById('spellerLetterPool');
     if (!slotsContainer || !poolContainer) return;
 
+    const isWordComplete = currentPlacedLetters.length === spellerTargetWord.length;
+
     slotsContainer.innerHTML = '';
     for (let i = 0; i < spellerTargetWord.length; i++) {
       const slot = document.createElement('div');
       const letterAtIdx = currentPlacedLetters[i] || '';
-      slot.className = `lq-speller-slot ${letterAtIdx ? 'filled' : ''}`;
+      slot.className = `lq-speller-slot ${letterAtIdx ? 'filled' : ''} ${isWordComplete ? 'completed' : ''}`;
       slot.innerText = letterAtIdx;
       slotsContainer.appendChild(slot);
     }
 
     poolContainer.innerHTML = '';
-    if (currentPlacedLetters.length === spellerTargetWord.length) {
-      return;
-    }
-
-    const neededLetters = [...spellerTargetWord];
-    currentPlacedLetters.forEach(placed => {
-      const idx = neededLetters.indexOf(placed);
-      if (idx !== -1) neededLetters.splice(idx, 1);
-    });
-
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const randomExtra = alphabet[Math.floor(Math.random() * alphabet.length)];
-    const lettersToShow = [...neededLetters, randomExtra].sort(() => 0.5 - Math.random());
-
-    lettersToShow.forEach(l => {
+    spellerPoolTiles.forEach(tile => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'lq-btn-3d lq-btn-neutral lq-speller-letter-btn';
-      btn.innerText = l;
-      btn.onclick = () => onLetterTapped(l);
+      btn.className = `lq-btn-3d lq-btn-neutral lq-speller-letter-btn ${tile.used ? 'used' : ''}`;
+      btn.innerText = tile.letter;
+      btn.disabled = tile.used || isSpellerLocked;
+      btn.onclick = () => onLetterTapped(tile, btn);
       poolContainer.appendChild(btn);
     });
   }
 
-  function onLetterTapped(letter) {
+  function onLetterTapped(tile, btnEl) {
+    if (isSpellerLocked || tile.used) return;
     playSynth('tap');
-    speakWord(letter, 1.0);
+    speakWord(tile.letter, 1.0);
 
     const nextExpected = spellerTargetWord[currentPlacedLetters.length];
-    if (letter === nextExpected) {
-      currentPlacedLetters.push(letter);
+    if (tile.letter === nextExpected) {
+      tile.used = true;
+      currentPlacedLetters.push(tile.letter);
       renderSpellerBoard();
 
       if (currentPlacedLetters.length === spellerTargetWord.length) {
+        isSpellerLocked = true;
         addScore(true);
-        setTimeout(() => speakCurrentSpellerWord(), 250);
-        setTimeout(initKidsSpellerGame, 1300);
+        setTimeout(() => speakCurrentSpellerWord(), 240);
+        setTimeout(() => {
+          if (isGamesTabActive && isKidsMode && currentKidsGame === 'letters') {
+            initKidsSpellerGame();
+          }
+        }, 1250);
       }
     } else {
       addScore(false);
-      const slots = document.getElementById('spellerSlots');
-      if (slots) {
-        slots.classList.add('lq-shake');
-        setTimeout(() => slots.classList.remove('lq-shake'), 400);
+      if (btnEl) {
+        btnEl.classList.add('lq-shake', 'lq-card-wrong-border');
+        setTimeout(() => btnEl.classList.remove('lq-shake', 'lq-card-wrong-border'), 420);
       }
     }
   }
 
+  function giveKidsSpellerHint() {
+    if (isSpellerLocked || !spellerTargetWord) return;
+    if (currentPlacedLetters.length >= spellerTargetWord.length) return;
+    const nextExpected = spellerTargetWord[currentPlacedLetters.length];
+    const matchingTile = spellerPoolTiles.find(t => !t.used && t.letter === nextExpected);
+    if (matchingTile) {
+      onLetterTapped(matchingTile, null);
+    }
+  }
+
   function resetSpellerWord() {
+    if (isSpellerLocked) return;
     currentPlacedLetters = [];
+    spellerPoolTiles.forEach(t => { t.used = false; });
     renderSpellerBoard();
   }
 
@@ -807,13 +938,20 @@
     const filtered = categories.filter(c => c !== bubbleGoalCategory);
     bubbleGoalCategory = filtered[Math.floor(Math.random() * filtered.length)];
 
+    const meta = CATEGORY_META[bubbleGoalCategory] || {
+      label: `🎈 ${bubbleGoalCategory.toUpperCase()}`,
+      speech: bubbleGoalCategory
+    };
+
     const goalEl = document.getElementById('kidsBubbleGoal');
-    if (goalEl) goalEl.innerText = bubbleGoalCategory.toUpperCase();
+    if (goalEl) goalEl.innerText = meta.label;
     speakBubbleGoal();
   }
 
   function speakBubbleGoal() {
-    speakWord(`Pop all the ${bubbleGoalCategory}!`);
+    const meta = CATEGORY_META[bubbleGoalCategory];
+    const spoken = meta ? meta.speech : bubbleGoalCategory;
+    speakWord(`Pop all the ${spoken}!`);
   }
 
   function startBubbleSpawner() {
@@ -823,7 +961,11 @@
     sky.innerHTML = '';
 
     for (let i = 0; i < 4; i++) {
-      spawnSingleBubble();
+      setTimeout(() => {
+        if (isGamesTabActive && isKidsMode && currentKidsGame === 'bubbles') {
+          spawnSingleBubble();
+        }
+      }, i * 320);
     }
 
     bubbleSpawnInterval = setInterval(() => {
@@ -832,29 +974,32 @@
       } else {
         stopBubbleSpawner();
       }
-    }, 1500);
+    }, 1350);
   }
 
   function spawnSingleBubble() {
     const sky = document.getElementById('bubbleSky');
-    if (!sky || sky.childElementCount >= 7) return;
+    if (!sky || sky.childElementCount >= 8) return;
 
     const goalPool = KIDS_ITEMS.filter(i => i.category === bubbleGoalCategory);
-    const useGoalPool = goalPool.length > 0 && Math.random() < 0.45;
+    const useGoalPool = goalPool.length > 0 && Math.random() < 0.48;
     const pool = useGoalPool ? goalPool : KIDS_ITEMS;
     const randomItem = pool[Math.floor(Math.random() * pool.length)];
-    const bubble = document.createElement('div');
 
+    const bubble = document.createElement('div');
     const leftPercent = Math.floor(Math.random() * 74) + 6;
-    const duration = (Math.random() * 2.8 + 5.2).toFixed(1);
-    const size = Math.floor(Math.random() * 16) + 64;
+    const duration = (Math.random() * 2.4 + 5.4).toFixed(1);
+    const size = Math.floor(Math.random() * 14) + 74;
 
     bubble.className = 'lq-floating-bubble';
     bubble.style.width = `${size}px`;
     bubble.style.height = `${size}px`;
     bubble.style.left = `${leftPercent}%`;
     bubble.style.animationDuration = `${duration}s`;
-    bubble.innerHTML = `<span>${randomItem.emoji}</span>`;
+    bubble.innerHTML = `
+      <span class="lq-bubble-emoji">${randomItem.emoji}</span>
+      <span class="lq-bubble-mini-word">${randomItem.word}</span>
+    `;
 
     bubble.onclick = (e) => {
       e.stopPropagation();
@@ -871,10 +1016,28 @@
   }
 
   function handleBubblePop(bubbleElement, item) {
+    if (!bubbleElement || bubbleElement.dataset.popped === '1') return;
+    bubbleElement.dataset.popped = '1';
+
     playSynth('pop');
     speakWord(item.word);
 
-    bubbleElement.style.transform = 'scale(1.4)';
+    const sky = document.getElementById('bubbleSky');
+    const isCorrectCategory = item.category === bubbleGoalCategory;
+
+    if (sky) {
+      const toast = document.createElement('div');
+      toast.className = `lq-bubble-pop-toast ${isCorrectCategory ? 'lq-pop-toast-ok' : 'lq-pop-toast-err'}`;
+      toast.style.left = bubbleElement.style.left;
+      toast.style.top = `${Math.max(24, bubbleElement.offsetTop)}px`;
+      toast.innerText = isCorrectCategory ? `+1 ⭐ ${item.word}!` : `Oops! ${item.word}`;
+      sky.appendChild(toast);
+      setTimeout(() => {
+        if (toast && toast.parentNode) toast.remove();
+      }, 750);
+    }
+
+    bubbleElement.style.transform = 'scale(1.38)';
     bubbleElement.style.opacity = '0';
     bubbleElement.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
 
@@ -882,7 +1045,7 @@
       if (bubbleElement && bubbleElement.parentNode) bubbleElement.remove();
     }, 150);
 
-    if (item.category === bubbleGoalCategory) {
+    if (isCorrectCategory) {
       poppedCount++;
       const countEl = document.getElementById('bubblePoppedCount');
       if (countEl) countEl.innerText = poppedCount;
@@ -903,15 +1066,28 @@
   function initKidsMemoryGame() {
     memoryTurns = 0;
     matchedPairs = 0;
-    const turnsEl = document.getElementById('memoryTurns');
-    if (turnsEl) turnsEl.innerText = '0';
     flippedCards = [];
 
-    const picked = [
-      pickNonRepeatingKidsItem(KIDS_ITEMS, recentMemoryWords, 36),
-      pickNonRepeatingKidsItem(KIDS_ITEMS, recentMemoryWords, 36),
-      pickNonRepeatingKidsItem(KIDS_ITEMS, recentMemoryWords, 36)
-    ];
+    const turnsEl = document.getElementById('memoryTurns');
+    const pairsEl = document.getElementById('memoryPairsCount');
+    const fbEl = document.getElementById('memoryFeedback');
+    if (turnsEl) turnsEl.innerText = '0';
+    if (pairsEl) pairsEl.innerText = '0/3';
+    if (fbEl) {
+      fbEl.innerText = '';
+      fbEl.className = 'lq-kids-feedback';
+    }
+
+    const picked = [];
+    const pickedWords = [];
+    for (let i = 0; i < 3; i++) {
+      const item = pickNonRepeatingKidsItem(KIDS_ITEMS, recentMemoryWords, 36, pickedWords);
+      if (item) {
+        picked.push(item);
+        pickedWords.push(item.word);
+      }
+    }
+
     const deck = [];
     picked.forEach((item, index) => {
       deck.push({ id: `${index}-a`, pairId: index, word: item.word, emoji: item.emoji });
@@ -942,7 +1118,9 @@
   }
 
   function onMemoryCardClick(cardBox, cardData) {
-    if (cardBox.classList.contains('flipped') || flippedCards.length >= 2) return;
+    if (cardBox.classList.contains('flipped') || cardBox.classList.contains('matched') || flippedCards.length >= 2) {
+      return;
+    }
 
     playSynth('tap');
     cardBox.classList.add('flipped');
@@ -952,26 +1130,36 @@
     if (flippedCards.length === 2) {
       memoryTurns++;
       const turnsEl = document.getElementById('memoryTurns');
+      const pairsEl = document.getElementById('memoryPairsCount');
+      const fbEl = document.getElementById('memoryFeedback');
       if (turnsEl) turnsEl.innerText = memoryTurns;
 
       const [card1, card2] = flippedCards;
       if (card1.data.pairId === card2.data.pairId) {
         matchedPairs++;
+        card1.element.classList.add('matched');
+        card2.element.classList.add('matched');
+        if (pairsEl) pairsEl.innerText = `${matchedPairs}/3`;
+        if (fbEl) {
+          fbEl.innerText = matchedPairs === 3 ? '🎉 ¡Completaste todas las parejas!' : `✨ ¡Pareja encontrada: "${card1.data.word}"!`;
+          fbEl.className = 'lq-kids-feedback lq-feedback-ok';
+        }
         addScore(true);
         flippedCards = [];
 
         if (matchedPairs === 3) {
           setTimeout(() => {
-            if (typeof window.confetti === 'function') window.confetti();
-            setTimeout(initKidsMemoryGame, 1400);
-          }, 450);
+            if (isGamesTabActive && isKidsMode && currentKidsGame === 'memory') {
+              initKidsMemoryGame();
+            }
+          }, 1500);
         }
       } else {
         setTimeout(() => {
           card1.element.classList.remove('flipped');
           card2.element.classList.remove('flipped');
           flippedCards = [];
-        }, 880);
+        }, 860);
       }
     }
   }
@@ -1028,16 +1216,37 @@
     if (currentGeneralGame === 'bubbles') initGeneralBubbleGame();
   }
 
-  function formatClueAndTag(rawClue) {
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function formatClueAndTag(rawClue, filledWord = null) {
     const clue = String(rawClue || '').trim();
-    if (clue.includes('___') || clue.includes('__')) {
-      return { tag: 'Sentence Complete', tagClass: 'lq-tag-sentence', displayClue: clue };
-    }
     const match = clue.match(/^\(([^)]+)\)\s*(.*)$/);
-    if (match) {
-      return { tag: match[1], tagClass: 'lq-tag-vocab', displayClue: match[2] || clue };
+    const cleanClue = match ? (match[2] || clue) : clue;
+
+    if (cleanClue.includes('___') || cleanClue.includes('__')) {
+      const slotHtml = filledWord
+        ? `<span class="lq-blank-slot filled-ok">${escapeHtml(filledWord)}</span>`
+        : '<span class="lq-blank-slot">_____</span>';
+      const htmlClue = escapeHtml(cleanClue).replace(/_{2,}/g, slotHtml);
+      return {
+        tag: match ? match[1] : 'Complete the Sentence',
+        tagClass: 'lq-tag-sentence',
+        displayClue: cleanClue,
+        htmlClue
+      };
     }
-    return { tag: 'Definition', tagClass: 'lq-tag-default', displayClue: clue };
+
+    return {
+      tag: match ? match[1] : 'Definition',
+      tagClass: match ? 'lq-tag-vocab' : 'lq-tag-default',
+      displayClue: cleanClue,
+      htmlClue: escapeHtml(cleanClue)
+    };
   }
 
   // 10.1 Fill-in Rush
@@ -1054,17 +1263,35 @@
     }
   }
 
+  function updateRushTimerUI() {
+    const tEl = document.getElementById('rushTimer');
+    const tBox = document.getElementById('timerContainer');
+    const barEl = document.getElementById('rushTimerBar');
+    if (tEl) tEl.innerText = rushTimeLeft;
+    if (tBox) tBox.classList.toggle('lq-timer-danger', rushTimeLeft <= 10);
+    if (barEl) {
+      const pct = Math.min(100, Math.max(0, Math.round((rushTimeLeft / 60) * 100)));
+      barEl.style.width = `${pct}%`;
+    }
+  }
+
+  function restartFillRush() {
+    startFillRush(true);
+  }
+
   function startFillRush(forceReset) {
-    if (forceReset || !rushTimerInterval) {
+    const playArea = document.getElementById('rushPlayArea');
+    const overPanel = document.getElementById('rushGameOverPanel');
+    if (playArea) playArea.classList.remove('hidden');
+    if (overPanel) overPanel.classList.add('hidden');
+
+    if (forceReset || !rushTimerInterval || rushTimeLeft <= 0) {
       stopRushTimer();
       rushTimeLeft = 60;
       rushHits = 0;
       const scoreEl = document.getElementById('rushScore');
-      const timerEl = document.getElementById('rushTimer');
-      const timerBox = document.getElementById('timerContainer');
       if (scoreEl) scoreEl.innerText = '0';
-      if (timerEl) timerEl.innerText = rushTimeLeft;
-      if (timerBox) timerBox.classList.remove('lq-timer-danger');
+      updateRushTimerUI();
 
       rushTimerInterval = setInterval(() => {
         if (!isGamesTabActive || isKidsMode || currentGeneralGame !== 'fillrush') {
@@ -1072,16 +1299,16 @@
           return;
         }
         rushTimeLeft = Math.max(0, rushTimeLeft - 1);
-        const tEl = document.getElementById('rushTimer');
-        const tBox = document.getElementById('timerContainer');
-        if (tEl) tEl.innerText = rushTimeLeft;
-        if (tBox) tBox.classList.toggle('lq-timer-danger', rushTimeLeft <= 10);
+        updateRushTimerUI();
 
         if (rushTimeLeft <= 0) {
           stopRushTimer();
-          const fb = document.getElementById('fillFeedback');
-          if (fb) fb.innerHTML = `<span class="lq-feedback-err">⏱️ ¡Tiempo agotado! (${rushHits} aciertos)</span>`;
-          setTimeout(() => startFillRush(true), 2000);
+          if (playArea) playArea.classList.add('hidden');
+          if (overPanel) overPanel.classList.remove('hidden');
+          const summaryEl = document.getElementById('rushFinalSummary');
+          if (summaryEl) {
+            summaryEl.innerText = `Completaste ${rushHits} ${rushHits === 1 ? 'acierto' : 'aciertos'} en el Nivel ${currentGeneralLevel}.`;
+          }
         }
       }, 1000);
     }
@@ -1091,7 +1318,7 @@
   function nextFillQuestion() {
     isFillAnswering = false;
     const items = getLevelQuestionsSync();
-    currentFillItem = items[Math.floor(Math.random() * items.length)];
+    currentFillItem = pickNonRepeatingGeneralQuestion();
 
     const fb = document.getElementById('fillFeedback');
     if (fb) fb.innerText = '';
@@ -1103,7 +1330,7 @@
       tag.innerText = parsed.tag;
       tag.className = `lq-category-pill ${parsed.tagClass}`;
     }
-    if (clueEl) clueEl.innerText = parsed.displayClue;
+    if (clueEl) clueEl.innerHTML = parsed.htmlClue;
 
     const correctAns = currentFillItem.RESPUESTA.trim();
     const options = [correctAns];
@@ -1135,19 +1362,24 @@
         isFillAnswering = true;
         if (opt.trim().toLowerCase() === correctAns.toLowerCase()) {
           btn.className = 'lq-btn-3d lq-btn-green lq-option-btn';
+          if (clueEl) {
+            clueEl.innerHTML = formatClueAndTag(currentFillItem.CLUE, correctAns).htmlClue;
+          }
           rushHits++;
           const sEl = document.getElementById('rushScore');
           if (sEl) sEl.innerText = rushHits;
-          rushTimeLeft += 3;
+          rushTimeLeft = Math.min(60, rushTimeLeft + 3);
+          updateRushTimerUI();
           if (fb) fb.innerHTML = '<span class="lq-feedback-ok">¡Correcto! (+3s) ⭐</span>';
           addScore(true);
-          setTimeout(nextFillQuestion, 480);
+          setTimeout(nextFillQuestion, 520);
         } else {
           btn.className = 'lq-btn-3d lq-btn-red lq-option-btn lq-shake';
           rushTimeLeft = Math.max(0, rushTimeLeft - 2);
-          if (fb) fb.innerHTML = `<span class="lq-feedback-err">Respuesta: <strong>${correctAns}</strong> (-2s)</span>`;
+          updateRushTimerUI();
+          if (fb) fb.innerHTML = `<span class="lq-feedback-err">Respuesta correcta: <strong>${escapeHtml(correctAns)}</strong> (-2s)</span>`;
           addScore(false);
-          setTimeout(nextFillQuestion, 1050);
+          setTimeout(nextFillQuestion, 1100);
         }
       };
       grid.appendChild(btn);
@@ -1156,34 +1388,41 @@
 
   function speakCurrentClue() {
     if (currentFillItem) {
-      speakWord(currentFillItem.CLUE, 0.95);
+      speakWord(currentFillItem.CLUE, 0.94);
     }
   }
 
   // 10.2 Swipe & Match
-  const swipeCardState = { isMatching: true, currentWord: '', currentClue: '' };
+  const swipeCardState = { isMatching: true, currentWord: '', currentClue: '', trueWordForClue: '' };
   let swipeCardEl = null;
   let sStartX = 0, sCurX = 0, sDragging = false;
+  let isSwipeAnimating = false;
 
   function initSwipeGame() {
     swipeCardEl = document.getElementById('swipeCard');
+    const fb = document.getElementById('swipeFeedback');
+    if (fb) fb.innerText = '';
     setupSwipeEvents();
     loadNextSwipeCard();
   }
 
   function loadNextSwipeCard() {
+    isSwipeAnimating = false;
     const items = getLevelQuestionsSync();
-    const target = items[Math.floor(Math.random() * items.length)];
+    const target = pickNonRepeatingGeneralQuestion();
     const isMatch = Math.random() >= 0.5;
 
     swipeCardState.isMatching = isMatch;
     swipeCardState.currentWord = target.RESPUESTA;
     if (isMatch) {
       swipeCardState.currentClue = target.CLUE;
+      swipeCardState.trueWordForClue = target.RESPUESTA;
     } else {
-      const pool = items.filter(i => i.RESPUESTA !== target.RESPUESTA);
+      const pool = items.filter(i => i.RESPUESTA.trim().toLowerCase() !== target.RESPUESTA.trim().toLowerCase());
       const dist = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : target;
       swipeCardState.currentClue = dist.CLUE;
+      swipeCardState.trueWordForClue = dist.RESPUESTA;
+      swipeCardState.isMatching = (dist.RESPUESTA.trim().toLowerCase() === target.RESPUESTA.trim().toLowerCase());
     }
 
     const parsed = formatClueAndTag(swipeCardState.currentClue);
@@ -1196,6 +1435,7 @@
     if (swipeCardEl) {
       swipeCardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
       swipeCardEl.style.opacity = '1';
+      swipeCardEl.style.borderColor = '#cbd5e1';
       swipeCardEl.classList.remove('dragging');
     }
     const stOk = document.getElementById('stampCorrect');
@@ -1206,14 +1446,14 @@
     const wEl = document.getElementById('swipeWord');
     const cEl = document.getElementById('swipeClue');
     if (wEl) wEl.innerText = swipeCardState.currentWord;
-    if (cEl) cEl.innerText = parsed.displayClue;
+    if (cEl) cEl.innerHTML = parsed.htmlClue;
   }
 
   function setupSwipeEvents() {
     if (!swipeCardEl || swipeEventsBound) return;
     swipeEventsBound = true;
     swipeCardEl.addEventListener('touchstart', onSStart, { passive: true });
-    window.addEventListener('touchmove', onSMove, { passive: false });
+    window.addEventListener('touchmove', onSMove, { passive: true });
     window.addEventListener('touchend', onSEnd);
     swipeCardEl.addEventListener('mousedown', onSStart);
     window.addEventListener('mousemove', onSMove);
@@ -1221,7 +1461,7 @@
   }
 
   function onSStart(e) {
-    if (!isGamesTabActive || isKidsMode || currentGeneralGame !== 'swipe') return;
+    if (!isGamesTabActive || isKidsMode || currentGeneralGame !== 'swipe' || isSwipeAnimating) return;
     if (e.target && e.target.closest('button')) return;
     sDragging = true;
     sStartX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
@@ -1229,19 +1469,19 @@
   }
 
   function onSMove(e) {
-    if (!sDragging || !swipeCardEl) return;
+    if (!sDragging || !swipeCardEl || isSwipeAnimating) return;
     sCurX = (e.type.includes('touch') ? e.touches[0].clientX : e.clientX) - sStartX;
-    const rot = sCurX * 0.08;
+    const rot = sCurX * 0.07;
     swipeCardEl.style.transform = `translate(${sCurX}px, 0px) rotate(${rot}deg)`;
 
     const rightS = document.getElementById('stampCorrect');
     const leftS = document.getElementById('stampWrong');
     if (rightS && leftS) {
-      if (sCurX > 30) {
-        rightS.style.opacity = String(Math.min(1, sCurX / 100));
+      if (sCurX > 25) {
+        rightS.style.opacity = String(Math.min(1, sCurX / 95));
         leftS.style.opacity = '0';
-      } else if (sCurX < -30) {
-        leftS.style.opacity = String(Math.min(1, Math.abs(sCurX) / 100));
+      } else if (sCurX < -25) {
+        leftS.style.opacity = String(Math.min(1, Math.abs(sCurX) / 95));
         rightS.style.opacity = '0';
       } else {
         rightS.style.opacity = '0';
@@ -1254,9 +1494,9 @@
     if (!sDragging || !swipeCardEl) return;
     sDragging = false;
     swipeCardEl.classList.remove('dragging');
-    if (sCurX > 85) {
+    if (sCurX > 80) {
       animateCardOut(true);
-    } else if (sCurX < -85) {
+    } else if (sCurX < -80) {
       animateCardOut(false);
     } else {
       swipeCardEl.style.transform = 'translate(0px, 0px) rotate(0deg)';
@@ -1269,22 +1509,35 @@
   }
 
   function handleSwipeAction(val) {
+    if (isSwipeAnimating) return;
     animateCardOut(val);
   }
 
   function animateCardOut(userVal) {
-    if (!swipeCardEl) return;
-    const destX = userVal ? 360 : -360;
-    swipeCardEl.style.transform = `translate(${destX}px, 20px) rotate(${userVal ? 22 : -22}deg)`;
-    swipeCardEl.style.opacity = '0';
+    if (!swipeCardEl || isSwipeAnimating) return;
+    isSwipeAnimating = true;
 
     const success = (userVal === swipeCardState.isMatching);
+    const fb = document.getElementById('swipeFeedback');
+    if (fb) {
+      if (success) {
+        fb.innerHTML = `<span class="lq-feedback-ok">✅ ¡Correcto! ${swipeCardState.isMatching ? 'Sí coincidían' : `La respuesta para la pista era "${escapeHtml(swipeCardState.trueWordForClue)}"`}</span>`;
+      } else {
+        fb.innerHTML = `<span class="lq-feedback-err">❌ Incorrecto — ${swipeCardState.isMatching ? `"${escapeHtml(swipeCardState.currentWord)}" sí era la respuesta` : `Correspondía a "${escapeHtml(swipeCardState.trueWordForClue)}"`}</span>`;
+      }
+    }
+
+    swipeCardEl.style.borderColor = success ? '#10b981' : '#f43f5e';
+    const destX = userVal ? 340 : -340;
+    swipeCardEl.style.transform = `translate(${destX}px, 16px) rotate(${userVal ? 18 : -18}deg)`;
+    swipeCardEl.style.opacity = '0';
+
     addScore(success);
-    setTimeout(loadNextSwipeCard, 250);
+    setTimeout(loadNextSwipeCard, 340);
   }
 
   function speakSwipeWord() {
-    speakWord(swipeCardState.currentWord, 0.95);
+    speakWord(swipeCardState.currentWord, 0.94);
   }
 
   // 10.3 Word Bubbles (General)
@@ -1292,18 +1545,31 @@
   let genTargetTokens = [];
   let genSelectedTokens = [];
   let genPoolTokens = [];
+  let isGenBubbleLocked = false;
 
   function initGeneralBubbleGame() {
-    const items = getLevelQuestionsSync();
-    currentGenBubbleItem = items[Math.floor(Math.random() * items.length)];
+    isGenBubbleLocked = false;
+    currentGenBubbleItem = pickNonRepeatingGeneralQuestion();
     const parsed = formatClueAndTag(currentGenBubbleItem.CLUE);
     const clueEl = document.getElementById('bubbleClue');
-    if (clueEl) clueEl.innerText = parsed.displayClue;
+    const tagEl = document.getElementById('genBubbleTag');
+    const fbEl = document.getElementById('genBubbleFeedback');
+
+    if (clueEl) clueEl.innerHTML = parsed.htmlClue;
+    if (fbEl) fbEl.innerText = '';
 
     const ans = currentGenBubbleItem.RESPUESTA.trim();
-    genTargetTokens = (ans.includes(' ') || ans.length > 9) ? ans.split(/\s+/) : ans.split('');
+    const isMultiWord = ans.includes(' ') || ans.length > 10;
+    if (tagEl) {
+      tagEl.innerText = isMultiWord ? 'Ordena las palabras' : `Ordena las ${ans.length} letras`;
+    }
+
+    genTargetTokens = isMultiWord ? ans.split(/\s+/) : ans.split('');
     genSelectedTokens = [];
-    genPoolTokens = genTargetTokens.map((val, idx) => ({ id: idx, value: val })).sort(() => 0.5 - Math.random());
+    genPoolTokens = genTargetTokens
+      .map((val, idx) => ({ id: idx, value: val }))
+      .sort(() => 0.5 - Math.random());
+
     renderGenBubbleBoard();
   }
 
@@ -1314,7 +1580,7 @@
 
     ansArea.innerHTML = '';
     if (genSelectedTokens.length === 0) {
-      ansArea.innerHTML = '<span class="lq-bubble-placeholder">Toca las fichas de abajo</span>';
+      ansArea.innerHTML = '<span class="lq-bubble-placeholder">Toca las fichas de abajo en orden</span>';
     } else {
       genSelectedTokens.forEach(t => {
         const btn = document.createElement('button');
@@ -1322,6 +1588,7 @@
         btn.className = 'lq-bubble-selected';
         btn.innerText = t.value;
         btn.onclick = () => {
+          if (isGenBubbleLocked) return;
           playSynth('tap');
           genPoolTokens.push(t);
           genSelectedTokens = genSelectedTokens.filter(x => x.id !== t.id);
@@ -1338,6 +1605,7 @@
       btn.className = 'lq-btn-3d lq-btn-neutral lq-bubble-token';
       btn.innerText = t.value;
       btn.onclick = () => {
+        if (isGenBubbleLocked) return;
         playSynth('tap');
         genSelectedTokens.push(t);
         genPoolTokens = genPoolTokens.filter(x => x.id !== t.id);
@@ -1348,6 +1616,7 @@
   }
 
   function undoLastBubble() {
+    if (isGenBubbleLocked) return;
     if (genSelectedTokens.length > 0) {
       playSynth('tap');
       const last = genSelectedTokens.pop();
@@ -1356,34 +1625,75 @@
     }
   }
 
+  function giveGeneralBubbleHint() {
+    if (isGenBubbleLocked || !currentGenBubbleItem) return;
+    // Verificar cuántos tokens colocados desde el inicio son correctos
+    let validPrefixLen = 0;
+    while (
+      validPrefixLen < genSelectedTokens.length &&
+      genSelectedTokens[validPrefixLen].value.toLowerCase() === genTargetTokens[validPrefixLen].toLowerCase()
+    ) {
+      validPrefixLen++;
+    }
+    // Devolver tokens incorrectos a la piscina
+    while (genSelectedTokens.length > validPrefixLen) {
+      const removed = genSelectedTokens.pop();
+      genPoolTokens.push(removed);
+    }
+    if (validPrefixLen < genTargetTokens.length) {
+      const neededVal = genTargetTokens[validPrefixLen];
+      const matchIdx = genPoolTokens.findIndex(t => t.value.toLowerCase() === neededVal.toLowerCase());
+      if (matchIdx !== -1) {
+        const [token] = genPoolTokens.splice(matchIdx, 1);
+        genSelectedTokens.push(token);
+        playSynth('tap');
+      }
+    }
+    renderGenBubbleBoard();
+  }
+
   function checkBubbleSolution() {
-    if (!currentGenBubbleItem) return;
-    const glue = (currentGenBubbleItem.RESPUESTA.includes(' ') || currentGenBubbleItem.RESPUESTA.trim().length > 9) ? ' ' : '';
+    if (!currentGenBubbleItem || isGenBubbleLocked) return;
+    const ans = currentGenBubbleItem.RESPUESTA.trim();
+    const isMultiWord = ans.includes(' ') || ans.length > 10;
+    const glue = isMultiWord ? ' ' : '';
     const user = genSelectedTokens.map(t => t.value).join(glue).trim();
-    const expected = currentGenBubbleItem.RESPUESTA.trim();
 
     const ansArea = document.getElementById('bubbleAnswerArea');
+    const fbEl = document.getElementById('genBubbleFeedback');
+    const clueEl = document.getElementById('bubbleClue');
     if (!ansArea) return;
 
-    if (user.toLowerCase() === expected.toLowerCase()) {
+    if (user.toLowerCase() === ans.toLowerCase()) {
+      isGenBubbleLocked = true;
       ansArea.classList.add('lq-bubble-area-correct');
+      if (clueEl) {
+        clueEl.innerHTML = formatClueAndTag(currentGenBubbleItem.CLUE, ans).htmlClue;
+      }
+      if (fbEl) {
+        fbEl.innerHTML = `<span class="lq-feedback-ok">🎉 ¡Excelente! "${escapeHtml(ans)}"</span>`;
+      }
       addScore(true);
+      speakBubbleTarget();
       setTimeout(() => {
         ansArea.classList.remove('lq-bubble-area-correct');
         initGeneralBubbleGame();
-      }, 800);
+      }, 950);
     } else {
       ansArea.classList.add('lq-bubble-area-wrong', 'lq-shake');
+      if (fbEl) {
+        fbEl.innerHTML = '<span class="lq-feedback-err">Revisa el orden de las fichas o usa 💡 Pista</span>';
+      }
       addScore(false);
       setTimeout(() => {
         ansArea.classList.remove('lq-bubble-area-wrong', 'lq-shake');
-      }, 600);
+      }, 550);
     }
   }
 
   function speakBubbleTarget() {
     if (currentGenBubbleItem) {
-      speakWord(currentGenBubbleItem.RESPUESTA, 0.95);
+      speakWord(currentGenBubbleItem.RESPUESTA, 0.94);
     }
   }
 
@@ -1402,8 +1712,8 @@
       const prog = String(profile.program || '').toLowerCase();
       const lvl = String(profile.course_level || '').toLowerCase();
 
-      // Si el alumno es de Kids, Nursery o Junior (o por defecto), abre en Modo Niños; si es Adultos/Teens abre en su nivel pero puede cambiar con 1 clic
-      const startInKids = prog === 'kids' || prog === 'nursery' || prog === 'junior' || lvl.includes('kids') || lvl.includes('junior') || lvl.includes('nursery');
+      const isAdultOrTeens = prog.includes('adult') || prog.includes('teen') || lvl.includes('adult') || lvl.includes('teen');
+      const startInKids = !isAdultOrTeens;
       const defaultCefr = lvl.includes('3') ? 'B2' : (lvl.includes('2') ? 'B1' : 'A1');
       currentGeneralLevel = defaultCefr;
 
@@ -1415,8 +1725,7 @@
       }
       if (title) title.innerText = LEVEL_META[defaultCefr].name;
 
-      // Iniciar en Modo Niños por defecto para niños o permitir ambos modos
-      setAudienceMode(startInKids || true);
+      setAudienceMode(startInKids);
     } else {
       if (isKidsMode) {
         switchKidsGame(currentKidsGame);
@@ -1453,7 +1762,8 @@
     switchGeneralGame,
     toggleLevelMenu,
     setLevel,
-    toggleSound
+    toggleSound,
+    restartFillRush
   };
 
   window.toggleAudienceMode = toggleAudienceMode;
@@ -1465,6 +1775,7 @@
   window.speakKidsListenTarget = speakKidsListenTarget;
   window.speakCurrentSpellerWord = speakCurrentSpellerWord;
   window.resetSpellerWord = resetSpellerWord;
+  window.giveKidsSpellerHint = giveKidsSpellerHint;
   window.speakBubbleGoal = speakBubbleGoal;
   window.refreshBubbleGoal = refreshBubbleGoal;
   window.initKidsMemoryGame = initKidsMemoryGame;
@@ -1472,6 +1783,7 @@
   window.speakSwipeWord = speakSwipeWord;
   window.handleSwipeAction = handleSwipeAction;
   window.undoLastBubble = undoLastBubble;
+  window.giveGeneralBubbleHint = giveGeneralBubbleHint;
   window.checkBubbleSolution = checkBubbleSolution;
   window.speakBubbleTarget = speakBubbleTarget;
 })();
