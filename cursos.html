@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Estilos Modulares -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_play_fullscreen">
-  <link rel="stylesheet" href="assets/css/base.css?v=20261029_play_fullscreen">
-  <link rel="stylesheet" href="assets/css/components.css?v=20261029_play_fullscreen">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_play_fullscreen">
+  <link rel="stylesheet" href="assets/css/variables.css?v=20261029_mode_picker">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261029_mode_picker">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261029_mode_picker">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_mode_picker">
 </head>
 <body>
 
@@ -204,6 +204,59 @@
                 <div id="lqRankProgressFill" class="lq-rank-progress-fill" style="width: 8%;"></div>
               </div>
             </div>
+
+            <!-- ============================================================== -->
+            <!-- PANTALLA 0: SELECCIÓN INICIAL DE MODO ANTES DE MOSTRAR JUEGOS  -->
+            <!-- ============================================================== -->
+            <div id="lqModeSelectScreen" class="lq-mode-select-screen">
+              <div class="lq-mode-select-header">
+                <span class="lq-start-mode-pill">🎮 CENTRO DE JUEGOS LIVING ENGLISH</span>
+                <h2 class="lq-mode-select-title">¿En qué modo quieres jugar hoy?</h2>
+                <p class="lq-mode-select-sub">Elige tu modalidad para ver los juegos disponibles</p>
+              </div>
+
+              <div class="lq-mode-cards-grid">
+                <!-- Opción 1: Modo Niños -->
+                <div class="lq-mode-choice-card lq-mode-card-kids" onclick="window.LivingGames.chooseInitialMode(true)">
+                  <div class="lq-mode-card-badge lq-badge-amber">🧸 Nursery · Kids · Junior</div>
+                  <div class="lq-mode-card-icon bounce-gentle">🎈</div>
+                  <h3 class="lq-mode-card-name">Modo Niños</h3>
+                  <p class="lq-mode-card-desc">
+                    4 juegos interactivos con dibujos, pronunciación guiada, burbujas y cartas de memoria en inglés.
+                  </p>
+                  <div class="lq-mode-mini-list">
+                    <span>🎧 Escucha</span>
+                    <span>🧩 Arma</span>
+                    <span>🎈 Burbujas</span>
+                    <span>✨ Parejas</span>
+                  </div>
+                  <button type="button" class="lq-btn-3d lq-btn-yellow lq-mode-enter-btn">
+                    ▶ Elegir Modo Niños
+                  </button>
+                </div>
+
+                <!-- Opción 2: Modo Niveles A1-C1 -->
+                <div class="lq-mode-choice-card lq-mode-card-gen" onclick="window.LivingGames.chooseInitialMode(false)">
+                  <div class="lq-mode-card-badge lq-badge-violet">🎓 Teens · Adultos (MCER)</div>
+                  <div class="lq-mode-card-icon bounce-gentle">⚡</div>
+                  <h3 class="lq-mode-card-name">Niveles A1 – C1</h3>
+                  <p class="lq-mode-card-desc">
+                    3 juegos de velocidad, vocabulario, definiciones y gramática clasificados desde nivel A1 hasta C1.
+                  </p>
+                  <div class="lq-mode-mini-list">
+                    <span>⚡ Fill-in Rush</span>
+                    <span>🃏 Swipe Match</span>
+                    <span>🧩 Word Bubbles</span>
+                  </div>
+                  <button type="button" class="lq-btn-3d lq-btn-blue lq-mode-enter-btn">
+                    ▶ Elegir Niveles A1–C1
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- CONTENEDOR DE JUEGOS (SE MUESTRA TRAS ELEGIR EL MODO) -->
+            <div id="lqGamesWorkspace" class="hidden">
 
             <!-- Barra Superior: Selector Modo Niños / Modo Niveles A1-C1, Estrellas, Racha y Sonido -->
             <div class="lq-topbar">
@@ -571,6 +624,7 @@
               </div>
             </section>
 
+            </div><!-- /#lqGamesWorkspace -->
           </div>
         </div>
       </section>
@@ -1216,10 +1270,10 @@
   <!-- 3. Confetti para celebraciones de racha en Juegos -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <!-- 4. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261029_play_fullscreen"></script>
+  <script src="assets/js/onlineClasses.js?v=20261029_mode_picker"></script>
   <!-- 5. Módulo Oficial de Juegos Interactivos (Tabla `games` en Supabase) -->
-  <script src="assets/js/studentGames.js?v=20261029_play_fullscreen"></script>
+  <script src="assets/js/studentGames.js?v=20261029_mode_picker"></script>
   <!-- 6. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261029_play_fullscreen"></script>
+  <script src="assets/js/platform.js?v=20261029_mode_picker"></script>
 </body>
 </html>

@@ -1798,25 +1798,45 @@
   }
 
   // ============================================================================
-  // 11. CICLO DE VIDA AL ABRIR / CERRAR LA PESTAÑA DE JUEGOS
+  // 11. CICLO DE VIDA Y SELECCIÓN INICIAL DE MODO
   // ============================================================================
-  let hasInitializedOnce = false;
+  let hasChosenModeOnce = false;
+
+  function showModeSelectionScreen() {
+    stopRushTimer();
+    stopBubbleSpawner();
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
+
+    const modeScreen = document.getElementById('lqModeSelectScreen');
+    const workspace = document.getElementById('lqGamesWorkspace');
+    if (modeScreen) modeScreen.classList.remove('hidden');
+    if (workspace) workspace.classList.add('hidden');
+  }
+
+  function chooseInitialMode(kidsModeSelected) {
+    playSynth('tap');
+    hasChosenModeOnce = true;
+
+    const modeScreen = document.getElementById('lqModeSelectScreen');
+    const workspace = document.getElementById('lqGamesWorkspace');
+    if (modeScreen) modeScreen.classList.add('hidden');
+    if (workspace) workspace.classList.remove('hidden');
+
+    setAudienceMode(Boolean(kidsModeSelected));
+  }
 
   async function onTabOpened() {
     isGamesTabActive = true;
     loadStats();
 
-    if (!hasInitializedOnce) {
-      hasInitializedOnce = true;
-      const profile = window.currentUserProfile || {};
-      const prog = String(profile.program || '').toLowerCase();
-      const lvl = String(profile.course_level || '').toLowerCase();
+    const profile = window.currentUserProfile || {};
+    const lvl = String(profile.course_level || '').toLowerCase();
+    const defaultCefr = lvl.includes('3') ? 'B2' : (lvl.includes('2') ? 'B1' : 'A1');
 
-      const isAdultOrTeens = prog.includes('adult') || prog.includes('teen') || lvl.includes('adult') || lvl.includes('teen');
-      const startInKids = !isAdultOrTeens;
-      const defaultCefr = lvl.includes('3') ? 'B2' : (lvl.includes('2') ? 'B1' : 'A1');
+    if (!hasChosenModeOnce) {
       currentGeneralLevel = defaultCefr;
-
       const badge = document.getElementById('levelBadge');
       const title = document.getElementById('levelTitle');
       if (badge) {
@@ -1825,7 +1845,7 @@
       }
       if (title) title.innerText = LEVEL_META[defaultCefr].name;
 
-      setAudienceMode(startInKids);
+      showModeSelectionScreen();
     } else {
       if (isKidsMode) {
         switchKidsGame(currentKidsGame);
@@ -1864,7 +1884,9 @@
     setLevel,
     toggleSound,
     restartFillRush,
-    startCurrentGame
+    startCurrentGame,
+    chooseInitialMode,
+    showModeSelectionScreen
   };
 
   window.toggleAudienceMode = toggleAudienceMode;

@@ -4191,3 +4191,146 @@ body.student-light-theme .btn-logout:hover,
 .lq-shake {
   animation: lqShake 0.4s ease-in-out;
 }
+
+/* ==========================================================================
+   PANTALLA 0: SELECTOR INICIAL DE MODO (#lqModeSelectScreen)
+   ========================================================================== */
+.lq-mode-select-screen {
+  padding: 18px 8px 10px 8px;
+  text-align: center;
+}
+
+.lq-mode-select-header {
+  max-width: 620px;
+  margin: 0 auto 26px auto;
+}
+
+.lq-mode-select-title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 8px 0 6px 0;
+  line-height: 1.2;
+}
+
+.lq-mode-select-sub {
+  font-size: 15px;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0;
+}
+
+.lq-mode-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.lq-mode-choice-card {
+  border-radius: 28px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.lq-mode-choice-card:hover {
+  transform: translateY(-4px);
+}
+
+.lq-mode-card-kids {
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+  border: 3px solid #fde68a;
+  box-shadow: 0 8px 0 #fde68a, 0 18px 34px rgba(245, 158, 11, 0.10);
+}
+
+.lq-mode-card-gen {
+  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 100%);
+  border: 3px solid #c7d2fe;
+  box-shadow: 0 8px 0 #c7d2fe, 0 18px 34px rgba(79, 70, 229, 0.10);
+}
+
+.lq-mode-card-badge {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.lq-mode-card-icon {
+  width: 92px;
+  height: 92px;
+  border-radius: 26px;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  margin-bottom: 14px;
+}
+
+.lq-mode-card-name {
+  font-family: 'Bubblegum Sans', var(--font-display), cursive;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.lq-mode-card-desc {
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+}
+
+.lq-mode-mini-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.lq-mode-mini-list span {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  color: #334155;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.lq-mode-enter-btn {
+  width: 100%;
+  max-width: 260px;
+  padding: 14px 22px;
+  font-size: 16px;
+  margin-top: auto;
+}
+
+@media (max-width: 767px) {
+  .lq-mode-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .lq-mode-select-title {
+    font-size: 23px;
+  }
+  .lq-mode-choice-card {
+    padding: 22px 16px;
+  }
+}
