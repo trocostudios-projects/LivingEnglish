@@ -5203,35 +5203,158 @@ body:has(#teacherDashboard:not(.hidden)),
   box-shadow: 0 4px 0 #1e40af;
 }
 
-/* KPIs Filtrables del Profesor a 1 Clic */
-.ux-clickable-metrics .metric-pill {
+/* ==========================================================================
+   PERFECCIONAMIENTO DE KPIS Y COMPONENTES DEL DOCENTE (TEMA CLARO)
+   ========================================================================== */
+
+/* Barra de Métricas del Docente: Sin contenedor oscuro, tarjetas independientes */
+#teacherDashboard .teacher-metrics-bar {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin-bottom: 24px !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 900px) {
+  #teacherDashboard .teacher-metrics-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  #teacherDashboard .teacher-metrics-bar {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Tarjeta Individual de Métrica (KPI Pill) */
+#teacherDashboard .metric-pill {
   background: #ffffff !important;
   border: 2px solid #cbd5e1 !important;
-  box-shadow: 0 5px 0 #cbd5e1 !important;
-  border-radius: 18px !important;
+  border-radius: 20px !important;
+  padding: 18px 22px !important;
+  box-shadow: 0 4px 0 #cbd5e1, 0 8px 18px rgba(15, 23, 42, 0.04) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
   cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: left;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease !important;
+  text-align: left !important;
+  min-height: 98px !important;
+  box-sizing: border-box !important;
 }
 
-.ux-clickable-metrics .metric-pill:hover {
-  transform: translateY(-2px);
+#teacherDashboard .metric-pill:hover {
+  transform: translateY(-3px) !important;
   border-color: #3b82f6 !important;
+  box-shadow: 0 6px 0 #93c5fd, 0 12px 24px rgba(59, 130, 246, 0.12) !important;
 }
 
-.ux-clickable-metrics .metric-pill.active {
+#teacherDashboard .metric-pill.active {
+  background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%) !important;
   border-color: #2563eb !important;
-  background: #eff6ff !important;
-  box-shadow: 0 5px 0 #93c5fd !important;
+  box-shadow: 0 5px 0 #1d4ed8, 0 14px 26px rgba(37, 99, 235, 0.14) !important;
 }
 
+/* Tipografía y Ubicación del Número */
 #teacherDashboard .metric-number {
-  color: #0f172a;
+  font-family: var(--font-display) !important;
+  font-size: 32px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  line-height: 1 !important;
+  margin: 0 0 8px 0 !important;
+  display: block !important;
+  letter-spacing: -0.02em !important;
 }
 
+#teacherDashboard .metric-number.metric-active {
+  color: #16a34a !important;
+}
+
+#teacherDashboard .metric-number.metric-warning {
+  color: #d97706 !important;
+}
+
+#teacherDashboard .metric-number.metric-expired {
+  color: #dc2626 !important;
+}
+
+/* Tipografía de la Etiqueta */
 #teacherDashboard .metric-label {
-  color: #475569;
-  font-weight: 700;
+  font-family: var(--font-display) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #475569 !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  letter-spacing: 0.02em !important;
+}
+
+#teacherDashboard .metric-pill.active .metric-label {
+  color: #1e40af !important;
+}
+
+/* Avatar del Alumno en la Lista Izquierda (GT) */
+#teacherDashboard .student-avatar-circle {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%) !important;
+  border: 1.5px solid #a5b4fc !important;
+  color: #3730a3 !important;
+  font-family: var(--font-display) !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+/* Tarjeta de Clases Online en Tema Claro */
+#teacherDashboard .class-card {
+  background: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 22px !important;
+  padding: 22px !important;
+  box-shadow: 0 6px 0 #cbd5e1, 0 10px 20px rgba(15, 23, 42, 0.05) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  color: #0f172a !important;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease !important;
+}
+
+#teacherDashboard .class-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 8px 0 #93c5fd, 0 16px 28px rgba(37, 99, 235, 0.12) !important;
+}
+
+#teacherDashboard .class-card h3 {
+  color: #0f172a !important;
+  font-family: var(--font-display) !important;
+  font-weight: 800 !important;
+}
+
+#teacherDashboard .spots-indicator-box {
+  background: #f8fafc !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  padding: 10px 14px !important;
+  color: #1e293b !important;
+}
+
+#teacherDashboard .spot-block.free {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
 }
 
 /* Lista Izquierda de Estudiantes en Tema Claro */

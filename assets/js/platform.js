@@ -2877,13 +2877,15 @@ async function loadTeacherOnlineClasses() {
 
     if (classes.length === 0) {
       container.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: rgba(0,0,0,0.25); border-radius: var(--radius-xl); border: 1px dashed rgba(255,255,255,0.2);">
-          <div style="font-size: 40px; margin-bottom: 8px;">🌐</div>
-          <h3 style="font-size: 18px; margin-bottom: 6px;">Aún no has publicado clases online</h3>
-          <p style="color: var(--color-muted); font-size: 13px; margin-bottom: 16px;">
-            Haz clic en «Publicar Nueva Clase Online» para programar sesiones de máximo 4 personas.
+        <div class="teacher-empty-selection" style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; background: #ffffff; border-radius: 24px; border: 2px dashed #cbd5e1; box-shadow: 0 4px 14px rgba(15,23,42,0.04);">
+          <div style="font-size: 48px; margin-bottom: 10px;">🌐</div>
+          <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 800; color: #0f172a; margin: 0 0 6px 0;">Aún no has publicado clases online</h3>
+          <p style="color: #64748b; font-size: 14px; max-width: 480px; margin: 0 auto 20px auto; line-height: 1.5;">
+            Haz clic en «Publicar Nueva Clase Online» para programar sesiones en vivo de máximo 4 estudiantes.
           </p>
-          <button class="btn-primary" onclick="openPublishClassModal()" style="width: auto; padding: 10px 20px;">➕ Publicar Primera Clase</button>
+          <button type="button" class="lq-btn-3d lq-btn-indigo" onclick="openPublishClassModal()" style="width: auto; padding: 12px 24px; font-size: 14px;">
+            ➕ Publicar Primera Clase
+          </button>
         </div>
       `;
       return;
@@ -2927,9 +2929,9 @@ async function loadTeacherOnlineClasses() {
             ${statusBadge}
           </div>
 
-          <h3 style="font-family: var(--font-display); font-size: 18px; color: #ffffff; margin: 0 0 4px 0;">${cls.title}</h3>
+          <h3 style="font-family: var(--font-display); font-size: 18px; color: #0f172a; margin: 0 0 4px 0;">${cls.title}</h3>
           
-          <div style="font-size: 12px; color: #93c5fd; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <div style="font-size: 13px; color: #475569; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 600;">
             <span>📅 ${formattedDate}</span>
             <span>·</span>
             <span>🕒 ${startTime} - ${endTime}</span>
@@ -2954,7 +2956,7 @@ async function loadTeacherOnlineClasses() {
           </div>
         </div>
 
-        <div style="display: flex; gap: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+        <div style="display: flex; gap: 8px; border-top: 1.5px solid #e2e8f0; padding-top: 12px;">
           <button type="button" class="btn-primary" style="flex: 2; padding: 8px 12px; font-size: 12px;" onclick="openClassBookingsModal('${cls.id}')">
             👥 Ver Alumnos (${cls.bookings_count || 0})
           </button>

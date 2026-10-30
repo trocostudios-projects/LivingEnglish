@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="assets/css/variables.css?v=20261029_mode_picker">
   <link rel="stylesheet" href="assets/css/base.css?v=20261029_mode_picker">
   <link rel="stylesheet" href="assets/css/components.css?v=20261029_mode_picker">
-  <link rel="stylesheet" href="assets/css/platform.css?v=20261029_mode_picker">
+  <link rel="stylesheet" href="assets/css/platform.css?v=20261030_kpi_polish">
 </head>
 <body>
 
@@ -838,7 +838,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
               <div>
                 <label style="font-size: 11px; text-transform: uppercase; color: var(--color-muted); margin-bottom: 4px; display: block; font-weight: 600;">Programa</label>
-                <select id="filterProgramSelect" class="form-control" onchange="filterStudents()" style="font-size: 12px; padding: 8px 10px; background: rgba(0,0,0,0.5);">
+                <select id="filterProgramSelect" class="form-control" onchange="filterStudents()" style="font-size: 12px; padding: 8px 10px;">
                   <option value="all">Todos</option>
                   <option value="adultos">Adultos</option>
                   <option value="teens">Teens</option>
@@ -849,7 +849,7 @@
               </div>
               <div>
                 <label style="font-size: 11px; text-transform: uppercase; color: var(--color-muted); margin-bottom: 4px; display: block; font-weight: 600;">Vigencia</label>
-                <select id="filterExpirySelect" class="form-control" onchange="filterStudents()" style="font-size: 12px; padding: 8px 10px; background: rgba(0,0,0,0.5);">
+                <select id="filterExpirySelect" class="form-control" onchange="filterStudents()" style="font-size: 12px; padding: 8px 10px;">
                   <option value="all">Todos</option>
                   <option value="active">🟢 Activos</option>
                   <option value="warning">🟡 Por vencer</option>
@@ -876,7 +876,7 @@
                 <!-- Selector de Nivel a Calificar / Consultar (Discriminación de Notas) -->
                 <div id="teacherLevelSelectorContainer" class="hidden" style="margin-top: 6px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                   <span style="font-size: 12px; font-weight: 700; color: #93c5fd;">📖 Libro de Calificaciones:</span>
-                  <select id="teacherActiveLevelSelect" onchange="changeTeacherGradingLevel(this.value)" class="form-control" style="width: auto; padding: 4px 10px; font-size: 12px; background: rgba(0,0,0,0.6); color: #ffffff; border-color: rgba(255,255,255,0.3); height: auto; font-weight: 600; cursor: pointer;">
+                  <select id="teacherActiveLevelSelect" onchange="changeTeacherGradingLevel(this.value)" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px; height: auto; font-weight: 700; cursor: pointer;">
                   </select>
                   <span id="teacherHistoryNotice" class="hidden" style="font-size: 11px; background: rgba(245,158,11,0.2); color: #fde047; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(245,158,11,0.4); font-weight: 600;">
                     Historial de Nivel Anterior
@@ -936,7 +936,7 @@
             <div id="teacherUnitsGrid" style="margin-top: 14px;">
               <div class="teacher-empty-selection">
                 <div style="font-size: 42px; margin-bottom: 10px;">👨‍🎓</div>
-                <h4 style="font-family: var(--font-display); font-size: 18px; color: #ffffff; margin: 0 0 6px 0;">Ningún estudiante seleccionado</h4>
+                <h4 style="font-family: var(--font-display); font-size: 18px; color: #0f172a; margin: 0 0 6px 0;">Ningún estudiante seleccionado</h4>
                 <p style="color: var(--color-muted); font-size: 13px; max-width: 420px; margin: 0 auto;">
                   Selecciona un alumno de la lista izquierda para ver su progreso por etapas, calificar sus evaluaciones o gestionar su matrícula.
                 </p>
@@ -966,23 +966,23 @@
           </div>
         </div>
 
-        <!-- BARRA RESUMEN DE CLASES ONLINE -->
+        <!-- BARRA RESUMEN DE CLASES ONLINE (TEMA CLARO PROFESIONAL) -->
         <div class="teacher-metrics-bar">
           <div class="metric-pill">
             <span class="metric-number" id="metricTotalClasses">0</span>
-            <span class="metric-label">Clases Activas</span>
+            <span class="metric-label">🌐 Clases Activas</span>
           </div>
           <div class="metric-pill">
             <span class="metric-number metric-active" id="metricTotalClassBookings">0</span>
-            <span class="metric-label">Cupos Ocupados</span>
+            <span class="metric-label">👥 Cupos Ocupados</span>
           </div>
           <div class="metric-pill">
             <span class="metric-number metric-warning" id="metricFreeClassSpots">0</span>
-            <span class="metric-label">Cupos Libres</span>
+            <span class="metric-label">⚡ Cupos Libres</span>
           </div>
           <div class="metric-pill">
-            <span class="metric-number" style="color: #a855f7;" id="metricConfirmedBookings">0</span>
-            <span class="metric-label">Confirmados por Correo</span>
+            <span class="metric-number" style="color: #7c3aed;" id="metricConfirmedBookings">0</span>
+            <span class="metric-label">✉️ Confirmados por Correo</span>
           </div>
         </div>
 
@@ -1432,6 +1432,6 @@
   <!-- 6. Módulo Oficial de Ejercicios por Lección (Tabla `lesson_exercises` en Supabase) -->
   <script src="assets/js/lessonExercises.js?v=20261030_ux"></script>
   <!-- 7. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261030_ux"></script>
+  <script src="assets/js/platform.js?v=20261030_kpi_polish"></script>
 </body>
 </html>
