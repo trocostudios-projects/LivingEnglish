@@ -4884,3 +4884,643 @@ body.student-light-theme .btn-logout:hover,
     font-size: 18px;
   }
 }
+
+/* ==========================================================================
+   REESTRUCTURACIÓN UX/UI 2027: PORTAL ESTUDIANTE, PANEL DOCENTE Y MÓVIL
+   ========================================================================== */
+
+/* 1. Banner Hero Guiado del Estudiante ("Tu Próximo Paso") */
+.ux-next-step-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 55%, #1e1b4b 100%);
+  color: #ffffff;
+  border-radius: 26px;
+  padding: 26px 32px;
+  margin-bottom: 22px;
+  box-shadow: 0 10px 0 #312e81, 0 20px 40px rgba(79, 70, 229, 0.22);
+  border: 2px solid #818cf8;
+  position: relative;
+  overflow: hidden;
+}
+
+.ux-next-step-left {
+  flex: 1 1 460px;
+}
+
+.ux-next-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  color: #e0e7ff;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 5px 13px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.ux-next-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  line-height: 1.25;
+}
+
+.ux-next-desc {
+  font-size: 14.5px;
+  color: #e0e7ff;
+  line-height: 1.5;
+  margin: 0 0 18px 0;
+  max-width: 640px;
+}
+
+.ux-next-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ux-next-btn-main {
+  background: #10b981 !important;
+  border-color: #059669 !important;
+  box-shadow: 0 5px 0 #047857 !important;
+  color: #ffffff !important;
+  padding: 12px 22px;
+  font-size: 15px;
+}
+
+.ux-next-btn-sec {
+  padding: 12px 18px;
+  font-size: 14px;
+}
+
+.ux-next-step-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ux-ring-box {
+  position: relative;
+  width: 118px;
+  height: 118px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  padding: 6px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.ux-ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ux-ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.2);
+  stroke-width: 9;
+}
+
+.ux-ring-fill {
+  fill: none;
+  stroke: #34d399;
+  stroke-width: 9;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.ux-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.ux-ring-pct {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.ux-ring-sub {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #a7f3d0;
+  margin-top: 2px;
+}
+
+/* 2. Barra de Pestañas por Etapa (Sin Scroll Largo en Estudiante y Profesor) */
+.ux-stage-tabs-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ux-stage-tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 18px;
+  padding: 13px 16px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  box-shadow: 0 4px 0 #cbd5e1;
+  text-align: left;
+}
+
+.ux-stage-tab-btn:hover {
+  transform: translateY(-2px);
+  border-color: #6366f1;
+  background: #f8fafc;
+}
+
+.ux-stage-tab-btn.active {
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  border-color: #3730a3;
+  color: #ffffff;
+  box-shadow: 0 5px 0 #312e81;
+}
+
+.ux-stage-tab-num {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 4px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.ux-stage-tab-btn.active .ux-stage-tab-num {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.ux-stage-tab-name {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ux-stage-tab-btn.active .ux-stage-tab-name {
+  color: #ffffff;
+}
+
+.ux-stage-tab-count {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.ux-stage-tab-btn.active .ux-stage-tab-count {
+  background: rgba(15, 23, 42, 0.25);
+  color: #ffffff;
+}
+
+.ux-stage-hidden {
+  display: none !important;
+}
+
+/* 3. Botón Directo "Practicar Lección" dentro de cada Tarjeta de Evaluación */
+.ux-unit-card-next {
+  border-color: #6366f1 !important;
+  box-shadow: 0 6px 0 #818cf8, 0 12px 24px rgba(79, 70, 229, 0.14) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ff 100%) !important;
+}
+
+.ux-chip-next {
+  background: #e0e7ff !important;
+  color: #3730a3 !important;
+  border: 1.5px solid #a5b4fc !important;
+  font-weight: 800 !important;
+}
+
+.ux-unit-practice-row {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1.5px dashed #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ux-unit-practice-btn {
+  width: 100%;
+  background: #f8fafc;
+  color: #4338ca;
+  border: 1.5px solid #c7d2fe;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ux-unit-practice-btn:hover {
+  background: #4f46e5;
+  color: #ffffff;
+  border-color: #4338ca;
+}
+
+/* 4. Unificación del Tema Claro Profesional para el Panel del Profesor (#teacherDashboard) */
+body:has(#teacherDashboard:not(.hidden)),
+.app-viewport:has(#teacherDashboard:not(.hidden)) {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  color: #0f172a !important;
+}
+
+.app-viewport:has(#teacherDashboard:not(.hidden)) .app-header {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 2px solid #cbd5e1 !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+}
+
+#teacherDashboard .page-title {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+
+#teacherDashboard .page-description {
+  color: #475569 !important;
+}
+
+#teacherDashboard .student-tabs-wrapper {
+  border-bottom: 2px solid #cbd5e1;
+  padding-bottom: 12px;
+}
+
+#teacherDashboard .student-tab-pill {
+  background: #ffffff;
+  color: #475569;
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 4px 0 #cbd5e1;
+  border-radius: 16px;
+  font-weight: 700;
+}
+
+#teacherDashboard .student-tab-pill.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 0 #1e40af;
+}
+
+/* KPIs Filtrables del Profesor a 1 Clic */
+.ux-clickable-metrics .metric-pill {
+  background: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
+  box-shadow: 0 5px 0 #cbd5e1 !important;
+  border-radius: 18px !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.ux-clickable-metrics .metric-pill:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6 !important;
+}
+
+.ux-clickable-metrics .metric-pill.active {
+  border-color: #2563eb !important;
+  background: #eff6ff !important;
+  box-shadow: 0 5px 0 #93c5fd !important;
+}
+
+#teacherDashboard .metric-number {
+  color: #0f172a;
+}
+
+#teacherDashboard .metric-label {
+  color: #475569;
+  font-weight: 700;
+}
+
+/* Lista Izquierda de Estudiantes en Tema Claro */
+#teacherDashboard .student-list {
+  background: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 22px !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05) !important;
+  padding: 18px !important;
+}
+
+#teacherDashboard .student-list .form-control {
+  background: #f8fafc !important;
+  border: 2px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-weight: 600;
+}
+
+#teacherDashboard .student-item {
+  background: #f8fafc !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  color: #0f172a !important;
+  margin-bottom: 10px !important;
+}
+
+#teacherDashboard .student-item:hover {
+  background: #eff6ff !important;
+  border-color: #93c5fd !important;
+}
+
+#teacherDashboard .student-item.active {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 0 #93c5fd !important;
+}
+
+#teacherDashboard .student-name {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+#teacherDashboard .student-level {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+/* Panel Derecho de Calificación del Profesor (Sticky + Tarjetas Claras) */
+#teacherDashboard .grade-editor {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+#teacherDashboard .selected-student-header {
+  position: sticky;
+  top: 10px;
+  z-index: 25;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(10px);
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 22px !important;
+  padding: 20px 24px !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08) !important;
+  margin-bottom: 16px !important;
+}
+
+#teacherDashboard #teacherActiveLevelSelect {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border: 2px solid #cbd5e1 !important;
+}
+
+#teacherDashboard .teacher-grade-summary-box {
+  background: #f8fafc !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 18px !important;
+  padding: 14px 18px !important;
+}
+
+#teacherDashboard .teacher-total-points-display {
+  color: #0f172a !important;
+}
+
+#teacherDashboard .eval-filter-toolbar {
+  background: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 18px !important;
+}
+
+#teacherDashboard .eval-filter-btn {
+  background: #f8fafc !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #475569 !important;
+  font-weight: 700;
+}
+
+#teacherDashboard .eval-filter-btn.active {
+  background: #2563eb !important;
+  border-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+#teacherDashboard .eval-search-input {
+  background: #f8fafc !important;
+  border: 2px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+#teacherDashboard .teacher-stage-block {
+  background: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 22px !important;
+  padding: 20px !important;
+  box-shadow: 0 6px 0 #cbd5e1 !important;
+}
+
+#teacherDashboard .teacher-stage-header {
+  border-bottom: 2px solid #f1f5f9 !important;
+}
+
+#teacherDashboard .teacher-stage-title-text {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+.ux-teacher-stage-pts-text {
+  font-size: 13.5px;
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+#teacherDashboard .grade-input-box {
+  background: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 0 #e2e8f0 !important;
+}
+
+#teacherDashboard .grade-input-box.graded {
+  background: #f0fdf4 !important;
+  border-color: #86efac !important;
+  box-shadow: 0 4px 0 #bbf7d0 !important;
+}
+
+#teacherDashboard .grade-input-box.modified {
+  background: #fffbeb !important;
+  border-color: #fcd34d !important;
+}
+
+#teacherDashboard .grade-input-box-title {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+#teacherDashboard .grade-input-wrapper {
+  background: #f8fafc !important;
+  border: 2px solid #94a3b8 !important;
+  border-radius: 12px !important;
+}
+
+#teacherDashboard .grade-input-wrapper input[type="number"] {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+#teacherDashboard .grade-input-suffix {
+  color: #475569 !important;
+}
+
+#teacherDashboard .teacher-empty-selection {
+  background: #ffffff !important;
+  border: 2px dashed #cbd5e1 !important;
+  border-radius: 22px !important;
+  color: #334155 !important;
+  padding: 48px 24px !important;
+}
+
+#teacherDashboard .teacher-empty-selection h4 {
+  color: #0f172a !important;
+}
+
+/* Botones Rápidos 50% / 75% / 100% en Tarjetas del Profesor */
+.ux-quick-score-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ux-preset-btn {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 2px 7px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.ux-preset-btn:hover {
+  background: #e0e7ff;
+  color: #3730a3;
+  border-color: #818cf8;
+}
+
+.ux-preset-max {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #6ee7b7;
+}
+
+.ux-preset-max:hover {
+  background: #10b981;
+  color: #ffffff;
+  border-color: #059669;
+}
+
+/* 5. Barra de Navegación Inferior Fija en Móviles (.ux-mobile-bottom-nav) */
+.ux-mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .ux-next-step-banner {
+    flex-direction: column-reverse;
+    text-align: center;
+    padding: 20px 18px;
+  }
+
+  .ux-next-actions {
+    justify-content: center;
+  }
+
+  .ux-stage-tabs-bar {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  #studentDashboard {
+    padding-bottom: 84px;
+  }
+
+  .ux-mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    border-top: 2px solid #cbd5e1;
+    box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.08);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 6px 10px calc(6px + env(safe-area-inset-bottom, 0px)) 10px;
+    gap: 6px;
+  }
+
+  .ux-mob-nav-item {
+    background: transparent;
+    border: none;
+    border-radius: 14px;
+    padding: 6px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: #64748b;
+    font-family: var(--font-display);
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .ux-mob-nav-item.active {
+    background: #eef2ff;
+    color: #4f46e5;
+  }
+
+  .ux-mob-nav-icon {
+    font-size: 19px;
+    line-height: 1.1;
+  }
+
+  #teacherDashboard .selected-student-header {
+    position: static;
+  }
+}

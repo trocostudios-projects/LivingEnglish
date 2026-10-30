@@ -735,8 +735,8 @@ async function initAuthenticatedUser(user) {
   userNameElem.innerText = `${isTeacher ? 'Prof.' : 'Est.'} ${profile.full_name}`;
 
   if (isTeacher) {
-    // Ingreso directo como Profesor: accede al panel docente exclusivo
-    document.body.classList.remove('student-light-theme');
+    // Ingreso directo como Profesor: accede al panel docente con tema claro profesional de alto contraste
+    document.body.classList.add('student-light-theme');
     document.getElementById('teacherDashboard').classList.remove('hidden');
     document.getElementById('studentDashboard').classList.add('hidden');
     switchTeacherTab('students');
@@ -788,6 +788,9 @@ function switchStudentTab(tab) {
   const btnGrades = document.getElementById('tabBtnGrades');
   const btnExercises = document.getElementById('tabBtnExercises');
   const btnGames = document.getElementById('tabBtnGames');
+  const mobGrades = document.getElementById('mobNavGrades');
+  const mobExercises = document.getElementById('mobNavExercises');
+  const mobGames = document.getElementById('mobNavGames');
   const contentGrades = document.getElementById('studentTabGrades');
   const contentExercises = document.getElementById('studentTabExercises');
   const contentGames = document.getElementById('studentTabGames');
@@ -797,6 +800,10 @@ function switchStudentTab(tab) {
   btnGrades.classList.toggle('active', tab === 'grades');
   if (btnExercises) btnExercises.classList.toggle('active', tab === 'exercises');
   btnGames.classList.toggle('active', tab === 'games');
+
+  if (mobGrades) mobGrades.classList.toggle('active', tab === 'grades');
+  if (mobExercises) mobExercises.classList.toggle('active', tab === 'exercises');
+  if (mobGames) mobGames.classList.toggle('active', tab === 'games');
 
   contentGrades.classList.toggle('hidden', tab !== 'grades');
   if (contentExercises) contentExercises.classList.toggle('hidden', tab !== 'exercises');
@@ -810,6 +817,31 @@ function switchStudentTab(tab) {
 
   if (tab === 'exercises' && window.LessonExercises) {
     window.LessonExercises.onExercisesTabOpened();
+  }
+}
+
+function resolvePracticeLessonCode(rawLessonStr, courseLevel) {
+  const raw = String(rawLessonStr || '').trim();
+  const upper = raw.toUpperCase();
+  if (upper.includes('REVIEW') || upper.includes('INTRO')) {
+    if (String(courseLevel || '').includes('2')) return 'Review';
+    return 'L1';
+  }
+  if (upper.includes('L4B')) return 'L4B';
+  const match = raw.match(/L(\d+)/i);
+  if (match) return 'L' + match[1];
+  return 'L1';
+}
+
+function jumpToPracticeLesson(lessonCode) {
+  const levelToLoad = studentActiveViewingLevel || currentUserProfile?.course_level || 'Adultos 1';
+  switchStudentTab('exercises');
+  if (window.LessonExercises) {
+    window.LessonExercises.selectBook(levelToLoad).then(() => {
+      if (lessonCode) {
+        window.LessonExercises.startLesson(lessonCode);
+      }
+    });
   }
 }
 
@@ -986,7 +1018,33 @@ async function loadStudentGrades() {
 
 let studentEvalActiveFilter = 'all';
 let teacherEvalActiveFilter = 'all';
+let studentSelectedStageIdx = 'auto';
+let teacherSelectedStageIdx = 'auto';
 let studentLayoutMode = localStorage.getItem('living_student_layout_mode') || 'list';
+
+function setStudentStageTab(stageVal) {
+  studentSelectedStageIdx = stageVal;
+  renderStudentEvaluations();
+}
+
+function setTeacherStageTab(stageVal) {
+  teacherSelectedStageIdx = stageVal;
+  if (!selectedStudent || !teacherActiveGradingLevel) return;
+  const config = getCourseConfig(teacherActiveGradingLevel);
+  renderTeacherCurriculumGrades(config);
+}
+
+function quickFilterTeacherExpiry(filterVal) {
+  const expirySelect = document.getElementById('filterExpirySelect');
+  if (expirySelect) {
+    expirySelect.value = filterVal;
+  }
+  const pills = document.querySelectorAll('.ux-clickable-metrics .metric-pill');
+  pills.forEach(p => {
+    p.classList.toggle('active', p.getAttribute('data-kfilter') === filterVal);
+  });
+  filterStudents();
+}
 
 function setStudentLayoutMode(mode) {
   studentLayoutMode = mode;
@@ -1025,9 +1083,11 @@ function renderStudentEvaluations() {
   let totalScoreEarned = 0;
   let totalItemsCount = 0;
   let gradedItemsCount = 0;
+  let firstPendingItem = null;
+  let firstPendingStageIdx = 0;
 
-  // Primer pase: calcular métricas globales reales sin importar el filtro visual
-  config.stages.forEach(stage => {
+  // Primer pase: calcular métricas globales reales y detectar la siguiente evaluación pendiente
+  config.stages.forEach((stage, sIdx) => {
     stage.items.forEach(item => {
       totalItemsCount++;
       const awarded = studentGradesCache[item.number];
@@ -1035,11 +1095,50 @@ function renderStudentEvaluations() {
       if (hasScore) {
         gradedItemsCount++;
         totalScoreEarned += Number(awarded);
+      } else if (!firstPendingItem) {
+        firstPendingItem = item;
+        firstPendingStageIdx = sIdx;
       }
     });
   });
 
   const pendingItemsCount = Math.max(0, totalItemsCount - gradedItemsCount);
+  const overallPct = config.maxPoints > 0 ? Math.min(100, Math.round((totalScoreEarned / config.maxPoints) * 100)) : 0;
+
+  // Actualizar Hero "Tu Próximo Paso" y anillo circular SVG
+  const nextTitle = document.getElementById('studentNextStepTitle');
+  const nextDesc = document.getElementById('studentNextStepDesc');
+  const nextBtn = document.getElementById('studentNextStepPracticeBtn');
+  const ringFill = document.getElementById('studentHeroRingFill');
+  const ringPct = document.getElementById('studentHeroRingPct');
+
+  if (ringPct) ringPct.innerText = `${overallPct}%`;
+  if (ringFill) {
+    const circumference = 251.2;
+    const offset = circumference - (overallPct / 100) * circumference;
+    ringFill.style.strokeDashoffset = String(offset);
+  }
+
+  if (firstPendingItem) {
+    const practiceCode = resolvePracticeLessonCode(firstPendingItem.lesson, courseLevel);
+    if (nextTitle) {
+      nextTitle.innerText = `Tu Próximo Paso: #${String(firstPendingItem.number).padStart(2, '0')} ${firstPendingItem.title}`;
+    }
+    if (nextDesc) {
+      nextDesc.innerText = `Corresponde a ${firstPendingItem.lesson} (${firstPendingItem.type} · ${firstPendingItem.maxPoints} pts). Practica los ejercicios interactivos de la guía antes de presentar tu evaluación.`;
+    }
+    if (nextBtn) {
+      nextBtn.innerText = `📖 Practicar ${practiceCode} ahora →`;
+      nextBtn.onclick = () => jumpToPracticeLesson(practiceCode);
+    }
+  } else {
+    if (nextTitle) nextTitle.innerText = `🎉 ¡Felicitaciones! Completaste todas las evaluaciones de ${courseLevel}`;
+    if (nextDesc) nextDesc.innerText = `Has completado las ${totalItemsCount} actividades oficiales del nivel. Puedes seguir repasando cualquier lección o jugar en LinguaQuest.`;
+    if (nextBtn) {
+      nextBtn.innerText = `📖 Repasar Lecciones →`;
+      nextBtn.onclick = () => switchStudentTab('exercises');
+    }
+  }
 
   // Actualizar contadores de los botones de filtro
   const stCountAll = document.getElementById('stCountAll');
@@ -1049,11 +1148,53 @@ function renderStudentEvaluations() {
   if (stCountGraded) stCountGraded.innerText = gradedItemsCount;
   if (stCountPending) stCountPending.innerText = pendingItemsCount;
 
+  // Determinar qué etapa mostrar activa si está en 'auto'
+  const effectiveStageIdx = studentSelectedStageIdx === 'auto' ? firstPendingStageIdx : studentSelectedStageIdx;
+
+  // Renderizar barra de pestañas por Etapa (#studentStageTabsBar)
+  const stageTabsBar = document.getElementById('studentStageTabsBar');
+  if (stageTabsBar) {
+    stageTabsBar.innerHTML = '';
+    config.stages.forEach((st, idx) => {
+      let stGraded = 0;
+      st.items.forEach(it => {
+        const v = studentGradesCache[it.number];
+        if (v !== undefined && v !== null && v !== '') stGraded++;
+      });
+      const isDone = stGraded === st.items.length && st.items.length > 0;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `ux-stage-tab-btn ${effectiveStageIdx === idx && !searchQuery ? 'active' : ''} ${isDone ? 'stage-completed' : ''}`;
+      btn.onclick = () => setStudentStageTab(idx);
+      btn.innerHTML = `
+        <span class="ux-stage-tab-num">${isDone ? '✅' : `Etapa ${idx + 1}`}</span>
+        <span class="ux-stage-tab-name">${st.name.replace(/^STAGE \d+:\s*/i, '')}</span>
+        <span class="ux-stage-tab-count">${stGraded}/${st.items.length}</span>
+      `;
+      stageTabsBar.appendChild(btn);
+    });
+
+    const btnAll = document.createElement('button');
+    btnAll.type = 'button';
+    btnAll.className = `ux-stage-tab-btn ${effectiveStageIdx === 'all' || searchQuery ? 'active' : ''}`;
+    btnAll.onclick = () => setStudentStageTab('all');
+    btnAll.innerHTML = `
+      <span class="ux-stage-tab-num">📚</span>
+      <span class="ux-stage-tab-name">Ver Todas las Etapas</span>
+      <span class="ux-stage-tab-count">${gradedItemsCount}/${totalItemsCount}</span>
+    `;
+    stageTabsBar.appendChild(btnAll);
+  }
 
   let visibleCardsCount = 0;
 
-  // Segundo pase: construir módulos por etapa con diseño moderno y digerible
+  // Segundo pase: construir módulos por etapa
   config.stages.forEach((stage, stageIdx) => {
+    // Si no hay búsqueda activa y el estudiante seleccionó una etapa específica, mostrar solo esa etapa
+    if (!searchQuery && effectiveStageIdx !== 'all' && stageIdx !== effectiveStageIdx) {
+      return;
+    }
+
     let stageEarned = 0;
     let stageMax = 0;
     let stageGradedCount = 0;
@@ -1123,6 +1264,8 @@ function renderStudentEvaluations() {
       const typeBadgeClass = item.type === 'Oral' ? 'badge-oral' : (item.type === 'Formativo' ? 'badge-formative' : (item.type === 'Proyecto' ? 'badge-project' : (item.type === 'Sticker' || item.type === 'Lúdico' ? 'badge-kids' : 'badge-written')));
       const typeIcon = getEvalTypeIcon(item.type);
       const numFormatted = String(item.number).padStart(2, '0');
+      const practiceCode = resolvePracticeLessonCode(item.lesson, courseLevel);
+      const isNextUp = firstPendingItem && firstPendingItem.number === item.number;
 
       const scoreHtml = hasScore
         ? (config.isKids ? '⭐ ¡Logrado!' : `<span class="score-val score-passed">${numericAwarded}</span> <span class="score-denom">/ ${item.maxPoints} pts</span>`)
@@ -1130,11 +1273,10 @@ function renderStudentEvaluations() {
 
       const statusChip = hasScore
         ? '<span class="expiry-chip chip-active">● Calificada</span>'
-        : '<span class="expiry-chip chip-none">○ Pendiente</span>';
+        : (isNextUp ? '<span class="expiry-chip ux-chip-next">🎯 Tu próximo paso</span>' : '<span class="expiry-chip chip-none">○ Pendiente</span>');
 
-      // Tarjeta plana del estudiante (sin exam-badge interna)
       const card = document.createElement('div');
-      card.className = `unit-card ${hasScore ? 'unit-card-graded' : 'unit-card-pending'}`;
+      card.className = `unit-card ${hasScore ? 'unit-card-graded' : 'unit-card-pending'} ${isNextUp ? 'ux-unit-card-next' : ''}`;
       card.innerHTML = `
         <div>
           <div class="unit-card-top">
@@ -1156,6 +1298,11 @@ function renderStudentEvaluations() {
             <div class="unit-card-score">${scoreHtml}</div>
             <div class="unit-card-status">${statusChip}</div>
           </div>
+          <div class="ux-unit-practice-row">
+            <button type="button" class="ux-unit-practice-btn" onclick="jumpToPracticeLesson('${practiceCode}')">
+              📖 Practicar ${practiceCode}
+            </button>
+          </div>
         </div>
       `;
       grid.appendChild(card);
@@ -1169,9 +1316,9 @@ function renderStudentEvaluations() {
     container.innerHTML = `
       <div class="empty-filter-box">
         <div style="font-size: 36px; margin-bottom: 8px;">🔍</div>
-        <h4 style="font-family: var(--font-display); font-size: 18px; margin: 0 0 6px 0;">No hay evaluaciones con este filtro</h4>
-        <p style="font-size: 13px; color: var(--color-muted); margin: 0 0 14px 0;">Prueba seleccionando «Todas» o borrando el texto de búsqueda.</p>
-        <button type="button" class="btn-sm-action" onclick="document.getElementById('studentEvalSearchInput').value=''; setStudentEvalFilter('all');">
+        <h4 style="font-family: var(--font-display); font-size: 18px; margin: 0 0 6px 0;">No hay evaluaciones en esta vista</h4>
+        <p style="font-size: 13px; color: var(--color-muted); margin: 0 0 14px 0;">Prueba seleccionando «Ver Todas las Etapas» o el filtro «Todas».</p>
+        <button type="button" class="btn-sm-action" onclick="document.getElementById('studentEvalSearchInput').value=''; studentSelectedStageIdx='all'; setStudentEvalFilter('all');">
           Ver todas las evaluaciones
         </button>
       </div>
@@ -1384,6 +1531,7 @@ let teacherActiveGradingLevel = null;
 async function selectStudent(studentId) {
   selectedStudent = teacherStudentsList.find(s => s.id === studentId);
   if (!selectedStudent) return;
+  teacherSelectedStageIdx = 'auto';
 
   renderStudentList();
 
@@ -1555,20 +1703,83 @@ function applyTeacherEvalFilter() {
       if (matchesFilter) visibleInStage++;
     });
 
+    if (searchQuery) {
+      stageBlock.classList.remove('ux-stage-hidden');
+    }
     stageBlock.classList.toggle('hidden-by-filter', visibleInStage === 0);
   });
 }
 
 function renderTeacherCurriculumGrades(config) {
   const grid = document.getElementById('teacherUnitsGrid');
+  const stageTabsBar = document.getElementById('teacherStageTabsBar');
   if (!grid) return;
   grid.innerHTML = '';
 
   let totalPts = 0;
+  let firstIncompleteStageIdx = 0;
+  let foundIncomplete = false;
+
+  config.stages.forEach((st, sIdx) => {
+    let stGraded = 0;
+    st.items.forEach(it => {
+      const v = selectedStudentGrades[it.number];
+      if (v !== undefined && v !== null && v !== '') stGraded++;
+    });
+    if (!foundIncomplete && stGraded < st.items.length) {
+      firstIncompleteStageIdx = sIdx;
+      foundIncomplete = true;
+    }
+  });
+
+  const effectiveTeacherStage = teacherSelectedStageIdx === 'auto' ? firstIncompleteStageIdx : teacherSelectedStageIdx;
+
+  if (stageTabsBar) {
+    stageTabsBar.classList.remove('hidden');
+    stageTabsBar.innerHTML = '';
+    let globalGraded = 0;
+    let globalTotal = 0;
+
+    config.stages.forEach((st, idx) => {
+      let stGraded = 0;
+      st.items.forEach(it => {
+        globalTotal++;
+        const v = selectedStudentGrades[it.number];
+        if (v !== undefined && v !== null && v !== '') {
+          stGraded++;
+          globalGraded++;
+        }
+      });
+      const isDone = stGraded === st.items.length && st.items.length > 0;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `ux-stage-tab-btn ${effectiveTeacherStage === idx ? 'active' : ''} ${isDone ? 'stage-completed' : ''}`;
+      btn.onclick = () => setTeacherStageTab(idx);
+      btn.innerHTML = `
+        <span class="ux-stage-tab-num">${isDone ? '✅' : `Etapa ${idx + 1}`}</span>
+        <span class="ux-stage-tab-name">${st.name.replace(/^STAGE \d+:\s*/i, '')}</span>
+        <span class="ux-stage-tab-count">${stGraded}/${st.items.length}</span>
+      `;
+      stageTabsBar.appendChild(btn);
+    });
+
+    const btnAll = document.createElement('button');
+    btnAll.type = 'button';
+    btnAll.className = `ux-stage-tab-btn ${effectiveTeacherStage === 'all' ? 'active' : ''}`;
+    btnAll.onclick = () => setTeacherStageTab('all');
+    btnAll.innerHTML = `
+      <span class="ux-stage-tab-num">📋</span>
+      <span class="ux-stage-tab-name">Todas las Etapas</span>
+      <span class="ux-stage-tab-count">${globalGraded}/${globalTotal}</span>
+    `;
+    stageTabsBar.appendChild(btnAll);
+  }
 
   config.stages.forEach((stage, stageIdx) => {
     const stageBlock = document.createElement('div');
-    stageBlock.className = 'teacher-stage-block';
+    const isHiddenStage = effectiveTeacherStage !== 'all' && stageIdx !== effectiveTeacherStage;
+    stageBlock.className = `teacher-stage-block ${isHiddenStage ? 'ux-stage-hidden' : ''}`;
+    stageBlock.setAttribute('data-stage-idx', String(stageIdx));
 
     let stageEarned = 0;
     let stageMax = 0;
@@ -1594,7 +1805,7 @@ function renderTeacherCurriculumGrades(config) {
           </div>
         </div>
         <div class="student-stage-stats">
-          <div style="font-size: 13px; color: var(--color-primary-light); font-weight: 700;">
+          <div class="ux-teacher-stage-pts-text">
             Puntaje: <span id="stage_pts_${stageIdx}">${stageEarned} / ${stageMax} pts</span>
           </div>
           <div class="stage-mini-bar-track">
@@ -1620,7 +1831,10 @@ function renderTeacherCurriculumGrades(config) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 
-      // Tarjeta plana del docente (el docente escribe directamente la nota; sin botones 100, 50, 0, X ni cajitas anidadas)
+      const pts50 = Math.round(item.maxPoints * 0.5);
+      const pts75 = Math.round(item.maxPoints * 0.75);
+      const pts100 = item.maxPoints;
+
       const box = document.createElement('div');
       box.className = `grade-input-box ${hasScore ? 'graded' : ''}`;
       box.id = `box_grade_${item.number}`;
@@ -1630,7 +1844,7 @@ function renderTeacherCurriculumGrades(config) {
           <div class="grade-box-top-row">
             <div class="unit-meta-pills">
               <span class="unit-num-pill">#${numFormatted}</span>
-              <span class="unit-lesson-pill">${item.lesson}</span>
+              <span class="unit-lesson-pill">📘 ${item.lesson}</span>
             </div>
             <span class="eval-badge-type ${typeBadgeClass}">${typeIcon} ${item.type}</span>
           </div>
@@ -1642,7 +1856,11 @@ function renderTeacherCurriculumGrades(config) {
             <span class="grade-state-indicator" id="grade_state_${item.number}">
               ${hasScore ? '✅ Calificada' : '⏳ Sin calificar'}
             </span>
-            <span class="grade-max-hint">Máx: ${item.maxPoints} pts</span>
+            <div class="ux-quick-score-pills" title="Asignación rápida">
+              <button type="button" class="ux-preset-btn" onclick="quickSetGrade(${item.number}, ${pts50})">50%</button>
+              <button type="button" class="ux-preset-btn" onclick="quickSetGrade(${item.number}, ${pts75})">75%</button>
+              <button type="button" class="ux-preset-btn ux-preset-max" onclick="quickSetGrade(${item.number}, ${pts100})">100%</button>
+            </div>
           </div>
 
           <div class="grade-input-action-row">
@@ -1650,7 +1868,7 @@ function renderTeacherCurriculumGrades(config) {
               <input type="number" step="0.5" min="0" max="${item.maxPoints}" 
                      id="grade_input_${item.number}" 
                      value="${currentPts}" 
-                     placeholder="Escribir nota..."
+                     placeholder="Nota..."
                      data-item-number="${item.number}"
                      data-item-title="${safeAttrTitle}"
                      data-item-type="${item.type}"

@@ -112,6 +112,37 @@
 
         <!-- SUBSECCIÓN 1: EVALUACIONES Y NOTAS -->
         <div id="studentTabGrades">
+          <!-- NUEVO HERO GUIADO: "TU PRÓXIMO PASO" (CONECTA NOTAS ↔ LECCIÓN A PRACTICAR) -->
+          <div id="studentNextStepBanner" class="ux-next-step-banner">
+            <div class="ux-next-step-left">
+              <span class="ux-next-eyebrow">🎯 TU RUTA DE APRENDIZAJE HOY</span>
+              <h2 id="studentNextStepTitle" class="ux-next-title">Próximo Paso: Lesson 1 — The English Alphabet</h2>
+              <p id="studentNextStepDesc" class="ux-next-desc">
+                Practica los ejercicios interactivos de esta lección antes de presentar tu evaluación con tu profesor.
+              </p>
+              <div class="ux-next-actions">
+                <button type="button" id="studentNextStepPracticeBtn" class="lq-btn-3d lq-btn-indigo ux-next-btn-main" onclick="jumpToPracticeLesson('L1')">
+                  📖 Practicar Lección L1 →
+                </button>
+                <button type="button" class="lq-btn-3d lq-btn-neutral ux-next-btn-sec" onclick="switchStudentTab('games')">
+                  🎮 Reto en Juegos
+                </button>
+              </div>
+            </div>
+            <div class="ux-next-step-right">
+              <div class="ux-ring-box">
+                <svg class="ux-ring-svg" viewBox="0 0 100 100">
+                  <circle class="ux-ring-track" cx="50" cy="50" r="40"></circle>
+                  <circle id="studentHeroRingFill" class="ux-ring-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
+                </svg>
+                <div class="ux-ring-center">
+                  <span id="studentHeroRingPct" class="ux-ring-pct">0%</span>
+                  <span class="ux-ring-sub">Avance</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Tarjeta Hero de Progreso y Resumen Digerible -->
           <div id="studentProgressCard" class="progress-summary-card">
             <div class="progress-header">
@@ -184,6 +215,11 @@
               <input type="text" id="studentEvalSearchInput" class="form-control eval-search-input" placeholder="🔍 Buscar evaluación o lección (ej. L3, Final)..." oninput="renderStudentEvaluations()">
             </div>
 
+          </div>
+
+          <!-- Selector de Etapas sin Scroll Largo (Etapa 1 · Etapa 2 · Etapa 3 · Todas) -->
+          <div id="studentStageTabsBar" class="ux-stage-tabs-bar" aria-label="Seleccionar Etapa Curricular">
+            <!-- Renderizado dinámicamente por renderStudentEvaluations() -->
           </div>
 
           <!-- Cuadrícula de Evaluaciones Reales por Etapas -->
@@ -728,6 +764,22 @@
 
           </div>
         </div>
+
+        <!-- BARRA DE NAVEGACIÓN INFERIOR FIJA PARA MÓVILES (ESTUDIANTE) -->
+        <nav class="ux-mobile-bottom-nav" aria-label="Navegación Móvil Estudiante">
+          <button type="button" class="ux-mob-nav-item active" id="mobNavGrades" onclick="switchStudentTab('grades')">
+            <span class="ux-mob-nav-icon">📊</span>
+            <span class="ux-mob-nav-label">Mis Notas</span>
+          </button>
+          <button type="button" class="ux-mob-nav-item" id="mobNavExercises" onclick="switchStudentTab('exercises')">
+            <span class="ux-mob-nav-icon">📖</span>
+            <span class="ux-mob-nav-label">Lecciones</span>
+          </button>
+          <button type="button" class="ux-mob-nav-item" id="mobNavGames" onclick="switchStudentTab('games')">
+            <span class="ux-mob-nav-icon">🎮</span>
+            <span class="ux-mob-nav-label">Juegos</span>
+          </button>
+        </nav>
       </section>
 
       <!-- 3. DASHBOARD DEL PROFESOR -->
@@ -757,24 +809,24 @@
             </button>
           </div>
 
-        <!-- BARRA RESUMEN DE ESTADÍSTICAS DEL PROFESOR -->
-        <div class="teacher-metrics-bar">
-          <div class="metric-pill">
+        <!-- BARRA RESUMEN DE ESTADÍSTICAS DEL PROFESOR (FILTROS INTERACTIVOS A 1 CLIC) -->
+        <div class="teacher-metrics-bar ux-clickable-metrics">
+          <button type="button" class="metric-pill active" data-kfilter="all" onclick="quickFilterTeacherExpiry('all')" title="Mostrar todos los estudiantes">
             <span class="metric-number" id="metricTotalStudents">0</span>
-            <span class="metric-label">Estudiantes</span>
-          </div>
-          <div class="metric-pill">
+            <span class="metric-label">👥 Todos los Alumnos</span>
+          </button>
+          <button type="button" class="metric-pill" data-kfilter="active" onclick="quickFilterTeacherExpiry('active')" title="Filtrar estudiantes activos">
             <span class="metric-number metric-active" id="metricActiveStudents">0</span>
-            <span class="metric-label">Activos</span>
-          </div>
-          <div class="metric-pill">
+            <span class="metric-label">🟢 Activos</span>
+          </button>
+          <button type="button" class="metric-pill" data-kfilter="warning" onclick="quickFilterTeacherExpiry('warning')" title="Filtrar estudiantes próximos a vencer">
             <span class="metric-number metric-warning" id="metricWarningStudents">0</span>
-            <span class="metric-label">Por vencer (≤ 7 días)</span>
-          </div>
-          <div class="metric-pill">
+            <span class="metric-label">🟡 Por vencer (≤ 7 días)</span>
+          </button>
+          <button type="button" class="metric-pill" data-kfilter="expired" onclick="quickFilterTeacherExpiry('expired')" title="Filtrar estudiantes caducados">
             <span class="metric-number metric-expired" id="metricExpiredStudents">0</span>
-            <span class="metric-label">Caducados</span>
-          </div>
+            <span class="metric-label">🔴 Caducados</span>
+          </button>
         </div>
 
         <div class="teacher-section">
@@ -877,8 +929,11 @@
 
             </div>
 
+            <!-- SUB-PESTAÑAS HORIZONTALES POR ETAPA PARA EL DOCENTE (SIN SCROLL LARGO) -->
+            <div id="teacherStageTabsBar" class="ux-stage-tabs-bar hidden" aria-label="Seleccionar Etapa a Calificar"></div>
+
             <!-- CUADRÍCULA DE ETAPAS Y EVALUACIONES -->
-            <div id="teacherUnitsGrid" style="margin-top: 18px;">
+            <div id="teacherUnitsGrid" style="margin-top: 14px;">
               <div class="teacher-empty-selection">
                 <div style="font-size: 42px; margin-bottom: 10px;">👨‍🎓</div>
                 <h4 style="font-family: var(--font-display); font-size: 18px; color: #ffffff; margin: 0 0 6px 0;">Ningún estudiante seleccionado</h4>
@@ -1371,12 +1426,12 @@
   <!-- 3. Confetti para celebraciones de racha en Juegos -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <!-- 4. Módulo Oficial de Clases Online -->
-  <script src="assets/js/onlineClasses.js?v=20261029_lx"></script>
+  <script src="assets/js/onlineClasses.js?v=20261030_ux"></script>
   <!-- 5. Módulo Oficial de Juegos Interactivos (Tabla `games` en Supabase) -->
-  <script src="assets/js/studentGames.js?v=20261029_lx"></script>
+  <script src="assets/js/studentGames.js?v=20261030_ux"></script>
   <!-- 6. Módulo Oficial de Ejercicios por Lección (Tabla `lesson_exercises` en Supabase) -->
-  <script src="assets/js/lessonExercises.js?v=20261029_lx"></script>
+  <script src="assets/js/lessonExercises.js?v=20261030_ux"></script>
   <!-- 7. Lógica de la Plataforma -->
-  <script src="assets/js/platform.js?v=20261029_lx"></script>
+  <script src="assets/js/platform.js?v=20261030_ux"></script>
 </body>
 </html>
