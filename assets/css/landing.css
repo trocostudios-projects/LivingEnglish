@@ -1,5 +1,6 @@
 /**
  * Academia Living English - Landing & Hero Section Styles
+ * Refinado bajo principios de Emil Kowalski: tipografía nítida, ratios WCAG y microinteracciones fluidas
  */
 
 /* ==========================================================================
@@ -58,15 +59,14 @@ body.landing-page {
   left: 0;
   width: 100%;
   z-index: 100;
-  background: rgba(3, 16, 44, 0.92);
+  background: rgba(2, 11, 30, 0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   padding: 10px 16px;
-  
-  /* Pequeño bisel inferior para diferenciar claramente del body */
-  border-bottom: 1px solid rgba(112, 166, 255, 0.22);
+  border-bottom: 1px solid var(--color-border);
   box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08);
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  transition: background-color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
 }
 
 @media (min-width: 768px) {
@@ -91,7 +91,7 @@ body.landing-page {
 .desktop-nav {
   display: none;
   align-items: center;
-  gap: 28px;
+  gap: 24px;
 }
 
 @media (min-width: 768px) {
@@ -104,11 +104,13 @@ body.landing-page {
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 14px;
-  color: #f8fafc;
+  color: var(--text-secondary);
   text-decoration: none;
   padding: 8px 12px;
   border-radius: var(--radius-md);
-  transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+  transition: color var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out),
+              transform var(--duration-tap) var(--ease-out);
   display: inline-flex;
   align-items: center;
 }
@@ -120,7 +122,7 @@ body.landing-page {
 }
 
 .nav-link:active {
-  transform: scale(0.96);
+  transform: scale(0.96) !important;
 }
 
 /* Botón de Acción en Cabecera (Rayo Mandarina de Living English) */
@@ -135,7 +137,8 @@ body.landing-page {
   border: 1px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
   box-shadow: var(--inner-highlight);
-  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+  transition: transform var(--duration-tap) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
 }
 
 .site-header .btn-talk:hover:not(:disabled) {
@@ -144,7 +147,7 @@ body.landing-page {
 }
 
 .site-header .btn-talk:active:not(:disabled) {
-  transform: scale(0.96);
+  transform: scale(0.96) !important;
 }
 
 /* Menú Móvil */
@@ -154,14 +157,15 @@ body.landing-page {
   gap: 6px;
   background: rgba(112, 166, 255, 0.12);
   border: 1px solid var(--color-border);
-  color: var(--color-white);
+  color: var(--text-primary);
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
   padding: 7px 16px;
   border-radius: var(--radius-md);
-  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+  transition: transform var(--duration-tap) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
 }
 
 .mobile-menu-btn:hover {
@@ -169,10 +173,8 @@ body.landing-page {
 }
 
 .mobile-menu-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
-
-
 
 @media (min-width: 768px) {
   .mobile-menu-btn {
@@ -183,14 +185,14 @@ body.landing-page {
 .mobile-menu-overlay {
   position: fixed;
   inset: 0;
-  background-color: var(--color-primary);
+  background-color: var(--surface-ground);
   z-index: 100;
   display: flex;
   flex-direction: column;
   padding: 24px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--transition-normal);
+  transition: opacity var(--duration-normal) var(--ease-out);
 }
 
 .mobile-menu-overlay.is-open {
@@ -208,36 +210,45 @@ body.landing-page {
 .mobile-menu-close {
   background: none;
   border: none;
-  color: var(--color-white);
+  color: var(--text-primary);
   font-size: 32px;
   line-height: 1;
   cursor: pointer;
   padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: transform var(--duration-tap) var(--ease-out);
+}
+
+.mobile-menu-close:active {
+  transform: scale(0.92);
 }
 
 .mobile-menu-links {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  margin-top: 60px;
+  gap: 20px;
+  margin-top: 48px;
 }
 
 .mobile-menu-links .nav-link {
-  font-size: 24px;
-  font-weight: 500;
-  color: var(--color-white);
-  text-shadow: none;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .mobile-menu-footer {
   margin-top: auto;
   padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.mobile-menu-footer .btn-talk {
+.mobile-menu-footer .btn-talk,
+.mobile-menu-footer .btn-primary {
   width: 100%;
-  padding: 14px;
-  font-size: 16px;
+  padding: 13px;
+  font-size: 15px;
 }
 
 /* ==========================================================================
@@ -253,17 +264,17 @@ body.landing-page {
 
 .tagline {
   display: inline-block;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em; /* Deliberate uppercase tracking */
   text-transform: uppercase;
-  color: var(--color-white);
-  background: var(--color-primary);
-  padding: 8px 16px;
-  border-radius: var(--radius-md);
-  margin-bottom: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 12px rgba(14, 56, 122, 0.4);
+  color: var(--text-primary);
+  background: var(--surface-panel);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 16px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
 .hero-title {
@@ -272,11 +283,10 @@ body.landing-page {
   font-size: 46px;
   line-height: 1.05;
   text-transform: uppercase;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.03em; /* Negative tracking for large display text */
   margin-bottom: 20px;
   word-break: normal;
   overflow-wrap: break-word;
-  text-shadow: var(--text-shadow-hero);
 }
 
 @media (min-width: 600px) {
@@ -293,29 +303,27 @@ body.landing-page {
 
 @media (min-width: 1024px) {
   .hero-title {
-    font-size: 88px;
+    font-size: 84px;
   }
 }
 
 .hero-title-line1 {
   display: block;
-  color: var(--color-white);
+  color: #ffffff;
 }
 
 .hero-title-line2 {
   display: block;
-  color: var(--color-white);
-  opacity: 0.9;
+  color: #e2e8f0; /* Crisp color without opacity degradation */
 }
 
 .hero-description {
-  font-weight: 500;
+  font-weight: 400;
   font-size: 16px;
-  line-height: 1.5;
-  color: var(--color-white);
-  max-width: 480px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  max-width: 56ch; /* 56 characters reading measure */
   margin-bottom: 32px;
-  text-shadow: var(--text-shadow-contrast);
 }
 
 @media (min-width: 768px) {
@@ -331,24 +339,24 @@ body.landing-page {
 }
 
 /* ==========================================================================
-   Animaciones de Revelado
+   Animaciones de Revelado Físicas (Under 400ms, respetando reduced motion)
    ========================================================================== */
 .reveal-item {
   opacity: 0;
-  transform: translateY(24px);
-  animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform: translateY(16px);
+  animation: revealUp 0.45s var(--ease-out) forwards;
 }
 
 .reveal-delay-1 { animation-delay: 0ms; }
-.reveal-delay-2 { animation-delay: 150ms; }
-.reveal-delay-3 { animation-delay: 300ms; }
-.reveal-delay-4 { animation-delay: 450ms; }
-.reveal-delay-5 { animation-delay: 600ms; }
+.reveal-delay-2 { animation-delay: 80ms; }
+.reveal-delay-3 { animation-delay: 160ms; }
+.reveal-delay-4 { animation-delay: 240ms; }
+.reveal-delay-5 { animation-delay: 320ms; }
 
 @keyframes revealUp {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -364,17 +372,16 @@ body.landing-page {
   }
 }
 
-
 /* ==========================================================================
    Sección de Clases Online en el Landing (Estilo Coherente y Unificado)
    ========================================================================== */
 .online-classes-section {
   position: relative;
-  background: linear-gradient(rgba(6, 20, 48, 0.82), rgba(4, 14, 34, 0.90));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: var(--color-white);
-  padding: clamp(60px, 8vw, 100px) 24px;
+  background: linear-gradient(rgba(4, 20, 52, 0.88), rgba(2, 11, 30, 0.94));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text-primary);
+  padding: clamp(60px, 8vw, 96px) 24px;
   border-top: 1px solid var(--color-border);
 }
 
@@ -388,39 +395,36 @@ body.landing-page {
   align-items: center;
   gap: 8px;
   font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-white);
-  background: var(--color-primary);
-  padding: 8px 16px;
-  border-radius: var(--radius-md);
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  background: var(--surface-panel);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
-  box-shadow: 0 4px 12px rgba(14, 56, 122, 0.4);
-  margin-bottom: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-bottom: 16px;
 }
 
 .section-title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(30px, 4.5vw, 44px);
+  font-size: clamp(28px, 4vw, 42px);
   text-transform: uppercase;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.025em;
   line-height: 1.15;
-  color: var(--color-white);
-  text-shadow: var(--text-shadow-hero);
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
 .section-subtitle {
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: clamp(15px, 2vw, 17px);
-  color: var(--color-white);
-  opacity: 0.92;
-  text-shadow: var(--text-shadow-contrast);
-  max-width: 720px;
+  font-weight: 400;
+  font-size: clamp(15px, 2vw, 16.5px);
+  color: var(--text-secondary);
+  max-width: 65ch;
   line-height: 1.6;
   margin: 0 auto 40px auto;
 }
@@ -433,42 +437,50 @@ body.landing-page {
 }
 
 .online-feature-card {
-  background: var(--color-primary-card);
+  background: var(--surface-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  padding: 26px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   box-shadow: var(--inner-highlight), var(--shadow-card);
-  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+  transition: transform var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .online-feature-card:hover {
   transform: translateY(-2px);
-  border-color: var(--color-border-focus);
-  background-color: var(--color-primary-glass-strong);
+  border-color: rgba(112, 166, 255, 0.38);
+  background-color: var(--surface-card-hover);
+  box-shadow: var(--inner-highlight), var(--shadow-md);
+}
+
+.online-feature-card:active {
+  transform: scale(0.985);
 }
 
 .online-feature-icon {
-  font-size: 30px;
+  font-size: 26px;
   margin-bottom: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(112, 166, 255, 0.12);
   border: 1px solid var(--color-border);
 }
 
 .online-feature-title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 19px;
-  color: var(--color-white);
-  text-shadow: var(--text-shadow-subtle);
+  font-size: 18px;
+  color: var(--text-primary);
   margin-bottom: 8px;
+  letter-spacing: -0.015em;
 }
 
 .online-feature-desc {
@@ -476,58 +488,54 @@ body.landing-page {
   font-weight: 400;
   font-size: 14px;
   line-height: 1.55;
-  color: var(--color-white);
-  opacity: 0.9;
-  text-shadow: var(--text-shadow-subtle);
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .online-cta-banner {
-  background: var(--color-primary-glass-strong);
+  background: var(--surface-panel);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-2xl);
-  padding: clamp(28px, 5vw, 40px);
+  border-radius: var(--radius-xl);
+  padding: clamp(24px, 4vw, 36px);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 24px;
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  box-shadow: var(--inner-highlight), var(--shadow-lg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .online-cta-title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 26px;
-  color: var(--color-white);
-  text-shadow: var(--text-shadow-hero);
+  font-size: 24px;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
 
 .online-cta-desc {
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: 15px;
+  font-size: 14.5px;
   line-height: 1.55;
-  color: var(--color-white);
-  opacity: 0.92;
+  color: var(--text-secondary);
   margin: 0;
-  max-width: 580px;
-  text-shadow: var(--text-shadow-subtle);
+  max-width: 58ch;
 }
 
 /* ==========================================================================
    Sección de Sedes y Footer
    ========================================================================== */
 .sedes-section {
-  background: linear-gradient(rgba(4, 14, 34, 0.88), rgba(3, 10, 24, 0.94));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 60px 24px;
+  background: linear-gradient(rgba(2, 11, 30, 0.94), rgba(1, 7, 22, 0.98));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 56px 24px;
   border-top: 1px solid var(--color-border-subtle);
-  color: var(--color-white);
+  color: var(--text-primary);
 }
 
 .sedes-container {
@@ -537,52 +545,43 @@ body.landing-page {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 30px;
+  gap: 32px;
 }
 
 .sedes-title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 24px;
-  color: var(--color-white);
+  font-size: 22px;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
   margin-bottom: 8px;
-  text-shadow: var(--text-shadow-subtle);
 }
 
 .sedes-desc {
   font-family: var(--font-body);
-  color: var(--color-white);
-  opacity: 0.85;
+  color: var(--text-secondary);
   font-size: 14px;
-  max-width: 450px;
-  line-height: 1.5;
+  max-width: 48ch;
+  line-height: 1.55;
   margin-bottom: 0;
 }
 
 .landing-footer {
-  background: rgba(3, 10, 24, 0.96);
+  background: rgba(1, 7, 22, 0.98);
   border-top: 1px solid var(--color-border-subtle);
-  padding: 32px 24px;
+  padding: 28px 24px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-muted);
   font-size: 13px;
   font-family: var(--font-body);
 }
 
 .landing-footer a {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
   text-decoration: none;
-  transition: color var(--transition-fast);
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .landing-footer a:hover {
-  color: var(--color-white);
-}
-
-.online-feature-card:active {
-  transform: scale(0.985);
-}
-
-.mobile-menu-btn:active {
-  transform: scale(0.95);
+  color: var(--text-primary);
 }

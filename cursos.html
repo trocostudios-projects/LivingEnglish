@@ -998,7 +998,7 @@
 
   <!-- MODAL PARA QUE EL DOCENTE REGISTRE NUEVOS ESTUDIANTES (COMPACTO) -->
   <div id="newStudentModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 16px; overflow-y: auto;">
-    <div class="auth-card" style="max-width: 520px; width: 100%; margin: auto; background: var(--color-primary-glass-strong); border: 1px solid rgba(255,255,255,0.4); padding: 22px;">
+    <div class="auth-card" style="max-width: 520px; width: 100%; margin: auto; background: var(--color-primary-glass-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-lg), var(--inner-highlight); padding: 22px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h3 class="page-title" style="font-size: 20px; margin: 0;">➕ Registrar Nuevo Estudiante</h3>
         <button type="button" onclick="toggleNewStudentModal(false)" style="background: none; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">&times;</button>
@@ -1067,7 +1067,7 @@
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <button type="submit" id="btnSaveNewStudent" class="btn-primary" style="flex: 1; padding: 10px; background: #22c55e; color: #022c22; font-weight: 700; font-size: 14px;">Guardar Alumno</button>
+          <button type="submit" id="btnSaveNewStudent" class="btn-success" style="flex: 1; padding: 10px; font-size: 14px;">Guardar Alumno</button>
           <button type="button" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 14px;" onclick="toggleNewStudentModal(false)">Cancelar</button>
         </div>
       </form>
@@ -1123,7 +1123,7 @@
         </div>
 
         <div style="display: flex; gap: 10px;">
-          <button type="submit" id="btnConfirmRenew" class="btn-primary" style="flex: 1; padding: 10px; background: #22c55e; color: #022c22; font-weight: 700; font-size: 14px;">
+          <button type="submit" id="btnConfirmRenew" class="btn-success" style="flex: 1; padding: 10px; font-size: 14px;">
             Confirmar Renovación
           </button>
           <button type="button" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 14px;" onclick="toggleRenewLevelModal(false)">
@@ -1136,7 +1136,7 @@
 
   <!-- MODAL PARA EDITAR ESTUDIANTE / VIGENCIA DE MATRÍCULA -->
   <div id="editStudentModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 998; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
-    <div class="auth-card" style="max-width: 520px; width: 100%; margin: 20px auto; background: var(--color-primary-glass-strong); border: 1px solid rgba(255,255,255,0.4);">
+    <div class="auth-card" style="max-width: 520px; width: 100%; margin: 20px auto; background: var(--color-primary-glass-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-lg), var(--inner-highlight);">
       <h3 class="page-title" style="font-size: 22px; margin-bottom: 6px;">✏️ Editar Información del Estudiante</h3>
       <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 20px;">
         Actualiza los datos académicos o renueva el acceso a la plataforma.
@@ -1216,7 +1216,7 @@
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <a href="https://wa.me/573000000000?text=Hola,%20mi%20acceso%20a%20la%20plataforma%20de%20Living%20English%20ha%20caducado%20y%20deseo%20renovarlo" target="_blank" rel="noopener noreferrer" class="btn-primary" style="background: #22c55e; color: #022c22; text-decoration: none;">
+        <a href="https://wa.me/573000000000?text=Hola,%20mi%20acceso%20a%20la%20plataforma%20de%20Living%20English%20ha%20caducado%20y%20deseo%20renovarlo" target="_blank" rel="noopener noreferrer" class="btn-success" style="text-decoration: none;">
           💬 Contactar por WhatsApp para Renovar
         </a>
         <button type="button" class="btn-secondary" onclick="logoutFromExpired()">
@@ -1225,13 +1225,10 @@
       </div>
     </div>
   </div>
-      </form>
-    </div>
-  </div>
 
   <!-- MODAL DE RECUPERACIÓN DE CONTRASEÑA -->
   <div id="recoveryModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px;">
-    <div class="auth-card" style="max-width: 440px; width: 100%; margin: 0; background: var(--color-primary-glass-strong); border: 1px solid rgba(255,255,255,0.4);">
+    <div class="auth-card" style="max-width: 440px; width: 100%; margin: 0; background: var(--color-primary-glass-strong); border: 1px solid var(--color-border); box-shadow: var(--shadow-lg), var(--inner-highlight);">
       <h3 class="page-title" style="font-size: 22px; margin-bottom: 8px;">🔑 Recuperar Contraseña</h3>
       <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 18px; line-height: 1.5;">
         Ingresa tu correo institucional registrado y te enviaremos un enlace oficial para restablecer tu contraseña.
@@ -1265,7 +1262,7 @@
           <input type="password" id="updateNewPass" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
         </div>
 
-        <button type="submit" id="btnUpdatePassword" class="btn-primary" style="background: #22c55e; color: #022c22;">Guardar y Continuar</button>
+        <button type="submit" id="btnUpdatePassword" class="btn-success" style="width: 100%;">Guardar y Continuar</button>
       </form>
     </div>
   </div>

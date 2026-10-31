@@ -2061,7 +2061,10 @@ body.student-light-theme .btn-logout:hover,
 }
 
 #studentDashboard .page-description {
-  color: #64748b;
+  color: #475569;
+  font-weight: 500;
+  max-width: 65ch;
+  line-height: 1.6;
 }
 
 .student-level-pill-box {
@@ -2079,7 +2082,7 @@ body.student-light-theme .btn-logout:hover,
 }
 
 .student-level-pill-label {
-  color: #64748b;
+  color: #475569;
   font-size: 12px;
   margin: 0;
 }
@@ -2188,7 +2191,7 @@ body.student-light-theme .btn-logout:hover,
 }
 
 #studentDashboard .student-kpi-label {
-  color: #64748b;
+  color: #475569;
 }
 
 #studentDashboard .student-kpi-value {
@@ -2260,7 +2263,7 @@ body.student-light-theme .btn-logout:hover,
 }
 
 #studentDashboard .student-stage-subtitle {
-  color: #64748b;
+  color: #475569;
 }
 
 #studentDashboard .student-stage-pts {
@@ -2323,7 +2326,7 @@ body.student-light-theme .btn-logout:hover,
 }
 
 #studentDashboard .unit-card-score .score-denom {
-  color: #64748b;
+  color: #475569;
 }
 
 #studentDashboard .badge-written {
@@ -2498,9 +2501,9 @@ body.student-light-theme .btn-logout:hover,
   font-family: 'Bubblegum Sans', var(--font-display), cursive;
   font-size: 15px;
   font-weight: 700;
-  color: #64748b;
+  color: #475569;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   touch-action: manipulation;
 }
 
@@ -2542,7 +2545,7 @@ body.student-light-theme .btn-logout:hover,
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .lq-level-btn:hover {
@@ -2654,7 +2657,7 @@ body.student-light-theme .btn-logout:hover,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s ease;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .lq-sound-btn:hover {
@@ -2692,9 +2695,9 @@ body.student-light-theme .btn-logout:hover,
   align-items: center;
   justify-content: center;
   gap: 4px;
-  color: #64748b;
+  color: #475569;
   cursor: pointer;
-  transition: all 0.16s ease;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   touch-action: manipulation;
 }
 
@@ -3168,7 +3171,7 @@ body.student-light-theme .btn-logout:hover,
   font-size: 30px;
   font-weight: 700;
   color: #cbd5e1;
-  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
 
 .lq-speller-slot.filled {
@@ -3489,7 +3492,7 @@ body.student-light-theme .btn-logout:hover,
   font-weight: 800;
   font-size: 20px;
   color: #4338ca;
-  transition: all 0.2s ease;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .lq-timer-danger {
@@ -3520,7 +3523,7 @@ body.student-light-theme .btn-logout:hover,
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #64748b;
+  color: #475569;
   display: block;
 }
 
@@ -3577,7 +3580,7 @@ body.student-light-theme .btn-logout:hover,
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .lq-audio-btn:hover {
@@ -3851,7 +3854,7 @@ body.student-light-theme .btn-logout:hover,
   gap: 10px;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .lq-bubble-area-correct {
@@ -4606,7 +4609,7 @@ body.student-light-theme .btn-logout:hover,
   font-size: 13px;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .lx-back-btn:hover {
@@ -5046,7 +5049,7 @@ body.student-light-theme .btn-logout:hover,
   border-radius: 18px;
   padding: 13px 16px;
   cursor: pointer;
-  transition: all 0.16s ease;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   box-shadow: 0 4px 0 #cbd5e1;
   text-align: left;
 }
@@ -5147,7 +5150,7 @@ body.student-light-theme .btn-logout:hover,
   font-size: 12.5px;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -5179,7 +5182,10 @@ body:has(#teacherDashboard:not(.hidden)),
 }
 
 #teacherDashboard .page-description {
-  color: #475569 !important;
+  color: #334155 !important;
+  font-weight: 500;
+  max-width: 65ch;
+  line-height: 1.6;
 }
 
 #teacherDashboard .student-tabs-wrapper {
@@ -5291,7 +5297,7 @@ body:has(#teacherDashboard:not(.hidden)),
   font-family: var(--font-display) !important;
   font-size: 13px !important;
   font-weight: 700 !important;
-  color: #475569 !important;
+  color: #334155 !important;
   line-height: 1.3 !important;
   margin: 0 !important;
   letter-spacing: 0.02em !important;
@@ -5511,18 +5517,98 @@ body:has(#teacherDashboard:not(.hidden)),
 }
 
 #teacherDashboard .grade-input-wrapper {
-  background: #f8fafc !important;
-  border: 2px solid #94a3b8 !important;
+  background: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
   border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out) !important;
+  display: flex !important;
+  align-items: center !important;
+  position: relative !important;
 }
 
-#teacherDashboard .grade-input-wrapper input[type="number"] {
+#teacherDashboard .grade-input-wrapper:focus-within {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
+  background: #ffffff !important;
+}
+
+#teacherDashboard .grade-input-box input,
+#teacherDashboard .grade-input-wrapper input,
+#teacherDashboard .grade-input-action-row .grade-input-wrapper input,
+#teacherDashboard input[id^="grade_input_"] {
+  width: 100% !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
   color: #0f172a !important;
+  font-family: var(--font-body) !important;
+  font-size: 15px !important;
   font-weight: 800 !important;
+  line-height: 1.2 !important;
+  padding: 8px 48px 8px 12px !important;
+  -moz-appearance: textfield;
+}
+
+#teacherDashboard .grade-input-box input:focus,
+#teacherDashboard .grade-input-wrapper input:focus,
+#teacherDashboard input[id^="grade_input_"]:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+#teacherDashboard .grade-input-box input::placeholder,
+#teacherDashboard .grade-input-wrapper input::placeholder {
+  color: #94a3b8 !important;
+  font-weight: 500 !important;
 }
 
 #teacherDashboard .grade-input-suffix {
+  position: absolute !important;
+  right: 12px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
   color: #475569 !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
+#teacherDashboard .grade-card-footer {
+  border-top: 1px solid #f1f5f9 !important;
+}
+
+#teacherDashboard .btn-save-grade-compact {
+  padding: 8px 14px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #1d4ed8 !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
+  cursor: pointer;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out) !important;
+}
+
+#teacherDashboard .btn-save-grade-compact:hover {
+  background: #1d4ed8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35) !important;
+}
+
+#teacherDashboard .btn-save-grade-compact:active {
+  transform: scale(0.96) !important;
+}
+
+#teacherDashboard .grade-input-box.modified .btn-save-grade-compact {
+  background: #f59e0b !important;
+  color: #ffffff !important;
+  border-color: #d97706 !important;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.35) !important;
 }
 
 #teacherDashboard .teacher-empty-selection {
@@ -5554,7 +5640,7 @@ body:has(#teacherDashboard:not(.hidden)),
   font-size: 11px;
   font-weight: 800;
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: transform var(--duration-tap) var(--ease-out), background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
 
 .ux-preset-btn:hover {
@@ -5646,4 +5732,74 @@ body:has(#teacherDashboard:not(.hidden)),
   #teacherDashboard .selected-student-header {
     position: static;
   }
+}
+
+
+/* ==========================================================================
+   MICROINTERACCIONES FÍSICAS REFINADAS (FILOSOFÍA EMIL KOWALSKI)
+   Feedback inmediato al tacto/click (active: scale 0.96 - 0.985)
+   ========================================================================== */
+.metric-pill:active {
+  transform: scale(0.98) !important;
+}
+
+.ux-next-btn-main:active {
+  transform: scale(0.97) !important;
+}
+
+.ux-next-btn-sec:active {
+  transform: scale(0.97) !important;
+}
+
+.ux-stage-tab-btn:active {
+  transform: scale(0.98) !important;
+}
+
+.ux-unit-practice-btn:active {
+  transform: scale(0.97) !important;
+}
+
+.ux-preset-btn:active {
+  transform: scale(0.94) !important;
+}
+
+.lq-audience-btn:active {
+  transform: scale(0.97) !important;
+}
+
+.lq-level-btn:active {
+  transform: scale(0.97) !important;
+}
+
+.kids-nav-tab:active,
+.gen-nav-tab:active {
+  transform: scale(0.97) !important;
+}
+
+.lq-sound-btn:active {
+  transform: scale(0.95) !important;
+}
+
+.lq-audio-btn:active {
+  transform: scale(0.96) !important;
+}
+
+.lx-back-btn:active {
+  transform: scale(0.97) !important;
+}
+
+.btn-preset-date:active {
+  transform: scale(0.95) !important;
+}
+
+.teacher-student-item:active {
+  transform: scale(0.99) !important;
+}
+
+.student-tab-pill:active {
+  transform: scale(0.97) !important;
+}
+
+.eval-filter-btn:active {
+  transform: scale(0.96) !important;
 }

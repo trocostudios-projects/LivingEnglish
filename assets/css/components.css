@@ -9,28 +9,33 @@
 .brand-logo-link {
   display: inline-flex;
   align-items: center;
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
 .brand-logo-img {
-  height: 68px;
+  height: 64px;
   width: auto;
   object-fit: contain;
   filter: var(--shadow-logo);
-  transition: transform var(--transition-fast);
+  transition: transform var(--duration-fast) var(--ease-out);
 }
 
 .brand-logo-link:hover .brand-logo-img {
   transform: scale(1.02);
 }
 
+.brand-logo-link:active .brand-logo-img {
+  transform: scale(0.98);
+}
+
 @media (min-width: 768px) {
   .brand-logo-img {
-    height: 76px;
+    height: 72px;
   }
 }
 
 /* ==========================================================================
-   Botones Profesionales
+   Botones Profesionales & Microinteracciones (Filosofía Emil Kowalski)
    ========================================================================== */
 .btn-primary {
   display: inline-flex;
@@ -42,12 +47,17 @@
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 14px;
-  padding: 12px 24px;
-  border-radius: var(--radius-lg);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(112, 166, 255, 0.35);
   cursor: pointer;
-  box-shadow: var(--inner-highlight), 0 2px 8px rgba(0, 43, 118, 0.4);
-  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  box-shadow: var(--inner-highlight), 0 2px 8px rgba(0, 43, 118, 0.35);
+  transition: transform var(--duration-tap) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -57,29 +67,55 @@
   box-shadow: var(--inner-highlight), 0 4px 14px rgba(0, 96, 248, 0.38);
 }
 
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97) !important;
+  box-shadow: var(--inner-highlight-subtle), 0 1px 4px rgba(0, 43, 118, 0.25);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   background-color: rgba(4, 20, 52, 0.7);
-  color: #e2e8f0;
+  color: var(--text-secondary);
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 14px;
-  padding: 12px 24px;
-  border-radius: var(--radius-lg);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   cursor: pointer;
-  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   box-shadow: var(--inner-highlight), 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform var(--duration-tap) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .btn-secondary:hover:not(:disabled) {
   background-color: rgba(9, 36, 92, 0.85);
-  border-color: rgba(112, 166, 255, 0.4);
-  color: #ffffff;
+  border-color: rgba(112, 166, 255, 0.35);
+  color: var(--text-primary);
   transform: translateY(-1px);
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: scale(0.97) !important;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
 .btn-talk {
@@ -92,17 +128,24 @@
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 13px;
-  padding: 8px 18px;
-  border-radius: var(--radius-lg);
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(112, 166, 255, 0.3);
   cursor: pointer;
   box-shadow: var(--inner-highlight), 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+  transition: transform var(--duration-tap) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .btn-talk:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
   transform: translateY(-1px);
+}
+
+.btn-talk:active:not(:disabled) {
+  transform: scale(0.97) !important;
 }
 
 /* Botón de Energía Acento (Inspirado en el rayo ⚡ de Living English) */
@@ -117,12 +160,16 @@
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 14px;
-  padding: 11px 22px;
-  border-radius: var(--radius-lg);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
   box-shadow: var(--inner-highlight), 0 2px 10px rgba(248, 120, 0, 0.35);
-  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  transition: transform var(--duration-tap) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .btn-orange:hover:not(:disabled),
@@ -132,31 +179,92 @@
   box-shadow: var(--inner-highlight), 0 4px 16px rgba(248, 120, 0, 0.45);
 }
 
+.btn-orange:active:not(:disabled),
+.btn-accent:active:not(:disabled) {
+  transform: scale(0.97) !important;
+}
+
+/* Botón Semántico de Éxito / Guardar / Confirmar */
+.btn-success {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--color-success);
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  box-shadow: var(--inner-highlight), 0 2px 10px rgba(16, 185, 129, 0.35);
+  transition: transform var(--duration-tap) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: var(--color-success-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--inner-highlight), 0 4px 16px rgba(16, 185, 129, 0.45);
+}
+
+.btn-success:active:not(:disabled) {
+  transform: scale(0.97) !important;
+}
+
+/* Enlaces de Acción Textual */
+.btn-link-action {
+  background: none;
+  border: none;
+  color: var(--color-primary-light);
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
+}
+
+.btn-link-action:hover {
+  color: #ffffff;
+  background-color: rgba(112, 166, 255, 0.12);
+}
+
+.btn-link-action:active {
+  transform: scale(0.96);
+}
+
 /* ==========================================================================
    Tipografía de Páginas & Jerarquía Editorial
    ========================================================================== */
 .page-title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 30px;
+  font-size: 28px;
   line-height: 1.15;
   margin-bottom: 6px;
-  color: #f8fafc;
-  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  letter-spacing: -0.025em; /* Tracking negativo sutil para títulos según Emil */
 }
 
 @media (min-width: 768px) {
   .page-title {
-    font-size: 38px;
+    font-size: 34px;
   }
 }
 
 .page-description {
-  font-size: 14px;
-  font-weight: 500;
-  color: #94a3b8;
-  line-height: 1.5;
-  margin-bottom: 22px;
+  font-size: 14.5px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  max-width: 65ch; /* Ancho óptimo de lectura */
+  letter-spacing: -0.005em;
 }
 
 /* ==========================================================================
@@ -168,40 +276,80 @@
 
 .form-group label {
   display: block;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   margin-bottom: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #94a3b8;
+  letter-spacing: 0.05em; /* Tracking positivo deliberado en uppercase */
+  color: var(--text-muted);
 }
 
 .form-control {
   width: 100%;
-  padding: 11px 15px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
   background: var(--surface-input);
-  color: #f8fafc;
+  color: var(--text-primary);
   font-size: 14px;
   font-family: inherit;
   outline: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+  box-sizing: border-box;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
 }
 
 .form-control:focus {
-  background: rgba(11, 23, 48, 0.9);
-  border-color: rgba(96, 165, 250, 0.65);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  background: rgba(11, 23, 48, 0.95);
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px rgba(0, 96, 248, 0.22);
 }
 
 .form-control::placeholder {
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 400;
 }
 
+/* Blindaje para <select> y sus <option> en todos los navegadores (Evita texto blanco sobre fondo blanco) */
+.form-control option {
+  background-color: #061a44;
+  color: #f8fafc;
+  padding: 8px;
+}
+
+/* Adaptación de controles cuando el panel está en Modo Claro */
+body.student-light-theme .form-control,
+body:has(#studentDashboard:not(.hidden)) .form-control,
+body:has(#teacherDashboard:not(.hidden)) .form-control {
+  background: #ffffff;
+  border-color: var(--color-border-light-strong);
+  color: var(--text-light-primary);
+}
+
+body.student-light-theme .form-control:focus,
+body:has(#studentDashboard:not(.hidden)) .form-control:focus,
+body:has(#teacherDashboard:not(.hidden)) .form-control:focus {
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+body.student-light-theme .form-control option,
+body:has(#studentDashboard:not(.hidden)) .form-control option,
+body:has(#teacherDashboard:not(.hidden)) .form-control option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+body.student-light-theme .form-group label,
+body:has(#studentDashboard:not(.hidden)) .form-group label,
+body:has(#teacherDashboard:not(.hidden)) .form-group label {
+  color: var(--text-light-muted);
+}
+
 /* ==========================================================================
-   Notificaciones Toast
+   Notificaciones Toast (Sonner Philosophy)
    ========================================================================== */
 .toast-container {
   position: fixed;
@@ -210,7 +358,7 @@
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   max-width: 380px;
   pointer-events: none;
 }
@@ -218,15 +366,16 @@
 .toast {
   padding: 12px 18px;
   border-radius: var(--radius-lg);
-  color: #f8fafc;
+  color: var(--text-primary);
   background: #0d1b36;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow-lg), var(--inner-highlight);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 500;
   opacity: 0;
-  transform: translateY(12px) scale(0.97);
-  transition: transform var(--duration-normal) var(--ease-out), opacity var(--duration-fast) var(--ease-out);
+  transform: translateY(10px) scale(0.97); /* Nunca animate from scale(0) */
+  transition: transform var(--duration-fast) var(--ease-out),
+              opacity var(--duration-fast) var(--ease-out);
   pointer-events: auto;
 }
 
@@ -248,29 +397,20 @@
 }
 
 /* ==========================================================================
-   Microinteracciones y Feedback Táctil (Emil Kowalski Framework)
-   ========================================================================== */
-.btn-primary:active:not(:disabled),
-.btn-talk:active:not(:disabled),
-.btn-secondary:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
-/* ==========================================================================
    Animación Física de Modales (Sin scale(0) ni teleport)
    ========================================================================== */
 [id$="Modal"]:not(.hidden),
 [id$="modal"]:not(.hidden) {
   animation: modalBackdropFadeIn var(--duration-fast) var(--ease-out) forwards;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 [id$="Modal"]:not(.hidden) > div,
 [id$="modal"]:not(.hidden) > div {
   animation: modalDialogScaleIn var(--duration-normal) var(--ease-out) forwards;
   transform-origin: center center;
-  box-shadow: var(--inner-highlight), 0 20px 45px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--inner-highlight), var(--shadow-lg);
 }
 
 @keyframes modalBackdropFadeIn {
@@ -285,10 +425,39 @@
 @keyframes modalDialogScaleIn {
   from {
     opacity: 0;
-    transform: scale(0.97) translateY(6px);
+    transform: scale(0.96) translateY(4px); /* Entrada física deliberada */
   }
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
+}
+
+/* Botón de Cierre de Modales */
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: color var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out),
+              transform var(--duration-tap) var(--ease-out);
+}
+
+.modal-close-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-close-btn:active {
+  transform: scale(0.92);
 }
